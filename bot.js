@@ -206,7 +206,6 @@ bot.on('speak', function (data) {
    var userid = data.userid;
    var setlist = null;
    
-   updateIdleTime(userid);
    
    // Show commands
    if (text.match(/^!help$/i)) {
@@ -440,7 +439,6 @@ bot.on('registered', function(data) {
 	var name = escape(data.user[0].name);
 	var name2 = data.user[0].name;
 	var userid = escape(data.user[0].userid);
-    updateIdleTime(userid);
 	var avatarid = data.user[0].avatarid;
 	var points = data.user[0].points;
 	
@@ -516,7 +514,6 @@ bot.on('pmmed', function (data) {
 	var senderid = data.senderid;
 	var userid = data.userid;
 	var text = data.text;
-    updateIdleTime(userid);
 	bot.getProfile(senderid, function(profile) { 
 		var name = profile.name;
 		myLog('pmmed', name+': '+text);
