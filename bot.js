@@ -6,7 +6,6 @@ var settings = require('./bot.settings.js');
 var bot = new Bot(AUTH, USERID, ROOMID);
 bot.debug = false;
 
-// Date parsing
 function parseDate(i) {
 	var r = /[0-9]{1,4}[\-\/\s\.\\]{0,1}[0-9]{1,2}[\-\/\s\.\\]{1,2}[0-9]{1,4}/;
 	var showdate = i.match(r); 
@@ -77,14 +76,6 @@ bot.on('newsong', function(data) {
 			bot.speak('/me reloads rifle');
 			modeBootPending = true;
 			myLog('newSong', 'Pending autoboot for '+userid+' accumulated '+mode[userid]+', limit is '+mode.maxPlays);
-		} else if (mode.type=='speed') {
-			if (tracktime <= mode.maxTime) {
-				myLog('newSong', 'Track length '+tracktime+' is within limit ('+mode.maxTime+')');				
-			} else {
-				myLog('newSong', 'Track length '+tracktime+' exceeds limit ('+mode.maxTime+'), booting');
-				bot.remDj(userid);
-				bot.speak('Speed mode is enabled, songs must be '+mode.maxTime+' or less. Sorry!');
-			}
 		} else {
 			myLog('newSong', "Mode is set but user will not be over limits.");
 		}
@@ -102,30 +93,30 @@ bot.on('endsong', function(data) {
 	if(mode.type) {
 		if (!mode[userid]) { mode[userid] = 0; myLog('endsong', 'mode['+userid+'] not set, set to '+mode[userid]); }
 		if(mode.type == 'playN') {
-			mode[userid] = mode[userid] ? mode[userid]+1 : 1;	// increment play count
+			mode[userid] = mode[userid] ? mode[userid]+1 : 1;
 			myLog('endSong', name+' has '+mode[userid]+' plays');
-			if (mode[userid] >= mode.maxPlays) {	// if over the limit
+			if (mode[userid] >= mode.maxPlays) {
 				bot.speak('/me fires a single shot');
-				bot.remDj(userid);	// boot user
+				bot.remDj(userid);
 				mode.cantDj = userid;
 				mode.cantDjExpires = getEpoch()+30;
 				myLog('endsong', 'Setting mode.cantDj to '+userid);
 				modeBootPending = false;
-				mode[userid] = 0;	// reset count
-				bot.pm(name+', we\'re asking DJs to give others a chance at a DJ spot after '+mode.maxPlays+mode.maxUnits+'. If nobody else wants to DJ, hop back up!', userid);	// say a few words
+				mode[userid] = 0;
+				bot.pm(name+', we\'re asking DJs to give others a chance at a DJ spot after '+mode.maxPlays+mode.maxUnits+'. If nobody else wants to DJ, hop back up!', userid);
 			}
 		} else if (mode.type == 'timed') {
-			mode[userid] = mode[userid] ? mode[userid]+parseInt(tracktime) : parseInt(tracktime); // increment the play time
+			mode[userid] = mode[userid] ? mode[userid]+parseInt(tracktime) : parseInt(tracktime);
 			myLog('endSong', name+' has played '+mode[userid]/60+' minutes');
-			if (mode[userid] >= mode.maxTime) {	// if over the limit
+			if (mode[userid] >= mode.maxTime) {
 				bot.speak('/me fires a single shot');
 				bot.remDj(userid);
 				myLog('Setting mode.cantDj to '+userid);
 				mode.cantDj = userid;
 				mode.cantDjExpires = getEpoch()+30;
 				modeBootPending = false;
-				mode[userid] = 0;	// reset count
-				bot.pm(name+', we\'re asking DJs to give others a chance at a DJ spot after '+mode.maxTime/60+mode.maxUnits+'. If nobody else wants to DJ, hop back up!', userid);	// say a few words
+				mode[userid] = 0;
+				bot.pm(name+', we\'re asking DJs to give others a chance at a DJ spot after '+mode.maxTime/60+mode.maxUnits+'. If nobody else wants to DJ, hop back up!', userid);
 			}
 		}
 	}	
@@ -150,7 +141,6 @@ bot.on('endsong', function(data) {
 bot.on('new_moderator', function (data) {
  });
 
-// Auto DJ
 bot.on('add_dj', function(data) {
 	var new_dj_id = data.user[0].userid;
 	var new_dj_name = data.user[0].name;
@@ -178,12 +168,8 @@ bot.on('add_dj', function(data) {
 			myLog('addDj', mode.cantDj+' yanked off the stage, easy, tiger, just '+secondsLeft+' '+secondsLeftUnits+' left.');
 		}
 	}
-	if (mode.type=='speed') {
-		bot.pm('Heads up - speed mode is enabled, songs must be '+mode.maxTime+' or less. You have been warned.', new_dj_id);
-	}	
 });
 
-// End auto DJ or grab a spot if in holdspot mode
 bot.on('rem_dj', function(data) {
 	var roominfo = bot.roomInfo(true, function(data) {
 		if (holdspot.length > 1) {
@@ -198,16 +184,13 @@ bot.on('rem_dj', function(data) {
 	var name = escape(data.user[0].name);
 });
 
-// Chatroom events
 bot.on('speak', function (data) {
-   // Get the data
    var name = data.name;
    var text = data.text;
    var userid = data.userid;
    var setlist = null;
    
    
-   // Show commands
    if (text.match(/^!help$/i)) {
 	   	bot.speak('http://stats.thephish.fm/about.php');
    }
@@ -360,7 +343,6 @@ bot.on('speak', function (data) {
    		}
    	});
    }
-   // Awesome the song
    if (text.match(/(awesome|great|sick|nasty|good|nice)/i)) {
 		if (!awesomes.contains(userid)) {
 			awesomes.push(userid);
@@ -394,7 +376,6 @@ bot.on('speak', function (data) {
    		bot.speak('/me dances with '+name);
    }
    
-   // Post setlist link
    if (text.match(/^\!setlist$/)) {	 
    		bot.roomInfo(true, function(data) {
    			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
@@ -405,7 +386,6 @@ bot.on('speak', function (data) {
    		});
    }
 
-	// Live replay
 	if (text.match(/^!live$/)) {
    		bot.roomInfo(true, function(data) { 
 			var options = { url: 'http://api.phish.net/api.js?api=1.0&method=getShow&apikey='+PNPK+'&linked=0&format=json&showdate=2015-06-06' };
@@ -713,17 +693,6 @@ bot.on('pmmed', function (data) {
 			myLog('pmmed', '!greet - Not authorized');
 		} 
    }
-
-   if (text.match(/^!idle:/i)) {
-   	myLog('pmmed', 'Idletime request');
-   		var name = text.substr(6);
-		bot.getUserId(name, function (data) { 
-			if (idleTime[data.userid]) {
-				myLog('pmmed', 'Idletime request for '+name+' returned '+idleTime[data.userid]);
-				bot.pm(name+' has been idle for '+idleTime[data.userid]+' seconds', senderid);
-			}
-		});
-   }
    if (text.match(/^!blacklist:/i)) {
    		if (admins.contains(senderid)) {
 			var badusername = escape(text.substr(11));
@@ -778,7 +747,6 @@ bot.on('pmmed', function (data) {
 			myLog('pmmed', '!awesome - Not authorized');	
 		}
 	}	
-   // HPB
    if (text.match(/^!last /i)) {
 		var songname = escape(text.substr(6));
 		var options = { url: apibase+'hpb.php?action=lastPlayed&song='+songname };
@@ -830,7 +798,7 @@ bot.on('pmmed', function (data) {
 		mode = null;
 		mode = new Object();
 		var newMode = text.substr(6);
-		if (!newMode) {	// if we can't parse anything after the colon
+		if (!newMode) {
 			mode = new Object();
 			modeBootPending = false;
 			bot.speak('DJ limits have been disabled.');
@@ -857,16 +825,6 @@ bot.on('pmmed', function (data) {
 				mode.maxTime = seconds;
 				mode.type = 'timed';
 			}
-		} else if (newMode.match(/^speed[0-9]+/)) {
-			var maxTime = Math.round(newMode.substr(5));
-			if (maxTime > 0) {
-				mode.timeUnits = maxTime == 1 ? ' minute' : ' minutes';
-				var seconds = maxTime*60;
-				bot.speak('Maximum song time is '+maxTime+mode.timeUnits+'. Offenders will be removed from the stage. You have been warned. Read more: http://thephish.fm/modes/');
-				myLog('pmmed', '!mode:speed'+maxTime+' now in effect');
-				mode.maxTime = seconds;
-				mode.type = 'speed';
-			}
 		} else {
 			bot.pm('Huh?', senderid);
 			myLog('pmmed', '!mode: Unintelligble');
@@ -876,24 +834,21 @@ bot.on('pmmed', function (data) {
 			if (!mode['data']) { mode['data'] = new Array(); }
 			var roominfo = bot.roomInfo(false, function(data) {
 				var djs = data.room.metadata.djs;
-				if (djs.indexOf(senderid) == -1) { 	// if person is NOT a DJ
-					mode['data'][senderid] = 0; // force the count to zero 
+				if (djs.indexOf(senderid) == -1) {
+					mode['data'][senderid] = 0;
 					myLog('pmmed', '!mode Reset '+senderid+' count to 0');
-				} else { 	// if they are a DJ
+				} else { 
 					if (!mode['data'][senderid]) { 	
 						myLog('pmmed', '!mode No value for mode['+senderid+'], setting to 0');
 						mode['data'][senderid]=0; 				
 					}	
-					if (mode.type=='timed') {	// echo back their accumulated minutes
+					if (mode.type=='timed') {
 						var units = mode['data'][senderid] == 1 ? ' minute' : ' minutes';
 						var minutes = mode['data'][senderid] ? Math.round(mode['data'][senderid]/60) : 0;
 						bot.pm("You have played about "+minutes+units+".", senderid);
 						myLog('pmmed', "!mode reply - You have played about "+minutes+units+".");
-					} else if (mode.type=='playN') {	// echo back their accumulated plays
+					} else if (mode.type=='playN') {
 						var units = mode['data'][senderid] == 1 ? ' song' : ' songs';
-						if (senderid == '4e15ccb5a3f751697801f4e9') {	// Phisher only
-							var units = mode.userid == 1 ? ' snog' : 'snogs';
-						}
 						bot.pm("You have played "+mode['data'][senderid]+units+".", senderid);
 						myLog("pmmed", "!mode reply - You have played "+mode['data'][senderid]+units+".");
 					}
