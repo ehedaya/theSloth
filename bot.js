@@ -571,7 +571,7 @@ bot.on('pmmed', function (data) {
    		var token = getGuid();
 		var options = { url: apibase+'key.php?key='+apikey+'&id='+senderid+'&token='+token };
 		http.get(options, function(error, res) {
-			bot.pm('Psst, do not share this link with anyone: http://stats.thephish.fm/auth.php?id='+senderid+'&token='+token, senderid);
+			bot.pm('Psst, do not share this link with anyone: '+apibase+'auth.php?id='+senderid+'&token='+token, senderid);
 			myLog('pmmed', '!connect key sent to - '+senderid);
 		});
    	}
