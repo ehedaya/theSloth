@@ -332,7 +332,7 @@ bot.on('speak', function (data) {
 	}
 	if (text.match(/^!points:/i)) {
 		var points = escape(text.substr(8));		
-		var options = {url: apibase+'points.php?name='+name+'&target='+points };
+		var options = {url: apibase+'points.php?userid='+userid+'&target='+points };
 		http.get(options, function(error, res) {
 			if (error) {
 				myLog('speak', '!points - Error connecting to '+options['url']);
