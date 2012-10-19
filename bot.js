@@ -330,6 +330,20 @@ bot.on('speak', function (data) {
 			}
    		});
 	}
+	if (text.match(/^!points:/i)) {
+		var points = escape(text.substr(8));		
+		var options = {url: apibase+'points.php?name='+name+'&target='+points };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('speak', '!points - Error connecting to '+options['url']);
+			} else {
+				var who = res.buffer;
+				if (who.length > 1) {
+					bot.speak(who);
+				} 
+			}
+		});
+	}
     if (text.match(/^!album$/)) {	 
    		bot.roomInfo(true, function(data) {
 			if ((data.room.metadata.current_song.metadata.album).length > 1) {
