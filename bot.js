@@ -461,12 +461,6 @@ bot.on('registered', function(data) {
 			moderators = data.room.metadata.moderator_id;
 		});		
 
-		if (is_preshow) {
-			bot.pm('Hey '+name2+'! We\'re doing a replay today (http://thephish.fm/replays/ for info). It should be starting soon. We\'re playing a little non-Phish preshow music until it starts.  Stick around!', userid);
-		}
-		if (is_postshow) {
-			bot.pm('Hey '+name2+', we just wrapped up a replay and are playing a little non-Phish music for the post-show. We\'ll be back to Phish soon, stick around!', userid);
-		}
 		if (userid == holdspot) {
 			bot.pm('Remember, reply with !spot when you are ready to take your spot back.', userid);
 		}
@@ -574,24 +568,6 @@ bot.on('pmmed', function (data) {
 			bot.pm('Psst, do not share this link with anyone: '+apibase+'auth.php?id='+senderid+'&token='+token, senderid);
 			myLog('pmmed', '!connect key sent to - '+senderid);
 		});
-   	}
-   	if (text.match(/^!preshow$/i) && (moderators.contains(senderid) || admins.contains(senderid))) {
-   		is_preshow = true;
-   		is_postshow = false;
-   		bot.pm('OK, I will PM people who arrive to tell them we are in pre-show mode', senderid);
-		myLog('pmmed', '!preshow invoked by '+senderid);
-   	}
-   	if (text.match(/^!postshow$/i) && (moderators.contains(senderid) || admins.contains(senderid))) {
-   		is_preshow = false;
-   		is_postshow = true;
-   		bot.pm('OK, I will PM people who arrive to tell them we are in post-show mode', senderid);
-		myLog('pmmed', '!postshow invoked by '+senderid);
-   	}
-   	if (text.match(/^!cancelreplaymode$/i) && (moderators.contains(senderid) || admins.contains(senderid))) {
-   		is_preshow = false;
-   		is_postshow = false;
-   		bot.pm('OK, no special pre or post show warnings will be issued.', senderid);
-		myLog('pmmed', '!preshow or !postshow canceled by '+senderid);
    	}
    	   	
    	
