@@ -7,7 +7,7 @@ var bot = new Bot(AUTH, USERID, ROOMID);
 bot.debug = false;
 
 function parseDate(i) {
-	var r = /[0-9]{1,4}[\-\/\s\.\\]{0,1}[0-9]{1,2}[\-\/\s\.\\]{1,2}[0-9]{1,4}/;
+	var r = /[0-9]{1,4}[\-\/\s\.\\]{1,2}[0-9]{1,2}[\-\/\s\.\\]{1,2}[0-9]{1,4}/;
 	var showdate = i.match(r); 
 	if (showdate) {
 		var d = Date.parse(showdate[0]);
