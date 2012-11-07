@@ -305,7 +305,7 @@ bot.on('speak', function (data) {
 					if (replayInfo.length > 1) {
 						bot.speak(replayInfo);
 					} else {
-						bot.speak("No replay today :( http://stats.thephish.fm/replays.php");
+						bot.speak("No replay today :( http://thephish.fm/replays");
 					}
 				}
 			});
