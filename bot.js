@@ -224,8 +224,8 @@ bot.on('speak', function (data) {
    if (text.match(/^!meettup$/i)) {
    		bot.speak('http://www.tinyurl.com/2012TTNYE');
    }
-   if (text.match(/^!meatup$/i)) {
-                bot.speak('http://www.tinyurl.com/2012TTFest');
+   if (text.match(/^!ss$/i)) {
+                bot.speak('http://thephish.fm/secreTTsanTTa');
    }
    if (text.match(/^!whatdidkfhaveforbreakfast$/i)) {
    		bot.speak('Trick question.  KernelForbin did not eat breakfast.');
