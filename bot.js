@@ -241,7 +241,7 @@ bot.on('speak', function (data) {
    if (text.match(/^!slide$/i)) {
    		bot.speak('http://thephish.fm/theslide');
    }
-   if (text.match(/^!sloth$/i)) {
+   if (text.match(/^!sloth$/i) || text.match(/^!about$/i)) {
    		bot.speak('http://stats.thephish.fm/about.php');
    }
    if (text.match(/^!meettup$/i)) {
