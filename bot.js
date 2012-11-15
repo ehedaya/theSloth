@@ -120,22 +120,29 @@ bot.on('endsong', function(data) {
 			}
 		}
 	}	
-	if (holdspot) {
-		if (is_dj) {
+	if (djspot['mode'] == 'reservation') {
+		bot.remDj();
+		djspot['on_stage'] = false;
+		djspot['reserved_for'] = false;
+		myLog('endSong', djspot['reserved_for']+' expired, quitting DJ spot');
+		bot.speak('Spot!');
+	} else if (djspot['mode'] == 'dj') {
+		djspot['count']++;
+		myLog('endsong', 'DJ turns: '+djspot['count']);
+		if (djspot['count'] >= 6) {
+			djspot['mode'] = false;
+			djspot['count'] = false;
+			djspot['on_stage'] = false;
+			bot.speak('If you still need help DJing, just say !dj and I\'ll hop back up for a few tunes.');
 			bot.remDj();
-			is_dj = false;
-			myLog('endSong', 'holdspot expired, quitting DJ spot');
-			bot.speak('Spot!');
 		}
-		myLog('endSong','bot.on(endsong) - Releasing unclaimed spot hold for '+holdspot);
-		holdspot = false;
 	}
 	if (lastsong) {
 		myLog('endSong', 'Booting '+lastsong+' via !lastsong');
 		bot.speak('/me fires a single shot.');
 		bot.remDj(lastsong);
 		lastsong = false;
-	}	
+	}
 });
 
 bot.on('new_moderator', function (data) {
@@ -168,16 +175,30 @@ bot.on('add_dj', function(data) {
 			myLog('addDj', mode.cantDj+' yanked off the stage, easy, tiger, just '+secondsLeft+' '+secondsLeftUnits+' left.');
 		}
 	}
+	if(djspot['on_stage'] && new_dj_id != USERID) {
+		if (djspot['mode'] == 'dj' && data.room.metadata.djcount >= 3) {
+			djspot['mode'] = false;
+			djspot['count'] = false;
+			djspot['on_stage'] = false;
+			bot.speak('Looks like you\'ve got enough DJs now.');
+			bot.remDj();
+		}
+	}
 });
 
 bot.on('rem_dj', function(data) {
 	var roominfo = bot.roomInfo(true, function(data) {
-		if (holdspot.length > 1) {
+		if (djspot['mode'] == 'reservation') {
 			myLog('remDj', 'Holding spot for '+data.userid);
 			bot.addDj();
    			bot.vote('up');
 			bot.speak('/me waves to the crowd.');
-			is_dj = true;
+			djspot['on_stage'] = true;
+		} else if (djspot['mode'] == 'dj' && data.room.metadata.djcount < 2) {			
+			djspot['mode'] = false;
+			djspot['count'] = false;
+			djspot['on_stage'] = false;
+			bot.remDj();
 		}
 	});
 	var type = 'rem_dj';
@@ -355,11 +376,31 @@ bot.on('speak', function (data) {
    	}
    if (text.match(/^!dj$/i)) {
    	bot.roomInfo(true, function(data) {
-   		if (data.room.metadata.djcount == 1) {
-/*    			bot.addDj(); */
+   		if (data.room.metadata.djcount == 1 && !djspot['mode']) {
+    			djspot['on_stage'] = true;
+    			djspot['mode'] = 'dj';
+    			djspot['count'] = 0;
+    			bot.addDj();
+   		} else if (data.room.metadata.djcount > 1 && !djspot['mode']) {
+   			bot.speak('Sorry, I am only allowed to DJ with one other person.');
+   		} else if (djspot['mode']) {
+   			bot.speak('Sorry, I\'m not available to be a right now.');
+   		} else if (data.room.metadata.djcount < 1 && !djspot['mode']) {
+   			bot.speak('You first!');
+   		} else {
+   			bot.speak('Egg freckles.');
+   			myLog('!dj', 'Fell out of if() block when asked to DJ');
    		}
    	});
    }
+   if (text.match(/^!quit$/i)) {
+   	   if (djspot['mode'] == 'dj') {
+   	   		djspot['on_stage'] = false;
+   	   		djspot['mode'] = false;
+   	   		djspot['count'] = false;
+   	   		bot.remDj();
+   	   }
+   }   
    if (text.match(/(awesome|great|sick|nasty|good|nice)/i)) {
 		if (!awesomes.contains(userid)) {
 			awesomes.push(userid);
@@ -376,20 +417,20 @@ bot.on('speak', function (data) {
 		bot.speak(randomItem(['/me glares at '+name, 'T_T', '>.<']));
 		bot.removeFan(userid);
    }
-	   if (text.match(/love.+thesloth/i)) {
+	   if (text.match(/love.+sloth/i)) {
 		bot.speak(randomItem(['I love you too, '+name+'', 'The feeling is mutual.', 'Awwwww....']));
 		bot.becomeFan(userid);
    }
-   if (text.match(/feed.+thesloth/i)) {
+   if (text.match(/feed.+sloth/i)) {
 	   	bot.speak(randomItem(['ITALIAN SPAGHETTI!','*omnomnom*', '/me burps']));
    }
-   if (text.match(/(pets|hugs).+thesloth/i)) {
+   if (text.match(/(pets|hugs).+sloth/i)) {
   	 	bot.speak(randomItem(['http://tinyurl.com/slothishappy', '<3', 'http://tinyurl.com/coolsloth']));
    }
-   if (text.match(/(lick|spam|dose).+thesloth/i)) {
+   if (text.match(/(lick|spam|dose).+sloth/i)) {
 	   	bot.speak('/me stabs '+name);
    }
-   if (text.match(/dances with.+thesloth/i)) {
+   if (text.match(/dances with.+sloth/i)) {
    		bot.speak('/me dances with '+name);
    }
    
@@ -478,7 +519,7 @@ bot.on('registered', function(data) {
 			moderators = data.room.metadata.moderator_id;
 		});		
 
-		if (userid == holdspot) {
+		if (userid == djspot['reserved_for']) {
 			bot.pm('Remember, reply with !spot when you are ready to take your spot back.', userid);
 		}
 		if (greeting) {
@@ -589,7 +630,7 @@ bot.on('pmmed', function (data) {
    	   	
    	
    	if (text.match(/^!spot$/i)) {
-   		if (!holdspot) {
+   		if (!djspot['mode']) {
    			var roominfo = bot.roomInfo(false, function(data) {
    				var djs = data.room.metadata.djs;
 				if (djs.indexOf(senderid) == -1) { 
@@ -597,21 +638,24 @@ bot.on('pmmed', function (data) {
 					myLog('pmmed', '!spot reply - You are not currently holding a DJ spot');
 				} else { 
 					bot.pm('PM me !spot when you are ready to take your spot back or if you change your mind to release the hold. I will automatically release it when this song ends, though, so hurry!', senderid);
-					holdspot = senderid;
+					djspot['reserved_for'] = senderid;
+					djspot['mode'] = 'reservation'; 
 					myLog('pmmed', '!spot - Holding spot for ('+senderid+')');
 				}
 			});
    		} else {
-   			if (holdspot == senderid) {
-   				if (is_dj) {
-					myLog('pmmed', '!spot - Reclaimed holdspot('+holdspot+') by '+senderid);
+   			if (djspot['reserved_for'] == senderid) {
+   				if (djspot['on_stage']) {
+					myLog('pmmed', '!spot - Reclaimed '+djspot['reserved_for']+' ('+djspot['reserved_for']+') by '+senderid);
 					bot.remDj();
-					holdspot = false;
-					is_dj = false; 
+					djspot['reserved_for'] = false;
+					djspot['on_stage'] = false; 
+					djspot['mode'] = false;
 				} else {
-					myLog('pmmed', '!spot - Canceled hold for '+holdspot+' by '+senderid);
+					myLog('pmmed', '!spot - Canceled hold for '+djspot['reserved_for']+' by '+senderid);
 					bot.pm('OK, I\'ve canceled the hold on your spot.', senderid);
-					holdspot = false;
+					djspot['reserved_for'] = false;
+					djspot['mode'] = false;
 				}
 			} else {
 				bot.pm('Sorry, I\'m holding a spot for someone else right now. Try later!', senderid);

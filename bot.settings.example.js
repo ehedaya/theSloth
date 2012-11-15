@@ -11,10 +11,8 @@ selfUserid = '';
 
 // Global variables
 apibase = '';
+apikey = '';
 is_dj = false;
-is_dj = false;
-is_preshow = false;
-is_postshow = false;
 awesomes = new Array();
 awesomeTriggers = /(awesome|great|sick|nasty|good)/i;
 admins = new Array('');
@@ -31,3 +29,4 @@ mode.cantDj = null;
 modeBootPending = false;
 replayOverride = false;
 lastPlayedResponse = '';
+djspot = new Array();
