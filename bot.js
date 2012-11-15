@@ -176,13 +176,15 @@ bot.on('add_dj', function(data) {
 		}
 	}
 	if(djspot['on_stage'] && new_dj_id != USERID) {
-		if (djspot['mode'] == 'dj' && data.room.metadata.djcount >= 3) {
-			djspot['mode'] = false;
-			djspot['count'] = false;
-			djspot['on_stage'] = false;
-			bot.speak('Looks like you\'ve got enough DJs now.');
-			bot.remDj();
-		}
+		var roominfo = bot.roomInfo(true, function(data) {
+			if (djspot['mode'] == 'dj' && data.room.metadata.djcount >= 3) {
+				djspot['mode'] = false;
+				djspot['count'] = false;
+				djspot['on_stage'] = false;
+				bot.speak('Looks like you\'ve got enough DJs now.');
+				bot.remDj();
+			}			
+		});
 	}
 });
 
