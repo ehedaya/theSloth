@@ -51,6 +51,13 @@ function getEpoch() {
 	return epoch;
 }
 
+function pause(millis) {
+	var date = new Date();
+	var curDate = null;
+	do { curDate = new Date(); } 
+	while(curDate-date < millis)
+}
+
 bot.on('newsong', function(data) { 
 	var dateBlob = data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album;
 	var songname = 	data.room.metadata.current_song.metadata.song, 
@@ -67,7 +74,7 @@ bot.on('newsong', function(data) {
 	var lastPlayedResponse = '';
 
 	if (mode.type) {
-		if (!mode[userid]) { mode[userid] = 0; myLog('newsong', 'mode['+userid+'] not set, set to '+mode[userid]); }
+		if (!mode[userid]) { mode[userid] = 0; }
 		if (mode.type=='timed' && (mode[userid]+tracktime>=mode.maxTime)) {
 			bot.speak('/me reloads rifle');
 			myLog('newSong', 'Pending autoboot for '+userid+' accumulated '+mode[userid]+', limit is '+mode.maxTime);
@@ -76,6 +83,17 @@ bot.on('newsong', function(data) {
 			bot.speak('/me reloads rifle');
 			modeBootPending = true;
 			myLog('newSong', 'Pending autoboot for '+userid+' accumulated '+mode[userid]+', limit is '+mode.maxPlays);
+		} else if (mode.type == 'speed') {
+			if (tracktime > mode.maxTime) {
+				pause(1000);
+				bot.remDj(userid);
+				var minutes = mode.maxTime/60;
+				bot.pm('DJs must play songs under '+minutes+mode.maxUnits+' to stay on the stage. Read more: http://thephish.fm/modes/', userid);
+				bot.speak('DJs must play songs under '+minutes+mode.maxUnits+' to stay on the stage. Read more: http://thephish.fm/modes/');
+				myLog('newsong', 'Track length is '+tracktime+', above cap of '+mode.maxTime);
+			} else {
+				myLog('newsong', 'Track length is '+tracktime+', beneath cap of '+mode.maxTime);
+			}
 		} else {
 			myLog('newSong', "Mode is set but user will not be over limits.");
 		}
@@ -91,7 +109,7 @@ bot.on('endsong', function(data) {
 		name = data.room.metadata.current_song.djname;
 		mode.cantDj = null;
 	if(mode.type) {
-		if (!mode[userid]) { mode[userid] = 0; myLog('endsong', 'mode['+userid+'] not set, set to '+mode[userid]); }
+		if (!mode[userid]) { mode[userid] = 0;  }
 		if(mode.type == 'playN') {
 			mode[userid] = mode[userid] ? mode[userid]+1 : 1;
 			myLog('endSong', name+' has '+mode[userid]+' plays');
@@ -118,7 +136,7 @@ bot.on('endsong', function(data) {
 				mode[userid] = 0;
 				bot.pm(name+', we\'re asking DJs to give others a chance at a DJ spot after '+mode.maxTime/60+mode.maxUnits+'. If nobody else wants to DJ, hop back up!', userid);
 			}
-		}
+		} 
 	}	
 	if (djspot['mode'] == 'reservation') {
 		bot.remDj();
@@ -869,6 +887,16 @@ bot.on('pmmed', function (data) {
 				myLog('pmmed', '!mode:timed'+maxTime+' now in effect');
 				mode.maxTime = seconds;
 				mode.type = 'timed';
+			}
+		} else if (newMode.match(/^speed[0-9]+/)) {
+			var maxTime = Math.round(newMode.substr(5));
+			if (maxTime > 0) {
+				mode.maxUnits = maxTime == 1 ? ' minute' : ' minutes';
+				var seconds = maxTime*60;
+				bot.speak('DJs must play songs under '+maxTime+mode.maxUnits+' to stay on the stage. Read more: http://thephish.fm/modes/');
+				myLog('pmmed', '!mode:speed'+maxTime+' now in effect');
+				mode.maxTime = seconds;
+				mode.type = 'speed';
 			}
 		} else {
 			bot.pm('Huh?', senderid);
