@@ -254,7 +254,13 @@ bot.on('speak', function (data) {
    		bot.speak('Trick question.  KernelForbin did not eat breakfast.');
    }
    if (text.match(/^!ttplus$/i)) {
-   		bot.speak('TT+ info: http://turntableplus.fm/beta');
+        bot.speak('TT+ info: http://turntableplus.fm/beta');
+   }
+   if (text.match(/^!ttx$/i)) {
+   		bot.speak('Turntable X: http://bit.ly/WbRp8P');
+   }
+   if (text.match(/^[!+](add(me)?|list)$/i)) {
+   		bot.speak('K '+name+', you\'re on "the list!"');
    }
    if (text.match(/^!notes$/i)) {
 		bot.roomInfo(true, function(data) {
