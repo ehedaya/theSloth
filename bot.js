@@ -259,7 +259,7 @@ bot.on('speak', function (data) {
    if (text.match(/^!ttx$/i)) {
    		bot.speak('Turntable X: http://bit.ly/WbRp8P');
    }
-   if (text.match(/^[!+](add(me)?|list)$/i)) {
+   if (text.match(/^[!+](add(me)?|list|q|qa)$/i)) {
    		bot.speak('K '+name+', you\'re on "the list!"');
    }
    if (text.match(/^!notes$/i)) {
