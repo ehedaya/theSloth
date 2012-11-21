@@ -227,7 +227,6 @@ bot.on('update_votes', function (data) {
   var votelog = data.room.metadata.votelog;
   for (var i=0; i<votelog.length; i++) {
     var userid = votelog[i][0];
-    usersList[userid].lastActivity = Date.now();
   }
 });
 
@@ -542,7 +541,6 @@ bot.on('registered', function(data) {
 	var points = data.user[0].points;
 
 	var user = data.user[0];
-	user.lastActivity = Date.now();
 	usersList[user.userid] = user;
 
 	
