@@ -175,10 +175,6 @@ bot.on('new_moderator', function (data) {
  });
 
 bot.on('add_dj', function(data) {
-	var user = data.user[0];
-	usersList[user.userid].lastActivity = Date.now();
-
-
 	var new_dj_id = data.user[0].userid;
 	var new_dj_name = data.user[0].name;
 	var new_dj_avatar_id = data.user[0].avatarid;
@@ -219,8 +215,6 @@ bot.on('add_dj', function(data) {
 });
 
 bot.on('rem_dj', function(data) {
-	var user = data.user[0];
-	usersList[user.userid].lastActivity = Date.now();
 	if ((djspot['mode'] == 'reservation') && (djspot['reservedfor'] == data.userid)) {
 		myLog('remDj', 'Holding spot for '+data.userid);
 		bot.addDj();
@@ -229,13 +223,6 @@ bot.on('rem_dj', function(data) {
 		djspot['on_stage'] = true;
 	}
 });
-
-bot.on('snagged', function (data) {
-  var userid = data.userid;
-  usersList[userid].lastActivity = Date.now();
-});
-
-
 bot.on('update_votes', function (data) {
   var votelog = data.room.metadata.votelog;
   for (var i=0; i<votelog.length; i++) {
@@ -250,9 +237,7 @@ bot.on('speak', function (data) {
    var text = data.text;
    var userid = data.userid;
    var setlist = null;
-   
-	usersList[data.userid].lastActivity = Date.now();
-   
+      
    if (text.match(/^!help$/i)) {
 	   	bot.speak('http://stats.thephish.fm/about.php');
    }
@@ -335,7 +320,6 @@ bot.on('speak', function (data) {
 				}
 			});
    		}
-   		myLog('pmmed', '!whohere string = '+usersHere);
    }
 
 	if (text.match(/^!last$/i)) {
