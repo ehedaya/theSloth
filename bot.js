@@ -2,6 +2,7 @@ var Bot    	= require('ttapi');
 var http   	= require('http-get');
 var dp = require('./date.js');
 var settings = require('./bot.settings.js');
+var usersList = { };
 
 var bot = new Bot(AUTH, USERID, ROOMID);
 bot.debug = false;
@@ -99,6 +100,14 @@ bot.on('newsong', function(data) {
 		}
 	}
 });
+bot.on('roomChanged',  function (data) {
+  usersList = { };
+  for (var i=0; i<data.users.length; i++) {
+    var user = data.users[i];
+    user.lastActivity = Date.now();
+    usersList[user.userid] = user;
+  }
+});
 
 bot.on('endsong', function(data) {
 			myLog('endsong', 'djcount was '+data.room.metadata.djcount);
@@ -166,6 +175,10 @@ bot.on('new_moderator', function (data) {
  });
 
 bot.on('add_dj', function(data) {
+	var user = data.user[0];
+	usersList[user.userid].lastActivity = Date.now();
+
+
 	var new_dj_id = data.user[0].userid;
 	var new_dj_name = data.user[0].name;
 	var new_dj_avatar_id = data.user[0].avatarid;
@@ -206,6 +219,8 @@ bot.on('add_dj', function(data) {
 });
 
 bot.on('rem_dj', function(data) {
+	var user = data.user[0];
+	usersList[user.userid].lastActivity = Date.now();
 	if ((djspot['mode'] == 'reservation') && (djspot['reservedfor'] == data.userid)) {
 		myLog('remDj', 'Holding spot for '+data.userid);
 		bot.addDj();
@@ -215,12 +230,28 @@ bot.on('rem_dj', function(data) {
 	}
 });
 
+bot.on('snagged', function (data) {
+  var userid = data.userid;
+  usersList[userid].lastActivity = Date.now();
+});
+
+
+bot.on('update_votes', function (data) {
+  var votelog = data.room.metadata.votelog;
+  for (var i=0; i<votelog.length; i++) {
+    var userid = votelog[i][0];
+    usersList[userid].lastActivity = Date.now();
+  }
+});
+
+
 bot.on('speak', function (data) {
    var name = data.name;
    var text = data.text;
    var userid = data.userid;
    var setlist = null;
    
+	usersList[data.userid].lastActivity = Date.now();
    
    if (text.match(/^!help$/i)) {
 	   	bot.speak('http://stats.thephish.fm/about.php');
@@ -279,6 +310,32 @@ bot.on('speak', function (data) {
 	   		bot.speak('Prefix notes with ## and I\'ll save them for later. For example: http://stats.thephish.fm/'+starttime);		
 		});
 
+   }
+   if (text.match(/^!whohere$/i)) {
+   		var usersHere = '';
+   		for(var u in usersList) {
+   			usersHere+=u.substring(0,11)+',';
+   		}
+   		if(usersHere.length>10) {
+			bot.roomInfo(true, function(data) {
+				if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
+					var options = {url: apibase+'getUsersAtShow.php?key='+apikey+'&date='+showdate+'&u='+usersHere };
+					http.get(options, function(error, res) {
+						if (error) {
+							myLog('speak', '!who - Error connecting to '+options['url']);
+						} else {
+							var who = res.buffer;
+							if (who.length > 1) {
+								bot.speak(who);
+							} 
+						}
+					});
+				} else {
+					bot.speak('I don\'t know the showdate.');
+				}
+			});
+   		}
+   		myLog('pmmed', '!whohere string = '+usersHere);
    }
 
 	if (text.match(/^!last$/i)) {
@@ -499,6 +556,11 @@ bot.on('registered', function(data) {
 	var userid = escape(data.user[0].userid);
 	var avatarid = data.user[0].avatarid;
 	var points = data.user[0].points;
+
+	var user = data.user[0];
+	user.lastActivity = Date.now();
+	usersList[user.userid] = user;
+
 	
 	
 	var options = { url: apibase+'user.php?key='+apikey+'&id='+userid+'&name='+name+'&avatarid='+avatarid+'&points='+points };
@@ -556,7 +618,7 @@ bot.on('registered', function(data) {
 });
 
 bot.on('deregistered', function(data) {
-
+  delete usersList[data.user[0].userid];
 });
 
 bot.on('pmmed', function (data) { 
