@@ -410,6 +410,19 @@ bot.on('speak', function (data) {
 			}
    		});
 	}
+	if (text.match(/^!groove$/i)) {
+		var options = {url: apibase+'groove.php' };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('speak', '!groove - Error connecting to '+options['url']);
+			} else {
+				var groove = res.buffer;
+				if (groove.length > 1) {
+					bot.speak(groove);
+				} 
+			}
+		});
+	}
 	if (text.match(/^!points:/i)) {
 		var points = escape(text.substr(8));		
 		var options = {url: apibase+'points.php?userid='+userid+'&target='+points };
