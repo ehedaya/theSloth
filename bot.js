@@ -295,7 +295,7 @@ bot.on('speak', function (data) {
 		});
 
    }
-   if (text.match(/^!whohere$/i)) {
+   if (text.match(/^!who$/i)) {
    		var usersHere = '';
    		for(var u in usersList) {
    			usersHere+=u.substring(0,11)+',';
@@ -390,25 +390,6 @@ bot.on('speak', function (data) {
 				}
 			});
 		}
-	}
-	if (text.match(/^!who$/i)) {
-   		bot.roomInfo(true, function(data) {
-   			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-				var options = {url: apibase+'getUsersAtShow.php?key='+apikey+'&date='+showdate };
-				http.get(options, function(error, res) {
-					if (error) {
-						myLog('speak', '!who - Error connecting to '+options['url']);
-					} else {
-						var who = res.buffer;
-						if (who.length > 1) {
-							bot.speak(who);
-						} 
-					}
-				});
-   			} else {
-				bot.speak('I don\'t know the showdate.');
-			}
-   		});
 	}
 	if (text.match(/^!groove$/i)) {
 		var options = {url: apibase+'groove.php' };
@@ -1020,3 +1001,4 @@ bot.on('pmmed', function (data) {
 	}
 		
 });
+
