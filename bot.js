@@ -516,8 +516,7 @@ bot.on('speak', function (data) {
 					}
 				});
    		});
-   }
-   
+   }   
    
    
    
@@ -999,6 +998,18 @@ bot.on('pmmed', function (data) {
 			}
 		});
 	}
+   if (text.match(/^!pnet:/)) {
+   		var pnet_username = escape(text.substr(6));
+		var options = { url: apibase+'pnet_connect.php?key='+apikey+'&userid='+senderid+'&pnet_username='+pnet_username };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('pmmed', '!whois - Error connecting to '+options['url']);
+			} else {
+				bot.pm(res.buffer, senderid);
+			}
+		});   
+   }
+
 		
 });
 
