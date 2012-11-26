@@ -1009,7 +1009,15 @@ bot.on('pmmed', function (data) {
 			}
 		});   
    }
-
-		
+   if (text.match(/^!pnet$/)) {
+		var options = { url: apibase+'pnet_connect.php?key='+apikey+'&userid='+senderid+'&refresh=1' };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('pmmed', '!whois - Error connecting to '+options['url']);
+			} else {
+				bot.pm(res.buffer, senderid);
+			}
+		});   
+   }
 });
 
