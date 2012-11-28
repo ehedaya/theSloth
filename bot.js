@@ -1019,5 +1019,15 @@ bot.on('pmmed', function (data) {
 			}
 		});   
    }
+   if (text.match(/^!balance$/)) {
+		var options = { url: apibase+'plusminus.php?userid='+senderid };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('pmmed', '!balance - Error connecting to '+options['url']);
+			} else {
+				bot.pm(res.buffer, senderid);
+			}
+		});   
+   }
 });
 
