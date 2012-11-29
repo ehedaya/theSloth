@@ -3,7 +3,6 @@ var http   	= require('http-get');
 var dp = require('./date.js');
 var settings = require('./bot.settings.js');
 var usersList = { };
-
 var bot = new Bot(AUTH, USERID, ROOMID);
 bot.debug = false;
 
@@ -236,64 +235,44 @@ bot.on('speak', function (data) {
    var text = data.text;
    var userid = data.userid;
    var setlist = null;
-      
-   if (text.match(/^!help$/i)) {
-	   	bot.speak('http://stats.thephish.fm/about.php');
-   }
-   if (text.match(/glares.+thesloth/i)) {
-   		bot.speak('/me glares at '+name);
-   }
-   if (text.match(/^!tips$/i)) {
-   		bot.speak('http://thephish.fm/tips/ ');
-   }
-   if (text.match(/^!stream$/i)) {
-   		bot.speak('http://mobilefunspot.com/streams.html');
-   }
-   if (text.match(/^!stats$/i)) {
-   		bot.speak('http://stats.thephish.fm/');
-   }
-   if (text.match(/^!gifs$/i)) {
-   		bot.speak('http://tinyurl.com/ttgifs');
-   }
-   if (text.match(/^!deg$/i)) {
-   		bot.speak('http://tinyurl.com/phishdeg');
-   }
-   if (text.match(/^!greet$/i) && greeting.length>1) {
-   		bot.speak(greeting);
-   }
-   if (text.match(/^!slide$/i)) {
-   		bot.speak('http://thephish.fm/theslide');
-   }
-   if (text.match(/^!sloth$/i) || text.match(/^!about$/i)) {
-   		bot.speak('http://stats.thephish.fm/about.php');
-   }
-   if (text.match(/^!skip$/i)) {
-   		bot.skip();
-   }
-   if (text.match(/^!meettup$/i)) {
-   		bot.speak('http://www.tinyurl.com/2012TTNYE');
-   }
-   if (text.match(/^!ss$/i)) {
-                bot.speak('http://thephish.fm/secreTTsanTTa');
-   }
-   if (text.match(/^!whatdidkfhaveforbreakfast$/i)) {
-   		bot.speak('Trick question.  KernelForbin did not eat breakfast.');
-   }
-   if (text.match(/^!ttplus$/i)) {
-        bot.speak('TT+ info: http://turntableplus.fm/beta');
-   }
-   if (text.match(/^!ttx$/i)) {
-   		bot.speak('Turntable X: http://bit.ly/WbRp8P');
-   }
-   if (text.match(/^[!+](add(me)?|list|q|qa)$/i)) {
-   		bot.speak('K '+name+', you\'re on "the list!"');
-   }
+
+	var chatResponses = { };
+	chatResponses.help 		= { trigger: new RegExp('^!help$','i'), response: 'http://stats.thephish.fm/about.php' };
+	chatResponses.tips 		= { trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'};
+	chatResponses.stream 	= { trigger: new RegExp('^!stream$','i'), response: 'http://mobilefunspot.com/streams.html'};
+	chatResponses.stats 	= { trigger: new RegExp('^!stats$','i'), response: 'http://stats.thephish.fm'};
+	chatResponses.gifs	 	= { trigger: new RegExp('^!gifs$','i'), response: 'http://tinyurl.com/ttgifs'};
+	chatResponses.deg	 	= { trigger: new RegExp('^!deg$','i'), response: 'http://tinyurl.com/phishdeg'};
+	chatResponses.greet	 	= { trigger: new RegExp('^!greet$','i'), response: greeting};
+	chatResponses.slide	 	= { trigger: new RegExp('^!slide$','i'), response: 'http://thephish.fm/theslide'};
+	chatResponses.sloth	 	= { trigger: new RegExp('^!sloth$','i'), response: 'http://stats.thephish.fm/about.php'};
+	chatResponses.sloth2 	= { trigger: new RegExp('^!about$','i'), response: 'http://stats.thephish.fm/about.php'};
+	chatResponses.meettup 	= { trigger: new RegExp('^!meettup$','i'), response: 'http://www.tinyurl.com/2012TTNYE'};
+	chatResponses.ss 		= { trigger: new RegExp('^!ss$','i'), response: 'http://thephish.fm/secreTTsanTTa'};
+	chatResponses.breakfast	= { trigger: new RegExp('^!whatdidkfhaveforbreakfast$','i'), response: 'Trick question.  KernelForbin did not eat breakfast.'};
+	chatResponses.ttplus 	= { trigger: new RegExp('^!ttplus$','i'), response: 'TT+ info: http://turntableplus.fm/beta'};
+	chatResponses.ttx	 	= { trigger: new RegExp('^!ttx$','i'), response: 'Turntable X: http://bit.ly/WbRp8P'};
+	chatResponses.addme	 	= { trigger: new RegExp('^[!+](add(me)?|list|q|qa)$','i'), response: 'K '+name+', you\'re on "the list!"'};
+	chatResponses.feed	 	= { trigger: new RegExp('feed.+sloth','i'), response: randomItem(['ITALIAN SPAGHETTI!','*omnomnom*', '/me burps'])};
+	chatResponses.pets	 	= { trigger: new RegExp('(pets|hugs).+sloth','i'), response: randomItem(['http://tinyurl.com/slothishappy', '<3', 'http://tinyurl.com/coolsloth'])};
+	chatResponses.lick	 	= { trigger: new RegExp('(lick|spam|dose).+sloth','i'), response: '/me stabs '+name};
+	chatResponses.dance	 	= { trigger: new RegExp('dances with.+sloth','i'), response: '/me dances with '+name};
+   
+	for(t in chatResponses) {
+		if (text.match(chatResponses[t].trigger)) {
+			bot.speak(chatResponses[t].response); 
+		}
+	}
+
    if (text.match(/^!notes$/i)) {
 		bot.roomInfo(true, function(data) {
 			var starttime = Math.floor(data.room.metadata.current_song.starttime);
 	   		bot.speak('Prefix notes with ## and I\'ll save them for later. For example: http://stats.thephish.fm/'+starttime);		
 		});
 
+   }
+   if (text.match(/^!skip$/i)) {
+   		bot.skip();
    }
    if (text.match(/^!who$/i)) {
    		var usersHere = '';
@@ -474,18 +453,6 @@ bot.on('speak', function (data) {
 	   if (text.match(/love.+sloth/i)) {
 		bot.speak(randomItem(['I love you too, '+name+'', 'The feeling is mutual.', 'Awwwww....']));
 		bot.becomeFan(userid);
-   }
-   if (text.match(/feed.+sloth/i)) {
-	   	bot.speak(randomItem(['ITALIAN SPAGHETTI!','*omnomnom*', '/me burps']));
-   }
-   if (text.match(/(pets|hugs).+sloth/i)) {
-  	 	bot.speak(randomItem(['http://tinyurl.com/slothishappy', '<3', 'http://tinyurl.com/coolsloth']));
-   }
-   if (text.match(/(lick|spam|dose).+sloth/i)) {
-	   	bot.speak('/me stabs '+name);
-   }
-   if (text.match(/dances with.+sloth/i)) {
-   		bot.speak('/me dances with '+name);
    }
    
    if (text.match(/^\!setlist$/)) {	 
