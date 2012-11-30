@@ -355,7 +355,7 @@ bot.on('speak', function (data) {
    	   	if (replayOverride) {
    	   		bot.speak(replayInfo);
    	   	} else {
-			var options = { url: apibase+'thephish.php?type=replay' };
+			var options = { url: apibase+'replay.php?past=1' };
 			http.get(options, function(error, res) {
 				if (error) {
 					myLog('speak', '!replay - Error connecting to '+options['url']);
@@ -526,7 +526,7 @@ bot.on('registered', function(data) {
 		if (replayOverride) {
 			bot.pm(replayInfo, userid);
 		} else {
-			var options = { url: apibase+'thephish.php?type=replay' };
+			var options = { url: apibase+'replay.php' };
 			http.get(options, function(error, res) {
 				if (error) {
 					myLog('registered', 'Retrieving replay info, error connecting to '+options['url']);
