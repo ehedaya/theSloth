@@ -931,6 +931,9 @@ bot.on('pmmed', function (data) {
 			} else if (mode.type == 'timed') {
 				bot.pm('DJs will now be removed after playing '+mode.maxTime/60+mode.maxUnits+' of tracks. Read more: http://thephish.fm/modes/', senderid);
 				myLog('pmmed', '!mode reply - DJs will now be removed after playing '+mode.maxTime/60+mode.maxUnits+' of tracks. Read more: http://thephish.fm/modes/');  
+			} else if (mode.type == 'speed') {
+				bot.speak('DJs must play songs under '+mode.maxTime/60+mode.maxUnits+' to stay on the stage. Read more: http://thephish.fm/modes/');
+				myLog('pmmed', '!mode reply - DJs must play songs under '+mode.maxTime/60+mode.maxUnits+' to stay on the stage. Read more: http://thephish.fm/modes/');  
 			}
 		} else {
 			bot.pm('No DJ limits at the moment', senderid);
