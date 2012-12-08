@@ -485,20 +485,6 @@ bot.on('speak', function (data) {
    		});
    }
    
-   if (text.match(/^!unplayed /)) {
-		var song = escape(text.substr(10));		
-		var options = {url: apibase+'getRandomUnplayedSong.php?song='+song };
-		http.get(options, function(error, res) {
-			if (error) {
-				myLog('speak', '!unplayed - Error connecting to '+options['url']);
-			} else {
-				var songlist = res.buffer;
-				if (songlist.length > 1) {
-					bot.speak(songlist);
-				} 
-			}
-		});
-   }   
    
    
    
@@ -1014,5 +1000,19 @@ bot.on('pmmed', function (data) {
 			}
 		});   
    }
+   if (text.match(/^!unplayed /)) {
+		var song = escape(text.substr(10));		
+		var options = {url: apibase+'getRandomUnplayedSong.php?song='+song };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('speak', '!unplayed - Error connecting to '+options['url']);
+			} else {
+				var songlist = res.buffer;
+				if (songlist.length > 1) {
+					bot.pm(songlist, senderid);
+				} 
+			}
+		});
+   }   
 });
 
