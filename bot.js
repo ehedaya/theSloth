@@ -98,6 +98,19 @@ bot.on('newsong', function(data) {
 			myLog('newSong', "Mode is set but user will not be over limits.");
 		}
 	}
+	// Is this song in the replay?
+	var options = {url: apibase+'isSongInReplay.php?starttime='+starttime };
+	http.get(options, function(error, res) {
+		if (error) {
+			myLog('newSong', 'Replay song check - Error connecting to '+options['url']);
+		} else {
+			var result = JSON.parse(res.buffer);
+			if (result.success && result.songInReplay) {
+				myLog('newSong', 'Replay song check - exists!');
+				bot.speak(result.message);
+			}
+		}
+	});
 });
 bot.on('roomChanged',  function (data) {
   usersList = { };
