@@ -789,18 +789,16 @@ bot.on('pmmed', function (data) {
 								bot.pm(badusername+' is now on the blacklist.  Visit http://stats.thephish.fm/banned.php after using !connect to undo this.', senderid);
 							}
 						} else {
+							if (result.message == "duplicate") {
+								bot.pm("User was already banned.", senderid);
+								myLog('pmmed', '!blacklist - User was already banned: '+badusername);
+							} else if (result.message == "not found") {
+								bot.pm("Cannot find user "+badusername, senderid);
+								myLog('pmmed', '!blacklist - User not found: '+badusername);
 							} else {
-								if (result.message == "duplicate") {
-									bot.pm("User was already banned.", senderid);
-									myLog('pmmed', '!blacklist - User was already banned: '+badusername);
-								} else if (result.message == "not found") {
-									bot.pm("Cannot find user "+badusername, senderid);
-									myLog('pmmed', '!blacklist - User not found: '+badusername);
-								} else {
-									bot.pm("Something went wrong. Tell Emil!", senderid);
-									myLog('pmmed', '!blacklist - Fatal error looking up: '+badusername);
-								}	
-							}						
+								bot.pm("Something went wrong. Tell Emil!", senderid);
+								myLog('pmmed', '!blacklist - Fatal error looking up: '+badusername);
+							}	
 						}
 					}
 			});
