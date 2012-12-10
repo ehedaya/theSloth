@@ -765,27 +765,29 @@ bot.on('pmmed', function (data) {
 						var d = new Date();
 							myLog('pmmed', '!blacklist - Error connecting to '+options['url']);
 					} else {
-						var result = res.buffer;
-						if (result.match(/[a-z0-9]{24}/i)) {
-							if (moderators.contains(result)) {
+						var result = JSON.parse(res.buffer);
+						if (result.success) {
+							if (moderators.contains(result.userid)) {
 								myLog('pmmed', '!blacklist - Cannot blacklist moderator '+badusername);
 								bot.pm('Sorry, I can\'t blacklist a moderator.  You must first remove moderator status.', senderid);
 							} else {
-								bot.bootUser(result, randomItem(blacklistReasons));
+								bot.bootUser(result.userid, randomItem(blacklistReasons));
 								myLog('pmmed', '!blacklist - Booting user '+result);
 								bot.pm(badusername+' is now on the blacklist.  Visit http://stats.thephish.fm/banned.php after using !connect to undo this.', senderid);
 							}
 						} else {
-							if (result == "duplicate") {
-								bot.pm("User was already banned.", senderid);
-								myLog('pmmed', '!blacklist - User was already banned: '+badusername);
-							} else if (result == "not found") {
-								bot.pm("Cannot find user "+badusername, senderid);
-								myLog('pmmed', '!blacklist - User not found: '+badusername);
 							} else {
-								bot.pm("Something went wrong. Tell Emil!", senderid);
-								myLog('pmmed', '!blacklist - Fatal error looking up: '+badusername);
-							}	
+								if (result.message == "duplicate") {
+									bot.pm("User was already banned.", senderid);
+									myLog('pmmed', '!blacklist - User was already banned: '+badusername);
+								} else if (result.message == "not found") {
+									bot.pm("Cannot find user "+badusername, senderid);
+									myLog('pmmed', '!blacklist - User not found: '+badusername);
+								} else {
+									bot.pm("Something went wrong. Tell Emil!", senderid);
+									myLog('pmmed', '!blacklist - Fatal error looking up: '+badusername);
+								}	
+							}						
 						}
 					}
 			});
