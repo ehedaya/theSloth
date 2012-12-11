@@ -771,21 +771,21 @@ bot.on('pmmed', function (data) {
    if (text.match(/^!blacklist:/i)) {
    		if (admins.contains(senderid)) {
 			var badusername = escape(text.substr(11));
-			var options = { url: apibase+'ban.php?key='+apikey+'&name='+badusername };
+			var options = { url: apibase+'ban.php?key='+apikey+'&name='+badusername+'&format=json'};
 			myLog('pmmed', '!blacklist - Looking up user '+badusername+' with '+options['url']+'');
 			http.get(options, function(error, res) {
 					if (error) {
 						var d = new Date();
 							myLog('pmmed', '!blacklist - Error connecting to '+options['url']);
 					} else {
-						var result = JSON.parse(res.buffer);
+						result = JSON.parse(res.buffer);
 						if (result.success) {
 							if (moderators.contains(result.userid)) {
 								myLog('pmmed', '!blacklist - Cannot blacklist moderator '+badusername);
 								bot.pm('Sorry, I can\'t blacklist a moderator.  You must first remove moderator status.', senderid);
 							} else {
 								bot.bootUser(result.userid, randomItem(blacklistReasons));
-								myLog('pmmed', '!blacklist - Booting user '+result);
+								myLog('pmmed', '!blacklist - Booting user '+result.userid);
 								bot.pm(badusername+' is now on the blacklist.  Visit http://stats.thephish.fm/banned.php after using !connect to undo this.', senderid);
 							}
 						} else {
