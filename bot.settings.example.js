@@ -6,9 +6,6 @@ ROOMID 	= '';
 PNPK = '';
 PNUK = '';
 
-// The bot's own userid
-selfUserid = '';
-
 // Global variables
 apibase = '';
 apikey = '';
@@ -22,7 +19,7 @@ greeting = false;
 replay = false;
 blacklist = new Array();
 moderators = new Array();
-blacklistReasons = new Array('');
+blacklistReasons = new Array('http://i.imgur.com/ibFLX.gif', 'http://i.imgur.com/Pjc52.gif', 'http://i.imgur.com/lDs7b.gif');
 mode = new Object();
 idleTime = new Object();
 mode.cantDj = null;
@@ -30,3 +27,4 @@ modeBootPending = false;
 replayOverride = false;
 lastPlayedResponse = '';
 djspot = new Array();
+var usersList = { };

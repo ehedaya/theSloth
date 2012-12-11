@@ -2,7 +2,6 @@ var Bot    	= require('ttapi');
 var http   	= require('http-get');
 var dp = require('./date.js');
 var settings = require('./bot.settings.js');
-var usersList = { };
 var bot = new Bot(AUTH, USERID, ROOMID);
 bot.debug = false;
 
@@ -73,6 +72,7 @@ bot.on('newsong', function(data) {
 	var showdate = parseDate(dateBlob);
 	var lastPlayedResponse = '';
 
+	// Boot DJs according to mode 
 	if (mode.type) {
 		if (!mode[userid]) { mode[userid] = 0; }
 		if (mode.type=='timed' && (mode[userid]+tracktime>=mode.maxTime)) {
@@ -98,7 +98,7 @@ bot.on('newsong', function(data) {
 			myLog('newSong', "Mode is set but user will not be over limits.");
 		}
 	}
-	// Is this song in the replay?
+	// If there is a replay starting in the next 4 hours, is this song in the replay?
 	var options = {url: apibase+'isSongInReplay.php?starttime='+starttime };
 	http.get(options, function(error, res) {
 		if (error) {
@@ -122,7 +122,6 @@ bot.on('roomChanged',  function (data) {
 });
 
 bot.on('endsong', function(data) {
-			myLog('endsong', 'djcount was '+data.room.metadata.djcount);
 	var upvotes = data.room.metadata.upvotes,
 		listeners = data.room.metadata.listeners,
 		starttime = data.room.metadata.current_song.starttime,
@@ -190,13 +189,13 @@ bot.on('add_dj', function(data) {
 	var new_dj_id = data.user[0].userid;
 	var new_dj_name = data.user[0].name;
 	var new_dj_avatar_id = data.user[0].avatarid;
-	var options = { url: apibase+'user.php?key='+apikey+'&id='+new_dj_id+'&name='+new_dj_name+'&avatarid='+new_dj_avatar_id };
+	var options = { url: apibase+'user.php?key='+apikey+'&id='+new_dj_id+'&name='+new_dj_name+'&avatarid='+new_dj_avatar_id+'&format=json' };
 	http.get(options, function(error, res) {
 		if (error) {
 			myLog('addDj','bot.on(add_dj) - Error connecting to '+options['url']);
 		} else {
-			var status = res.buffer;
-			if (status == 'new' && new_dj_id != selfUserid) {
+			var json = JSON.parse(res.buffer);
+			if (json.status == 'new' && new_dj_id != USERID) {
 				bot.pm('Hey '+new_dj_name+', welcome to thePhish! Please read this before playing your first track - http://thephish.fm/tips', new_dj_id);
 				myLog('addDj', 'Sent welcome message to  '+new_dj_name);
 			}
@@ -519,7 +518,7 @@ bot.on('registered', function(data) {
 
 	
 	
-	var options = { url: apibase+'user.php?key='+apikey+'&id='+userid+'&name='+name+'&avatarid='+avatarid+'&points='+points };
+	var options = { url: apibase+'user.php?key='+apikey+'&id='+userid+'&name='+name+'&avatarid='+avatarid+'&format=json };
 	if (blacklist.contains(userid)) {
 		bot.bootUser(userid, randomItem(blacklistReasons));
 		return;
@@ -528,8 +527,8 @@ bot.on('registered', function(data) {
 			if (error) {
 				myLog('registered', 'Not on cached blacklist, checking database, error connecting to '+options['url']);
 			} else {
-				var status = res.buffer;
-				if (status == 'banned') {
+				var json = JSON.parse(res.buffer);
+				if (json.status == 'banned') {
 					bot.bootUser(userid, randomItem(blacklistReasons));
 					blacklist.push(userid);
 					myLog('registered', 'Booted blacklisted user '+userid);
