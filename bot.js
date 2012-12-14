@@ -1076,7 +1076,7 @@ bot.on('pmmed', function (data) {
 						if (isJsonString(res.buffer)) {
 							var ratingResponse = JSON.parse(res.buffer);
 							if (ratingResponse.success) {
-								bot.pm('Recorded a rating of '+rating+' for this song: http://stats.thephish.fm/'+Math.floor(data.room.metadata.current_song.starttime), senderid);
+								bot.pm(ratingResponse.message, senderid);
 							} else {
 								bot.pm('Hmm, I couldn\'n find this song in the database. *shrug*');
 							}
