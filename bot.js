@@ -72,7 +72,7 @@ bot.on('newsong', function(data) {
 	var songname = 	data.room.metadata.current_song.metadata.song, 
 		artist = 	escape(data.room.metadata.current_song.metadata.artist),
 		songid = 	escape(data.room.metadata.current_song._id),
-		starttime = escape(data.room.metadata.current_song.starttime),
+		starttime = escape(Math.floor(data.room.metadata.current_song.starttime)),
 		album = 	escape(data.room.metadata.current_song.metadata.album),
 		song = 		escape(data.room.metadata.current_song.metadata.song),
 		tracktime = escape(data.room.metadata.current_song.metadata.length),
@@ -138,7 +138,7 @@ bot.on('roomChanged',  function (data) {
 bot.on('endsong', function(data) {
 	var upvotes = data.room.metadata.upvotes,
 		listeners = data.room.metadata.listeners,
-		starttime = data.room.metadata.current_song.starttime,
+		starttime = Math.floor(data.room.metadata.current_song.starttime),
 		userid = 	escape(data.room.metadata.current_dj),
 		tracktime = escape(data.room.metadata.current_song.metadata.length),
 		name = data.room.metadata.current_song.djname;
@@ -337,7 +337,7 @@ bot.on('speak', function (data) {
 		} else {
 			bot.roomInfo(true, function(data) {
 				if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-					var options = {url: apibase+'lastPlayed.php?showdate='+showdate+'&starttime='+data.room.metadata.current_song.starttime };
+					var options = {url: apibase+'lastPlayed.php?showdate='+showdate+'&starttime='+Math.floor(data.room.metadata.current_song.starttime) };
 					http.get(options, function(error, res) {
 						if (error) {
 							myLog('speak', '!last - Error connecting to '+options['url']);
@@ -358,7 +358,7 @@ bot.on('speak', function (data) {
 		var note = escape(text.substr(2));		
 		bot.roomInfo(true, function(data) {
 			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-				var options = {url: apibase+'note.php?userid='+userid+'&starttime='+data.room.metadata.current_song.starttime+'&visibility=public&content='+note };
+				var options = {url: apibase+'note.php?userid='+userid+'&starttime='+Math.floor(data.room.metadata.current_song.starttime)+'&visibility=public&content='+note };
 				http.get(options, function(error, res) {
 					if (error) {
 						myLog('speak', '## note - Error connecting to '+options['url']);
@@ -385,16 +385,16 @@ bot.on('speak', function (data) {
    	   	if (replayOverride) {
    	   		bot.speak(replayInfo);
    	   	} else {
-			var options = { url: apibase+'replay.php?past=1' };
+			var options = { url: apibase+'replay.php' };
 			http.get(options, function(error, res) {
 				if (error) {
 					myLog('speak', '!replay - Error connecting to '+options['url']);
 				} else {
-					var replayInfo = res.buffer;
-					if (replayInfo.length > 1) {
-						bot.speak(replayInfo);
+					if(isJsonString(res.buffer)) {
+						json = JSON.parse(res.buffer);
+						bot.speak(json.message);
 					} else {
-						bot.speak("No replay today :( http://thephish.fm/replays");
+						myLog('speak', '!replay - Unparsable JSON: '+res.buffer);
 					}
 				}
 			});
@@ -567,12 +567,16 @@ bot.on('registered', function(data) {
 			var options = { url: apibase+'replay.php' };
 			http.get(options, function(error, res) {
 				if (error) {
-					myLog('registered', 'Retrieving replay info, error connecting to '+options['url']);
+					myLog('pmmed', '!replay - Error connecting to '+options['url']);
 				} else {
-					var replayInfo = res.buffer;
-					if (replayInfo.length > 1) {
-						bot.pm(replayInfo, userid);
-					} 
+					if(isJsonString(res.buffer)) {
+						json = JSON.parse(res.buffer);
+						if (json.replay_later_today) {
+							bot.speak(json.message);
+						}
+					} else {
+						myLog('speak', '!replay - Unparsable JSON: '+res.buffer);
+					}
 				}
 			});
 		}
@@ -990,7 +994,7 @@ bot.on('pmmed', function (data) {
 		var note = escape(text.substr(2));		
 		bot.roomInfo(true, function(data) {
 			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-				var options = {url: apibase+'note.php?userid='+senderid+'&starttime='+data.room.metadata.current_song.starttime+'&visibility=private&content='+note };
+				var options = {url: apibase+'note.php?userid='+senderid+'&starttime='+Math.floor(data.room.metadata.current_song.starttime)+'&visibility=private&content='+note };
 				http.get(options, function(error, res) {
 					if (error) {
 						myLog('speak', '## note - Error connecting to '+options['url']);
@@ -1062,8 +1066,9 @@ bot.on('pmmed', function (data) {
 	if (text.match(/^[*]{1,5}$/i)) {
 		var rating = text.length;		
 		bot.roomInfo(true, function(data) {
+			myLog('pmmed', senderid+' assigns a rating of '+rating+' to '+Math.floor(data.room.metadata.current_song.starttime));
 			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-				var options = {url: apibase+'rating.php?userid='+senderid+'&starttime='+data.room.metadata.current_song.starttime+'&rating='+rating };
+				var options = {url: apibase+'rating.php?key='+apikey+'&userid='+senderid+'&starttime='+Math.floor(data.room.metadata.current_song.starttime)+'&rating='+rating };
 				http.get(options, function(error, res) {
 					if (error) {
 						myLog('pmmed', 'rating - Error connecting to '+options['url']);
@@ -1071,7 +1076,7 @@ bot.on('pmmed', function (data) {
 						if (isJsonString(res.buffer)) {
 							var ratingResponse = JSON.parse(res.buffer);
 							if (ratingResponse.success) {
-								bot.pm('Recorded a rating of '+rating+' for this song: http://stats.thephish.fm/'+data.room.metadata.current_song.starttime, senderid);
+								bot.pm('Recorded a rating of '+rating+' for this song: http://stats.thephish.fm/'+Math.floor(data.room.metadata.current_song.starttime), senderid);
 							} else {
 								bot.pm('Hmm, I couldn\'n find this song in the database. *shrug*');
 							}
@@ -1081,7 +1086,7 @@ bot.on('pmmed', function (data) {
 					}
 				});
 			} else {
-				bot.speak('I can\'t note this without the showdate.');
+				bot.pm('I can\'t rate this without the showdate.', senderid);
 			}
 		});
 	}
