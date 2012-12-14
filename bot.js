@@ -57,6 +57,16 @@ function pause(millis) {
 	while(curDate-date < millis)
 }
 
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+
 bot.on('newsong', function(data) { 
 	var dateBlob = data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album;
 	var songname = 	data.room.metadata.current_song.metadata.song, 
@@ -104,10 +114,14 @@ bot.on('newsong', function(data) {
 		if (error) {
 			myLog('newSong', 'Replay song check - Error connecting to '+options['url']);
 		} else {
-			var result = JSON.parse(res.buffer);
-			if (result.success && result.songInReplay) {
-				myLog('newSong', 'Replay song check - exists!');
-				bot.speak(result.message);
+			if (isJsonString(res.buffer)) {
+				var result = JSON.parse(res.buffer);
+				if (result.success && result.songInReplay) {
+					myLog('newSong', 'Replay song check - exists!');
+					bot.speak(result.message);
+				}
+			} else {
+				myLog('newSong', 'JSON.parse error - '+res.buffer);
 			}
 		}
 	});
@@ -194,10 +208,14 @@ bot.on('add_dj', function(data) {
 		if (error) {
 			myLog('addDj','bot.on(add_dj) - Error connecting to '+options['url']);
 		} else {
-			var json = JSON.parse(res.buffer);
-			if (json.status == 'new' && new_dj_id != USERID) {
-				bot.pm('Hey '+new_dj_name+', welcome to thePhish! Please read this before playing your first track - http://thephish.fm/tips', new_dj_id);
-				myLog('addDj', 'Sent welcome message to  '+new_dj_name);
+			if (isJsonString(res.buffer)) {
+				var json = JSON.parse(res.buffer);
+				if (json.status == 'new' && new_dj_id != USERID) {
+					bot.pm('Hey '+new_dj_name+', welcome to thePhish! Please read this before playing your first track - http://thephish.fm/tips', new_dj_id);
+					myLog('addDj', 'Sent welcome message to  '+new_dj_name);
+				}
+			} else {
+				myLog('addDj', 'JSON.parse error - '+res.buffer);
 			}
 		}
 	});
@@ -486,12 +504,15 @@ bot.on('speak', function (data) {
 						myLog('pmmed', '!setlisfull - Error connecting to '+options['url']);
 						bot.speak('Oops, something went wrong.');
 					} else {
-					   var d = res.buffer;
-						  var json = JSON.parse(d);
-						  var setlistdata = json[0].setlistdata;
-						  var setlist = setlistdata.replace(/(<([^>]+)>)/ig,"");
-						  bot.speak(setlist);
-						myLog('pmmed', '!setlisfull - Retrieved setlist successfully');
+						if (isJsonString(res.buffer)) {
+							var json = JSON.parse(res.buffer);
+							var setlistdata = json[0].setlistdata;
+							var setlist = setlistdata.replace(/(<([^>]+)>)/ig,"");
+							bot.speak(setlist);
+							myLog('pmmed', '!setlisfull - Retrieved setlist successfully');
+						} else {
+							myLog('pmmed', 'JSON.parse error - '+res.buffer);
+						}
 					}
 				});
    		});
@@ -518,7 +539,7 @@ bot.on('registered', function(data) {
 
 	
 	
-	var options = { url: apibase+'user.php?key='+apikey+'&id='+userid+'&name='+name+'&avatarid='+avatarid+'&format=json };
+	var options = { url: apibase+'user.php?key='+apikey+'&id='+userid+'&name='+name+'&avatarid='+avatarid+'&format=json' };
 	if (blacklist.contains(userid)) {
 		bot.bootUser(userid, randomItem(blacklistReasons));
 		return;
@@ -527,13 +548,17 @@ bot.on('registered', function(data) {
 			if (error) {
 				myLog('registered', 'Not on cached blacklist, checking database, error connecting to '+options['url']);
 			} else {
-				var json = JSON.parse(res.buffer);
-				if (json.status == 'banned') {
-					bot.bootUser(userid, randomItem(blacklistReasons));
-					blacklist.push(userid);
-					myLog('registered', 'Booted blacklisted user '+userid);
-					return;
-				} 
+				if (isJsonString(res.buffer)) {
+					var json = JSON.parse(res.buffer);
+					if (json.status == 'banned') {
+						bot.bootUser(userid, randomItem(blacklistReasons));
+						blacklist.push(userid);
+						myLog('registered', 'Booted blacklisted user '+userid);
+						return;
+					} 
+				} else {
+					myLog('addDj', 'JSON.parse error - '+res.buffer);
+				}
 			}
 		});
 		if (replayOverride) {
@@ -604,12 +629,15 @@ bot.on('pmmed', function (data) {
 							var d = new Date();
 							myLog('pmmed', '!setlisfull - Error connecting to '+options['url']);
 						} else {
-						   var d = res.buffer;
-							  var json = JSON.parse(d);
-							  var setlistdata = json[0].setlistdata;
-							  var setlist = setlistdata.replace(/(<([^>]+)>)/ig,"");
-							  bot.pm(setlist, senderid);
-							myLog('pmmed', '!setlisfull - Retrieved setlist successfully');
+						   if (isJsonString(res.buffer)) {
+								var json = JSON.parse(res.buffer);
+								var setlistdata = json[0].setlistdata;
+								var setlist = setlistdata.replace(/(<([^>]+)>)/ig,"");
+								bot.pm(setlist, senderid);
+								myLog('pmmed', '!setlisfull - Retrieved setlist successfully');
+							} else {
+								myLog('pmmed', 'JSON.parse error - '+res.buffer);
+							}						
 						}
 					});
 			} else {
@@ -777,27 +805,31 @@ bot.on('pmmed', function (data) {
 						var d = new Date();
 							myLog('pmmed', '!blacklist - Error connecting to '+options['url']);
 					} else {
-						result = JSON.parse(res.buffer);
-						if (result.success) {
-							if (moderators.contains(result.userid)) {
-								myLog('pmmed', '!blacklist - Cannot blacklist moderator '+badusername);
-								bot.pm('Sorry, I can\'t blacklist a moderator.  You must first remove moderator status.', senderid);
+						if (isJsonString(res.buffer)) {
+							result = JSON.parse(res.buffer);
+							if (result.success) {
+								if (moderators.contains(result.userid)) {
+									myLog('pmmed', '!blacklist - Cannot blacklist moderator '+badusername);
+									bot.pm('Sorry, I can\'t blacklist a moderator.  You must first remove moderator status.', senderid);
+								} else {
+									bot.bootUser(result.userid, randomItem(blacklistReasons));
+									myLog('pmmed', '!blacklist - Booting user '+result.userid);
+									bot.pm(badusername+' is now on the blacklist.  Visit http://stats.thephish.fm/banned.php after using !connect to undo this.', senderid);
+								}
 							} else {
-								bot.bootUser(result.userid, randomItem(blacklistReasons));
-								myLog('pmmed', '!blacklist - Booting user '+result.userid);
-								bot.pm(badusername+' is now on the blacklist.  Visit http://stats.thephish.fm/banned.php after using !connect to undo this.', senderid);
+								if (result.message == "duplicate") {
+									bot.pm("User was already banned.", senderid);
+									myLog('pmmed', '!blacklist - User was already banned: '+badusername);
+								} else if (result.message == "not found") {
+									bot.pm("Cannot find user "+badusername, senderid);
+									myLog('pmmed', '!blacklist - User not found: '+badusername);
+								} else {
+									bot.pm("Something went wrong. Tell Emil!", senderid);
+									myLog('pmmed', '!blacklist - Fatal error looking up: '+badusername);
+								}	
 							}
 						} else {
-							if (result.message == "duplicate") {
-								bot.pm("User was already banned.", senderid);
-								myLog('pmmed', '!blacklist - User was already banned: '+badusername);
-							} else if (result.message == "not found") {
-								bot.pm("Cannot find user "+badusername, senderid);
-								myLog('pmmed', '!blacklist - User not found: '+badusername);
-							} else {
-								bot.pm("Something went wrong. Tell Emil!", senderid);
-								myLog('pmmed', '!blacklist - Fatal error looking up: '+badusername);
-							}	
+							myLog('pmmed', 'JSON.parse error - '+res.buffer);
 						}
 					}
 			});
@@ -1026,5 +1058,34 @@ bot.on('pmmed', function (data) {
 			}
 		});
    }   
+
+	if (text.match(/^[*]{1,5}$/i)) {
+		var rating = text.length;		
+		bot.roomInfo(true, function(data) {
+			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
+				var options = {url: apibase+'rating.php?userid='+senderid+'&starttime='+data.room.metadata.current_song.starttime+'&rating='+rating };
+				http.get(options, function(error, res) {
+					if (error) {
+						myLog('pmmed', 'rating - Error connecting to '+options['url']);
+					} else {
+						if (isJsonString(res.buffer)) {
+							var ratingResponse = JSON.parse(res.buffer);
+							if (ratingResponse.success) {
+								bot.pm('Recorded a rating of '+rating+' for this song: http://stats.thephish.fm/'+data.room.metadata.current_song.starttime, senderid);
+							} else {
+								bot.pm('Hmm, I couldn\'n find this song in the database. *shrug*');
+							}
+						} else {
+							myLog('pmmed', 'Unparseable response: '+res.buffer);						
+						}
+					}
+				});
+			} else {
+				bot.speak('I can\'t note this without the showdate.');
+			}
+		});
+	}
+   
+   
 });
 
