@@ -86,11 +86,9 @@ bot.on('newsong', function(data) {
 	if (mode.type) {
 		if (!mode[userid]) { mode[userid] = 0; }
 		if (mode.type=='timed' && (mode[userid]+tracktime>=mode.maxTime)) {
-			bot.speak('/me reloads rifle');
 			myLog('newSong', 'Pending autoboot for '+userid+' accumulated '+mode[userid]+', limit is '+mode.maxTime);
 			modeBootPending = true;
 		} else if (mode.type=='playN' && (mode[userid]+1>=mode.maxPlays)) {
-			bot.speak('/me reloads rifle');
 			modeBootPending = true;
 			myLog('newSong', 'Pending autoboot for '+userid+' accumulated '+mode[userid]+', limit is '+mode.maxPlays);
 		} else if (mode.type == 'speed') {
@@ -149,7 +147,6 @@ bot.on('endsong', function(data) {
 			mode[userid] = mode[userid] ? mode[userid]+1 : 1;
 			myLog('endSong', name+' has '+mode[userid]+' plays');
 			if (mode[userid] >= mode.maxPlays) {
-				bot.speak('/me fires a single shot');
 				bot.remDj(userid);
 				mode.cantDj = userid;
 				mode.cantDjExpires = getEpoch()+30;
@@ -162,7 +159,6 @@ bot.on('endsong', function(data) {
 			mode[userid] = mode[userid] ? mode[userid]+parseInt(tracktime) : parseInt(tracktime);
 			myLog('endSong', name+' has played '+mode[userid]/60+' minutes');
 			if (mode[userid] >= mode.maxTime) {
-				bot.speak('/me fires a single shot');
 				bot.remDj(userid);
 				myLog('Setting mode.cantDj to '+userid);
 				mode.cantDj = userid;
@@ -190,7 +186,6 @@ bot.on('endsong', function(data) {
 	}
 	if (lastsong) {
 		myLog('endSong', 'Booting '+lastsong+' via !lastsong');
-		bot.speak('/me fires a single shot.');
 		bot.remDj(lastsong);
 		lastsong = false;
 	}
@@ -740,26 +735,22 @@ bot.on('pmmed', function (data) {
 					lastsong = senderid;
 					myLog('pmmed', '!lastsong - Pending autoboot for '+lastsong);
 					bot.pm('As you wish.', senderid);
-					bot.speak('/me attaches scope to rifle.');
 				} else if (cdj == senderid && modeBootPending) {
 					bot.pm('Sorry sir, I have my orders.', senderid);
 				} else {
 					myLog('pmmed', '!lastsong - Pending autoboot for '+lastsong+' canceled');
 					lastsong = false;
 					bot.pm('*sigh*', senderid);
-					bot.speak('/me puts his rifle away.');
 				}			
 			} else if ((cdj!=senderid)&&(moderators.contains(senderid))){
 				if (!lastsong && !modeBootPending) {
 					lastsong = cdj;
 					myLog('pmmed', '!lastsong - Pending autoboot issued by '+senderid+' for '+cdj);
 					bot.pm('As you wish.', senderid);
-					bot.speak('/me attaches scope to rifle.');
 				} else if (lastsong && !modeBootPending) {
 					myLog('pmmed', '!lastsong - Pending autoboot for '+lastsong+' canceled by '+senderid);
 					lastsong = false;
 					bot.pm('*sigh*', senderid);
-					bot.speak('/me puts his rifle away.');
 				}
 			} else {
 				bot.pm('You must be the active DJ to use this feature.', senderid);
