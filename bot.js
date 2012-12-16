@@ -123,6 +123,11 @@ bot.on('newsong', function(data) {
 			}
 		}
 	});
+
+	// Daily ghost
+	if (data.room.metadata.current_song.metadata.artist.match(/Daily\sGhost/i)) {
+		bot.speak(':ghost:'+data.room.metadata.current_song.metadata.album);
+	}
 });
 bot.on('roomChanged',  function (data) {
   usersList = { };
