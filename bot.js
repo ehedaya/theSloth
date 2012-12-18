@@ -571,7 +571,7 @@ bot.on('registered', function(data) {
 				} else {
 					if(isJsonString(res.buffer)) {
 						json = JSON.parse(res.buffer);
-						if (json.replay_later_today) {
+						if (json.replay_later_today == true) {
 							bot.speak(json.message);
 						}
 					} else {
