@@ -136,6 +136,12 @@ bot.on('roomChanged',  function (data) {
     user.lastActivity = Date.now();
     usersList[user.userid] = user;
   }
+	var options = { url: apibase+'heartbeat.php?key='+apikey+'&bot=theSloth' };
+	http.get(options, function(error, res) {
+		if (error) {
+			myLog('addDj','bot.on(roomchanged) - Error connecting to '+options['url']);
+		}
+	});
 });
 
 bot.on('endsong', function(data) {
@@ -518,6 +524,12 @@ bot.on('speak', function (data) {
    		});
    }
    
+	var options = { url: apibase+'heartbeat.php?key='+apikey+'&bot=theSloth' };
+	http.get(options, function(error, res) {
+		if (error) {
+			myLog('addDj','bot.on(chat) - Error connecting to '+options['url']);
+		}
+	});
    
    
    
