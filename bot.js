@@ -611,10 +611,23 @@ bot.on('registered', function(data) {
 			}		
 		}
 	}
+	var options = { url: apibase+'heartbeat.php?key='+apikey+'&bot=theSloth' };
+	http.get(options, function(error, res) {
+		if (error) {
+			myLog('addDj','bot.on(registered) - Error connecting to '+options['url']);
+		}
+	});
+
 });
 
 bot.on('deregistered', function(data) {
   delete usersList[data.user[0].userid];
+	var options = { url: apibase+'heartbeat.php?key='+apikey+'&bot=theSloth' };
+	http.get(options, function(error, res) {
+		if (error) {
+			myLog('addDj','bot.on(deregistered) - Error connecting to '+options['url']);
+		}
+	});
 });
 
 bot.on('pmmed', function (data) { 
