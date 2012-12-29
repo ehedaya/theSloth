@@ -275,7 +275,6 @@ bot.on('speak', function (data) {
 	var chatResponses = { };
 	chatResponses.help 		= { trigger: new RegExp('^!help$','i'), response: 'http://stats.thephish.fm/about.php' };
 	chatResponses.tips 		= { trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'};
-	chatResponses.stream 	= { trigger: new RegExp('^!stream$','i'), response: 'http://mobilefunspot.com/streams.html'};
 	chatResponses.stats 	= { trigger: new RegExp('^!stats$','i'), response: 'http://stats.thephish.fm'};
 	chatResponses.gifs	 	= { trigger: new RegExp('^!gifs$','i'), response: 'http://tinyurl.com/ttgifs'};
 	chatResponses.deg	 	= { trigger: new RegExp('^!deg$','i'), response: 'http://tinyurl.com/phishdeg'};
