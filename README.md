@@ -1,7 +1,7 @@
 theSloth
 ========
 
-Read the [Wiki](wiki/) for more information.
+Read the [Wiki](https://github.com/ehedaya/theSloth/wiki) for more information.
 
 ### Additional requirements
 - [node.js](http://nodejs.org/)
