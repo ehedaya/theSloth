@@ -280,8 +280,8 @@ bot.on('speak', function (data) {
 	chatResponses.deg	 	= { trigger: new RegExp('^!deg$','i'), response: 'http://tinyurl.com/phishdeg'};
 	chatResponses.greet	 	= { trigger: new RegExp('^!greet$','i'), response: greeting};
 	chatResponses.slide	 	= { trigger: new RegExp('^!slide$','i'), response: 'http://thephish.fm/theslide'};
-	chatResponses.sloth	 	= { trigger: new RegExp('^!sloth$','i'), response: 'http://stats.thephish.fm/about.php'};
-	chatResponses.sloth2 	= { trigger: new RegExp('^!about$','i'), response: 'http://stats.thephish.fm/about.php'};
+	chatResponses.sloth 	= { trigger: new RegExp('^!(about|commands|sloth)$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'};
+	chatResponses.commands 	= { trigger: new RegExp('^commands$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'};
 	chatResponses.meettup 	= { trigger: new RegExp('^!meettup$','i'), response: 'http://www.tinyurl.com/2012TTNYE'};
 	chatResponses.ss 		= { trigger: new RegExp('^!ss$','i'), response: 'http://thephish.fm/secreTTsanTTa'};
 	chatResponses.breakfast	= { trigger: new RegExp('^!whatdidkfhaveforbreakfast$','i'), response: 'Trick question.  KernelForbin did not eat breakfast.'};
@@ -292,6 +292,7 @@ bot.on('speak', function (data) {
 	chatResponses.pets	 	= { trigger: new RegExp('(pets|hugs).+sloth','i'), response: randomItem(['http://tinyurl.com/slothishappy', '<3', 'http://tinyurl.com/coolsloth'])};
 	chatResponses.lick	 	= { trigger: new RegExp('(lick|spam|dose).+sloth','i'), response: '/me stabs '+name};
 	chatResponses.dance	 	= { trigger: new RegExp('dances with.+sloth','i'), response: '/me dances with '+name};
+	chatResponses.latest	= { trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'};
    
 	for(t in chatResponses) {
 		if (text.match(chatResponses[t].trigger)) {
