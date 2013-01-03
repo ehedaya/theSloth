@@ -1,5 +1,6 @@
 var Bot    	= require('ttapi');
 var http   	= require('http-get');
+var md5 = require('MD5');
 var dp = require('./date.js');
 var settings = require('./bot.settings.js');
 var bot = new Bot(AUTH, USERID, ROOMID);
@@ -64,6 +65,10 @@ function isJsonString(str) {
         return false;
     }
     return true;
+}
+
+function authKey() {
+	return md5(getEpoch()+apikey);
 }
 
 
@@ -136,7 +141,7 @@ bot.on('roomChanged',  function (data) {
     user.lastActivity = Date.now();
     usersList[user.userid] = user;
   }
-	var options = { url: apibase+'heartbeat.php?key='+apikey+'&bot=theSloth' };
+	var options = { url: apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
 	http.get(options, function(error, res) {
 		if (error) {
 			myLog('addDj','bot.on(roomchanged) - Error connecting to '+options['url']);
@@ -209,7 +214,7 @@ bot.on('add_dj', function(data) {
 	var new_dj_id = data.user[0].userid;
 	var new_dj_name = data.user[0].name;
 	var new_dj_avatar_id = data.user[0].avatarid;
-	var options = { url: apibase+'user.php?key='+apikey+'&id='+new_dj_id+'&name='+new_dj_name+'&avatarid='+new_dj_avatar_id+'&format=json' };
+	var options = { url: apibase+'user.php?key='+authKey()+'&id='+new_dj_id+'&name='+new_dj_name+'&avatarid='+new_dj_avatar_id+'&format=json' };
 	http.get(options, function(error, res) {
 		if (error) {
 			myLog('addDj','bot.on(add_dj) - Error connecting to '+options['url']);
@@ -221,7 +226,7 @@ bot.on('add_dj', function(data) {
 					myLog('addDj', 'Sent welcome message to  '+new_dj_name);
 				}
 			} else {
-				myLog('addDj', 'JSON.parse error - '+res.buffer);
+				myLog('addDj', 'JSON.parse error - '+res.buffer+' (URL was '+options.url+')');
 			}
 		}
 	});
@@ -318,7 +323,7 @@ bot.on('speak', function (data) {
    		if(usersHere.length>10) {
 			bot.roomInfo(true, function(data) {
 				if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-					var options = {url: apibase+'getUsersAtShow.php?key='+apikey+'&date='+showdate+'&u='+usersHere };
+					var options = {url: apibase+'getUsersAtShow.php?key='+authKey()+'&date='+showdate+'&u='+usersHere };
 					http.get(options, function(error, res) {
 						if (error) {
 							myLog('speak', '!who - Error connecting to '+options['url']);
@@ -364,7 +369,7 @@ bot.on('speak', function (data) {
 		var note = escape(text.substr(2));		
 		bot.roomInfo(true, function(data) {
 			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-				var options = {url: apibase+'note.php?userid='+userid+'&starttime='+Math.floor(data.room.metadata.current_song.starttime)+'&visibility=public&content='+note };
+				var options = {url: apibase+'note.php?key='+authKey()+'&userid='+userid+'&starttime='+Math.floor(data.room.metadata.current_song.starttime)+'&visibility=public&content='+note };
 				http.get(options, function(error, res) {
 					if (error) {
 						myLog('speak', '## note - Error connecting to '+options['url']);
@@ -376,7 +381,7 @@ bot.on('speak', function (data) {
 							bot.pm('This song didn\'t get logged in stats', userid);
 							myLog('speak', '## note - Failed note, could not find song.');
 						} else {
-							myLog('speak', '## note - Failed note, fell out of if-block.');
+							myLog('speak', '## note - Failed note, fell out of if-block. '+options.url);
 							bot.pm('Hm, something went wrong.', userid);
 						}
 					}
@@ -524,7 +529,7 @@ bot.on('speak', function (data) {
    		});
    }
    
-	var options = { url: apibase+'heartbeat.php?key='+apikey+'&bot=theSloth' };
+	var options = { url: apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
 	http.get(options, function(error, res) {
 		if (error) {
 			myLog('addDj','bot.on(chat) - Error connecting to '+options['url']);
@@ -547,11 +552,9 @@ bot.on('registered', function(data) {
 	var points = data.user[0].points;
 
 	var user = data.user[0];
-	usersList[user.userid] = user;
-
+	usersList[user.userid] = user;	
 	
-	
-	var options = { url: apibase+'user.php?key='+apikey+'&id='+userid+'&name='+name+'&avatarid='+avatarid+'&format=json' };
+	var options = { url: apibase+'user.php?key='+authKey()+'&id='+userid+'&name='+name+'&avatarid='+avatarid+'&format=json' };
 	if (blacklist.contains(userid)) {
 		bot.bootUser(userid, randomItem(blacklistReasons));
 		return;
@@ -569,7 +572,7 @@ bot.on('registered', function(data) {
 						return;
 					} 
 				} else {
-					myLog('addDj', 'JSON.parse error - '+res.buffer);
+					myLog('registered', 'JSON.parse error - '+res.buffer+' (URL was '+options.url+')');
 				}
 			}
 		});
@@ -587,7 +590,7 @@ bot.on('registered', function(data) {
 							bot.speak(json.message);
 						}
 					} else {
-						myLog('speak', '!replay - Unparsable JSON: '+res.buffer);
+						myLog('registered', '!replay - Unparsable JSON: '+res.buffer);
 					}
 				}
 			});
@@ -611,7 +614,7 @@ bot.on('registered', function(data) {
 			}		
 		}
 	}
-	var options = { url: apibase+'heartbeat.php?key='+apikey+'&bot=theSloth' };
+	var options = { url: apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
 	http.get(options, function(error, res) {
 		if (error) {
 			myLog('addDj','bot.on(registered) - Error connecting to '+options['url']);
@@ -622,7 +625,7 @@ bot.on('registered', function(data) {
 
 bot.on('deregistered', function(data) {
   delete usersList[data.user[0].userid];
-	var options = { url: apibase+'heartbeat.php?key='+apikey+'&bot=theSloth' };
+	var options = { url: apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
 	http.get(options, function(error, res) {
 		if (error) {
 			myLog('addDj','bot.on(deregistered) - Error connecting to '+options['url']);
@@ -715,7 +718,7 @@ bot.on('pmmed', function (data) {
    	
    	if (text.match(/^!connect$/i)) {
    		var token = getGuid();
-		var options = { url: apibase+'key.php?key='+apikey+'&id='+senderid+'&token='+token };
+		var options = { url: apibase+'key.php?key='+authKey()+'&id='+senderid+'&token='+token };
 		http.get(options, function(error, res) {
 			bot.pm('Psst, do not share this link with anyone: '+apibase+'auth.php?id='+senderid+'&token='+token, senderid);
 			myLog('pmmed', '!connect key sent to - '+senderid);
@@ -823,7 +826,7 @@ bot.on('pmmed', function (data) {
    if (text.match(/^!blacklist:/i)) {
    		if (admins.contains(senderid)) {
 			var badusername = escape(text.substr(11));
-			var options = { url: apibase+'ban.php?key='+apikey+'&name='+badusername+'&format=json'};
+			var options = { url: apibase+'ban.php?key='+authKey()+'&name='+badusername+'&format=json'};
 			myLog('pmmed', '!blacklist - Looking up user '+badusername+' with '+options['url']+'');
 			http.get(options, function(error, res) {
 					if (error) {
@@ -897,7 +900,7 @@ bot.on('pmmed', function (data) {
 	
     if (text.match(/^!weather/)) {	 
 		var zip = escape(text.substr(9));
-		var options = { url: apibase+'weather.php?key='+apikey+'&what=all&zip='+zip };
+		var options = { url: apibase+'weather.php?key='+authKey()+'&what=all&zip='+zip };
 		http.get(options, function(error, res) {
 			if (error) {
 				myLog('pmmed', '!weather - Error connecting to '+options['url']);
@@ -1015,7 +1018,7 @@ bot.on('pmmed', function (data) {
 		var note = escape(text.substr(2));		
 		bot.roomInfo(true, function(data) {
 			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-				var options = {url: apibase+'note.php?userid='+senderid+'&starttime='+Math.floor(data.room.metadata.current_song.starttime)+'&visibility=private&content='+note };
+				var options = {url: apibase+'note.php?key='+authKey()+'&userid='+senderid+'&starttime='+Math.floor(data.room.metadata.current_song.starttime)+'&visibility=private&content='+note };
 				http.get(options, function(error, res) {
 					if (error) {
 						myLog('speak', '## note - Error connecting to '+options['url']);
@@ -1028,7 +1031,7 @@ bot.on('pmmed', function (data) {
 							bot.pm('This song didn\'t get logged in stats', senderid);
 							myLog('pmmed', '## note - Failed note, could not find song.');
 						} else {
-							myLog('pmmed', '## note - Failed note, fell out of if-block.');
+							myLog('pmmed', '## note - Failed note, fell out of if-block.'+options.url);
 							bot.pm('Hm, something went wrong.', senderid);
 						}
 					}
@@ -1040,7 +1043,7 @@ bot.on('pmmed', function (data) {
 	}
    if (text.match(/^!pnet:/)) {
    		var pnet_username = escape(text.substr(6));
-		var options = { url: apibase+'pnet_connect.php?key='+apikey+'&userid='+senderid+'&pnet_username='+pnet_username };
+		var options = { url: apibase+'pnet_connect.php?key='+authKey()+'&userid='+senderid+'&pnet_username='+pnet_username };
 		http.get(options, function(error, res) {
 			if (error) {
 				myLog('pmmed', '!pnet: - Error connecting to '+options['url']);
@@ -1050,7 +1053,7 @@ bot.on('pmmed', function (data) {
 		});   
    }
    if (text.match(/^!pnet$/)) {
-		var options = { url: apibase+'pnet_connect.php?key='+apikey+'&userid='+senderid+'&refresh=1' };
+		var options = { url: apibase+'pnet_connect.php?key='+authKey()+'&userid='+senderid+'&refresh=1' };
 		http.get(options, function(error, res) {
 			if (error) {
 				myLog('pmmed', '!pnet - Error connecting to '+options['url']);
@@ -1089,7 +1092,7 @@ bot.on('pmmed', function (data) {
 		bot.roomInfo(true, function(data) {
 			myLog('pmmed', senderid+' assigns a rating of '+rating+' to '+Math.floor(data.room.metadata.current_song.starttime));
 			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-				var options = {url: apibase+'rating.php?key='+apikey+'&userid='+senderid+'&starttime='+Math.floor(data.room.metadata.current_song.starttime)+'&rating='+rating };
+				var options = {url: apibase+'rating.php?key='+authKey()+'&userid='+senderid+'&starttime='+Math.floor(data.room.metadata.current_song.starttime)+'&rating='+rating };
 				http.get(options, function(error, res) {
 					if (error) {
 						myLog('pmmed', 'rating - Error connecting to '+options['url']);
