@@ -1021,15 +1021,17 @@ bot.on('pmmed', function (data) {
 						myLog('speak', '## note - Error connecting to '+options['url']);
 					} else {
 						var noteResponse = res.buffer;
-						if (noteResponse == "success") {
-							myLog('pmmed', '## note - Stored note.');
-							bot.pm('Private note stored! Private notes appear on your stats profile if you signed in (reply !connect to sign in)', senderid);
-						} else if (noteResponse == "not found") {
-							bot.pm('This song didn\'t get logged in stats', senderid);
-							myLog('pmmed', '## note - Failed note, could not find song.');
+						if (isJsonString(noteResponse)) {
+							json = JSON.parse(noteResponse);
+							if (json.success) {
+								myLog('pmmed', '## note - Stored note.');
+								bot.pm('Private note stored! View your private notes here: '+json.url, senderid);
+							} else {
+								bot.pm('Hm, your note was not stored. ('+json.message+')', senderid);
+							} 
 						} else {
-							myLog('pmmed', '## note - Failed note, fell out of if-block.');
-							bot.pm('Hm, something went wrong.', senderid);
+							myLog('pmmed', 'Unparseable JSON in private note: '+noteResponse);
+							bot.pm('Whoops, something went wrong.');
 						}
 					}
 				});
