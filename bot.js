@@ -1027,6 +1027,7 @@ bot.on('pmmed', function (data) {
 								myLog('pmmed', '## note - Stored note.');
 								bot.pm('Private note stored! View your private notes here: '+json.url, senderid);
 							} else {
+								myLog('pmmed', 'Unparseable JSON in private note: '+noteResponse);
 								bot.pm('Hm, your note was not stored. ('+json.message+')', senderid);
 							} 
 						} else {
