@@ -1,0 +1,24 @@
+{
+  "author": {
+   "name": "Emil Hedaya",
+   "email": "ehedaya@gmail.com",
+   "url": "http://redmedia.com"  
+  },
+  "name": "theSloth",
+  "description": "",
+  "version": "3.0",
+  "main": "./bot.js",
+  "dependencies": {
+    "ttapi": "~1.5.0",
+    "http-get": "~0.4.2"
+    "MD5": "~1.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "bot.js"
+  },
+  "engines": {
+    "node": "0.8.x"
+  }
+}
+
