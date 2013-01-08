@@ -374,15 +374,17 @@ bot.on('speak', function (data) {
 					if (error) {
 						myLog('speak', '## note - Error connecting to '+options['url']);
 					} else {
-						var noteResponse = res.buffer;
-						if (noteResponse == "success") {
-							myLog('speak', '## note - Stored note.');
-						} else if (noteResponse == "not found") {
-							bot.pm('This song didn\'t get logged in stats', userid);
-							myLog('speak', '## note - Failed note, could not find song.');
+						if (isJsonString(res.buffer)) {
+							json = JSON.parse(res.buffer);
+							if (json.success) {
+								myLog('pmmed', '## note - Stored note.');
+							} else {
+								myLog('pmmed', 'JSON failure in private note: '+res.buffer);
+								bot.pm('Hm, your note was not stored. ('+json.message+')', senderid);
+							} 
 						} else {
-							myLog('speak', '## note - Failed note, fell out of if-block. '+options.url);
-							bot.pm('Hm, something went wrong.', userid);
+							myLog('pmmed', 'Unparseable JSON in private note: '+options.url);
+							bot.pm('Whoops, something went wrong.');
 						}
 					}
 				});
@@ -587,7 +589,7 @@ bot.on('registered', function(data) {
 					if(isJsonString(res.buffer)) {
 						json = JSON.parse(res.buffer);
 						if (json.replay_later_today == true) {
-							bot.speak(json.message);
+							bot.pm(json.message);
 						}
 					} else {
 						myLog('registered', '!replay - Unparsable JSON: '+res.buffer);
@@ -1119,5 +1121,3 @@ bot.on('pmmed', function (data) {
    
    
 });
-
-
