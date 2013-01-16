@@ -916,23 +916,6 @@ bot.on('pmmed', function (data) {
 		});
 	}
 	
-    if (text.match(/^!weather/)) {	 
-		var zip = escape(text.substr(9));
-		var options = { bufferType: 'buffer', url:apibase+'weather.php?key='+authKey()+'&what=all&zip='+zip };
-		http.get(options, function(error, res) {
-			if (error) {
-				myLog('pmmed', '!weather - Error connecting to '+options['url']);
-			} else {
-				var weather = res.buffer;
-				if (weather.substr(0,15) == 'Conditions in ,') {
-					bot.pm("There is no weather today.", senderid);
-				} else {
-					bot.pm(weather, senderid);
-					myLog('pmmed', '!weather reply - '+weather);
-				}
-			}
-		});
-   	}
     if (text.match(/^!whois:/)) {	 
    		var whoisName = escape(text.substr(7));
 		var options = { bufferType: 'buffer', url:apibase+'whois.php?name='+whoisName };
