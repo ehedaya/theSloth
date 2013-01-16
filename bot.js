@@ -507,6 +507,22 @@ bot.on('speak', function (data) {
 			}
    		});
    }
+	if (text.match(/^!birthday/i)) {
+		var options = {bufferType: 'buffer', url:apibase+'getUserBirthdays.php' };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('speak', '!points - Error connecting to '+options['url']);
+			} else {
+				if (isJsonString(res.buffer)) {
+					var json = JSON.parse(res.buffer);
+					bot.speak(json.message);
+				} else {
+					myLog('speak', '!birthday - JSON parse error: '+res.buffer);
+				}
+			}
+		});
+	}
+   
 
 	if (text.match(/^!live$/)) {
    		bot.roomInfo(true, function(data) { 
@@ -1053,6 +1069,22 @@ bot.on('pmmed', function (data) {
 				myLog('pmmed', '!pnet: - Error connecting to '+options['url']);
 			} else {
 				bot.pm(res.buffer, senderid);
+			}
+		});   
+   }
+   if (text.match(/^!birthday:/)) {
+   		var birthday = escape(text.substr(10));
+		var options = { bufferType: 'buffer', url:apibase+'birthday.php?key='+authKey()+'&userid='+senderid+'&birthday='+birthday };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('pmmed', '!birthday: - Error connecting to '+options['url']);
+			} else {
+				if (isJsonString(res.buffer)) {
+					json = JSON.parse(res.buffer);
+					bot.pm(json.message, senderid);
+				} else {
+					myLog('pmmed', '!birthday: - JSON parse error '+res.buffer);
+				}
 			}
 		});   
    }
