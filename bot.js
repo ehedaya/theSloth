@@ -723,6 +723,10 @@ bot.on('pmmed', function (data) {
    			myLog('pmmed', 'Puppetry - '+text.substr(1));
    			bot.speak(text.substr(1));
    		}
+   		if (text.match(/^!avatar:/)) {
+   			bot.setAvatar(text.substr(8));
+   			myLog('pmmed', 'Set avatar to '+text.substr(8));
+   		}
    	}
    	if (text.match(/(awesome|great|sick|nasty|good)/i)) {
 		if (!awesomes.contains(senderid)) {
