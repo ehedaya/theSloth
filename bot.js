@@ -298,7 +298,8 @@ bot.on('speak', function (data) {
 	chatResponses.lick	 	= { trigger: new RegExp('(lick|spam|dose).+sloth','i'), response: '/me stabs '+name};
 	chatResponses.dance	 	= { trigger: new RegExp('dances with.+sloth','i'), response: '/me dances with '+name};
 	chatResponses.latest	= { trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'};
-   
+    chatResponses.history    = { trigger: new RegExp('^!history$', 'i'), response: 'http://phish.net/song/'};
+
 	for(t in chatResponses) {
 		if (text.match(chatResponses[t].trigger)) {
 			bot.speak(chatResponses[t].response); 
