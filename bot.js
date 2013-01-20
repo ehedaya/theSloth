@@ -381,7 +381,7 @@ bot.on('speak', function (data) {
 								myLog('pmmed', '## note - Stored note.');
 							} else {
 								myLog('pmmed', 'JSON failure in private note: '+res.buffer);
-								bot.pm('Hm, your note was not stored. ('+json.message+')', senderid);
+								bot.pm('Hm, your note was not stored. ('+json.message+')', userid);
 							} 
 						} else {
 							myLog('pmmed', 'Unparseable JSON in private note: '+options.url);
@@ -525,28 +525,6 @@ bot.on('speak', function (data) {
 	}
    
 
-	if (text.match(/^!live$/)) {
-   		bot.roomInfo(true, function(data) { 
-			var options = { bufferType: 'buffer', url:'http://api.phish.net/api.js?api=1.0&method=getShow&apikey='+PNPK+'&linked=0&format=json&showdate=2015-06-06' };
-			http.get(options, function(error, res) {
-					if (error) {
-						var d = new Date();
-						myLog('pmmed', '!setlisfull - Error connecting to '+options['url']);
-						bot.speak('Oops, something went wrong.');
-					} else {
-						if (isJsonString(res.buffer)) {
-							var json = JSON.parse(res.buffer);
-							var setlistdata = json[0].setlistdata;
-							var setlist = setlistdata.replace(/(<([^>]+)>)/ig,"");
-							bot.speak(setlist);
-							myLog('pmmed', '!setlisfull - Retrieved setlist successfully');
-						} else {
-							myLog('pmmed', 'JSON.parse error - '+res.buffer);
-						}
-					}
-				});
-   		});
-   }
    
 	var options = { bufferType: 'buffer', url:apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
 	http.get(options, function(error, res) {
@@ -735,7 +713,11 @@ bot.on('pmmed', function (data) {
 		}
    		if ((awesomes.length) >= 3) {
    			bot.vote('up');
-   		}
+                        for(var i=9;i<18;i++){
+                                bot.setAvatar(i);
+                                pause(500);
+                        }
+  		}
    	}
    	
    	
