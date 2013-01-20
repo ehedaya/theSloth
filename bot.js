@@ -354,10 +354,17 @@ bot.on('speak', function (data) {
 						if (error) {
 							myLog('speak', '!last - Error connecting to '+options['url']);
 						} else {
-							var lastPlayedResponse = res.buffer;
-							if (lastPlayedResponse.length > 1) {
-								bot.speak(lastPlayedResponse);
-							} 
+							if (isJsonString(res.buffer)) {
+								json = JSON.parse(res.buffer);
+								if (json.success) {
+									myLog('speak', '!last - Stored note.');
+									bot.speak(json.message);
+								} else {
+									myLog('speak', 'JSON failure in !last: '+res.buffer);
+								}
+							} else {
+								myLog('speak', '!last Unparseable JSON: '+res.buffer);
+							}	 
 						}
 					});
 				} else {
