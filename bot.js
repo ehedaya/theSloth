@@ -519,7 +519,7 @@ bot.on('speak', function (data) {
 		var options = {bufferType: 'buffer', url:apibase+'getUserBirthdays.php' };
 		http.get(options, function(error, res) {
 			if (error) {
-				myLog('speak', '!points - Error connecting to '+options['url']);
+				myLog('speak', '!birthday - Error connecting to '+options['url']);
 			} else {
 				if (isJsonString(res.buffer)) {
 					var json = JSON.parse(res.buffer);
@@ -1131,13 +1131,13 @@ bot.on('pmmed', function (data) {
 				var options = {bufferType: 'buffer', url:apibase+'getDownload.php?date='+showdate };
 				http.get(options, function(error, res) {
 					if (error) {
-						myLog('speak', '!points - Error connecting to '+options['url']);
+						myLog('speak', '!download - Error connecting to '+options['url']);
 					} else {
 						if (isJsonString(res.buffer)) {
 							var json = JSON.parse(res.buffer);
 							bot.pm(json.message, senderid);
 						} else {
-							myLog('speak', '!birthday - JSON parse error: '+res.buffer);
+							myLog('speak', '!download - JSON parse error: '+res.buffer);
 						}
 					}
 				});
