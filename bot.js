@@ -530,31 +530,7 @@ bot.on('speak', function (data) {
 			}
 		});
 	}
-	if (text.match(/^!download/i)) {
-   		bot.roomInfo(true, function(data) {
-			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
-				var options = {bufferType: 'buffer', url:apibase+'getDownload.php?date='+showdate };
-				http.get(options, function(error, res) {
-					if (error) {
-						myLog('speak', '!points - Error connecting to '+options['url']);
-					} else {
-						if (isJsonString(res.buffer)) {
-							var json = JSON.parse(res.buffer);
-							bot.speak(json.message);
-						} else {
-							myLog('speak', '!birthday - JSON parse error: '+res.buffer);
-						}
-					}
-				});
-			} else {
-				bot.speak("I can't figure out the showdate.");
-			}
-		});
-	}
-	
-   
 
-   
 	var options = { bufferType: 'buffer', url:apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
 	http.get(options, function(error, res) {
 		if (error) {
@@ -1146,6 +1122,27 @@ bot.on('pmmed', function (data) {
 				});
 			} else {
 				bot.pm('I can\'t rate this without the showdate.', senderid);
+			}
+		});
+	}
+	if (text.match(/^!download/i)) {
+   		bot.roomInfo(true, function(data) {
+			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
+				var options = {bufferType: 'buffer', url:apibase+'getDownload.php?date='+showdate };
+				http.get(options, function(error, res) {
+					if (error) {
+						myLog('speak', '!points - Error connecting to '+options['url']);
+					} else {
+						if (isJsonString(res.buffer)) {
+							var json = JSON.parse(res.buffer);
+							bot.pm(json.message, senderid);
+						} else {
+							myLog('speak', '!birthday - JSON parse error: '+res.buffer);
+						}
+					}
+				});
+			} else {
+				bot.speak("I can't figure out the showdate.");
 			}
 		});
 	}
