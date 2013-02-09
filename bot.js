@@ -298,7 +298,6 @@ bot.on('speak', function (data) {
 	chatResponses.lick	 	= { trigger: new RegExp('(lick|spam|dose).+sloth','i'), response: '/me stabs '+name};
 	chatResponses.dance	 	= { trigger: new RegExp('dances with.+sloth','i'), response: '/me dances with '+name};
 	chatResponses.latest	= { trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'};
-    chatResponses.history    = { trigger: new RegExp('^!history$', 'i'), response: 'http://phish.net/song/'};
 
 	for(t in chatResponses) {
 		if (text.match(chatResponses[t].trigger)) {
@@ -528,6 +527,23 @@ bot.on('speak', function (data) {
 					myLog('speak', '!birthday - JSON parse error: '+res.buffer);
 				}
 			}
+		});
+	}
+	if (text.match(/^!history/i)) {
+		bot.roomInfo(true, function(data) {
+			var options = {bufferType: 'buffer', url:apibase+'getSongHistory.php?starttime='+Math.floor(data.room.metadata.current_song.starttime) };
+			http.get(options, function(error, res) {
+				if (error) {
+					myLog('speak', '!history - Error connecting to '+options['url']);
+				} else {
+					if (isJsonString(res.buffer)) {
+						var json = JSON.parse(res.buffer);
+						bot.speak(json.message);
+					} else {
+						myLog('speak', '!history - JSON parse error: '+res.buffer);
+					}
+				}
+			});	
 		});
 	}
 
