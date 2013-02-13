@@ -895,16 +895,17 @@ bot.on('pmmed', function (data) {
 	}	
    if (text.match(/^!last /i)) {
 		var songname = escape(text.substr(6));
-		var options = { bufferType: 'buffer', url:apibase+'hpb.php?action=lastPlayed&song='+songname };
+		var options = { bufferType: 'buffer', url:apibase+'getTimeSongLastPlayed.php?song='+songname };
 		http.get(options, function(error, res) {
 			if (error) {
 				myLog('pmmed', '!last [song] - Error connecting to '+options['url']);
 			} else {
-				var result = res.buffer;
-				if (result.length > 1) {
-					bot.pm(result, senderid);
+				if (isJsonString(res.buffer)) {
+					var json = JSON.parse(res.buffer);
+					bot.pm(json.message, senderid);
 				} else {
-					bot.pm("I do not understand.", senderid);
+					bot.pm('Oops, something went wrong.', senderid);
+					myLog('pmmed', 'Unparseable response: '+res.buffer);						
 				}
 			}
 		});
