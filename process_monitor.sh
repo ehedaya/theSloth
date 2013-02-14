@@ -7,17 +7,18 @@ then
 	now=`date +"%s"`
 	last=`cat /home/thephishvps/tmp/theSloth`
 	diff=`expr $now - $last`;
+	logfile=`date +"%Y%m%d"`
 	if [ $diff -gt 360 ] 
 	then
         echo "Last activity $diff second(s) ago, rebooting"
 		kill $m
-		/usr/bin/nohup /home/thephishvps/usr/local/bin/node /home/thephishvps/bots/theSloth/bot.js >> /home/thephishvps/bots/theSloth.out 2>&1&
+		/usr/bin/nohup /home/thephishvps/usr/local/bin/node /home/thephishvps/bots/theSloth/bot.js >> /home/thephishvps/bots/theSloth.${logfile}.out 2>&1&
 		echo "theSloth was restarted (last activity $diff seconds ago)" > /home/thephishvps/bots/theSloth.out
 	else 
 		echo "Last activity $diff second(s) ago"
 	fi
 else
-	/usr/bin/nohup /home/thephishvps/usr/local/bin/node /home/thephishvps/bots/theSloth/bot.js >> /home/thephishvps/bots/theSloth.out 2>&1&
+	/usr/bin/nohup /home/thephishvps/usr/local/bin/node /home/thephishvps/bots/theSloth/bot.js >> /home/thephishvps/bots/theSloth.${logfile}.out 2>&1&
 	mail -s "theSloth process died, restarted" emil@thephish.fm
 fi
 
