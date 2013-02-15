@@ -290,7 +290,7 @@ bot.on('speak', function (data) {
 	chatResponses.meettup 	= { trigger: new RegExp('^!meettup$','i'), response: 'http://www.tinyurl.com/2012TTNYE'};
 	chatResponses.ss 		= { trigger: new RegExp('^!ss$','i'), response: 'http://thephish.fm/secreTTsanTTa'};
 	chatResponses.breakfast	= { trigger: new RegExp('^!whatdidkfhaveforbreakfast$','i'), response: 'Trick question.  KernelForbin did not eat breakfast.'};
-	chatResponses.ttplus 	= { trigger: new RegExp('^!ttplus$','i'), response: 'TT+ info: http://turntableplus.fm/beta'};
+	chatResponses.ttplus 	= { trigger: new RegExp('^!ttplus$','i'), response: 'TT+ info: http://bit.ly/turntableplus'};
 	chatResponses.ttx	 	= { trigger: new RegExp('^!ttx$','i'), response: 'Turntable X: http://bit.ly/WbRp8P'};
 	chatResponses.addme	 	= { trigger: new RegExp('^[!+](add(me)?|list|q|qa)$','i'), response: 'K '+name+', you\'re on "the list!"'};
 	chatResponses.feed	 	= { trigger: new RegExp('feed.+sloth','i'), response: randomItem(['ITALIAN SPAGHETTI!','*omnomnom*', '/me burps'])};
@@ -298,6 +298,7 @@ bot.on('speak', function (data) {
 	chatResponses.lick	 	= { trigger: new RegExp('(lick|spam|dose).+sloth','i'), response: '/me stabs '+name};
 	chatResponses.dance	 	= { trigger: new RegExp('dances with.+sloth','i'), response: '/me dances with '+name};
 	chatResponses.latest	= { trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'};
+	chatResponses.archive	= { trigger: new RegExp('^!archive$', 'i'), response: 'Archive room (DJs DO NOT CLICK): http://bit.ly/thePhishArchive'};
 
 	for(t in chatResponses) {
 		if (text.match(chatResponses[t].trigger)) {
