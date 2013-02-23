@@ -1164,6 +1164,22 @@ bot.on('pmmed', function (data) {
 			}
 		});
 	}
+	if (text.match(/^!request:/i)) {
+		var showdate = text.substr(9);
+		var options = {bufferType: 'buffer', url:apibase+'postReplayRequest.php?showdate='+showdate+'&userid='+senderid+'&key='+authKey() };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('speak', '!request - Error connecting to '+options['url']);
+			} else {
+				if (isJsonString(res.buffer)) {
+					var json = JSON.parse(res.buffer);
+					bot.pm(json.message, senderid);
+				} else {
+					myLog('speak', '!request - JSON parse error: '+res.buffer);
+				}
+			}
+		});
+	}
    
    
 });
