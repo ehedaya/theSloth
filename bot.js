@@ -279,28 +279,28 @@ bot.on('speak', function (data) {
    var userid = data.userid;
    var setlist = null;
 
-	var chatResponses = { };
-	chatResponses.help 		= { trigger: new RegExp('^!help$','i'), response: 'http://stats.thephish.fm/about.php' };
-	chatResponses.tips 		= { trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'};
-	chatResponses.stats 	= { trigger: new RegExp('^!stats$','i'), response: 'http://stats.thephish.fm'};
-	chatResponses.gifs	 	= { trigger: new RegExp('^!gifs$','i'), response: 'http://tinyurl.com/ttgifs'};
-	chatResponses.deg	 	= { trigger: new RegExp('^!deg$','i'), response: 'http://tinyurl.com/phishdeg'};
-	chatResponses.greet	 	= { trigger: new RegExp('^!greet$','i'), response: greeting};
-	chatResponses.slide	 	= { trigger: new RegExp('^!slide$','i'), response: 'http://thephish.fm/theslide'};
-	chatResponses.sloth 	= { trigger: new RegExp('^!(about|commands|sloth)$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'};
-	chatResponses.commands 	= { trigger: new RegExp('^commands$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'};
-	chatResponses.meettup 	= { trigger: new RegExp('^!meettup$','i'), response: 'http://www.tinyurl.com/2012TTNYE'};
-	chatResponses.ss 		= { trigger: new RegExp('^!ss$','i'), response: 'http://thephish.fm/secreTTsanTTa'};
-	chatResponses.breakfast	= { trigger: new RegExp('^!whatdidkfhaveforbreakfast$','i'), response: 'Trick question.  KernelForbin did not eat breakfast.'};
-	chatResponses.ttplus 	= { trigger: new RegExp('^!ttplus$','i'), response: 'TT+ info: http://turntableplus.fm/beta'};
-	chatResponses.ttx	 	= { trigger: new RegExp('^!ttx$','i'), response: 'Turntable X: http://bit.ly/WbRp8P'};
-	chatResponses.addme	 	= { trigger: new RegExp('^[!+](add(me)?|list|q|qa)$','i'), response: 'K '+name+', you\'re on "the list!"'};
-	chatResponses.feed	 	= { trigger: new RegExp('feed.+sloth','i'), response: randomItem(['ITALIAN SPAGHETTI!','*omnomnom*', '/me burps'])};
-	chatResponses.pets	 	= { trigger: new RegExp('(pets|hugs).+sloth','i'), response: randomItem(['http://tinyurl.com/slothishappy', '<3', 'http://tinyurl.com/coolsloth'])};
-	chatResponses.lick	 	= { trigger: new RegExp('(lick|spam|dose).+sloth','i'), response: '/me stabs '+name};
-	chatResponses.dance	 	= { trigger: new RegExp('dances with.+sloth','i'), response: '/me dances with '+name};
-	chatResponses.latest	= { trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'};
-
+	var chatResponses = [
+		{ trigger: new RegExp('^!help$','i'), response: 'http://stats.thephish.fm/about.php' },
+		{ trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'},
+		{ trigger: new RegExp('^!stats$','i'), response: 'http://stats.thephish.fm'},
+		{ trigger: new RegExp('^!gifs$','i'), response: 'http://tinyurl.com/ttgifs'},
+		{ trigger: new RegExp('^!deg$','i'), response: 'http://tinyurl.com/phishdeg'},
+		{ trigger: new RegExp('^!greet$','i'), response: greeting},
+		{ trigger: new RegExp('^!slide$','i'), response: 'http://thephish.fm/theslide'},
+		{ trigger: new RegExp('^!(about|commands|sloth)$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},
+		{ trigger: new RegExp('^commands$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},
+		{ trigger: new RegExp('^!meettup$','i'), response: 'http://thephish.fm/meettups'},
+		{ trigger: new RegExp('^!ss$','i'), response: 'http://thephish.fm/secreTTsanTTa'},
+		{ trigger: new RegExp('^!whatdidkfhaveforbreakfast$','i'), response: 'Trick question.  KernelForbin did not eat breakfast.'},
+		{ trigger: new RegExp('^!ttplus$','i'), response: 'TT+ info: http://turntableplus.fm/beta'},
+		{ trigger: new RegExp('^!ttx$','i'), response: 'Turntable X: http://bit.ly/WbRp8P'},
+		{ trigger: new RegExp('^[!+](add(me)?|list|q|qa)$','i'), response: 'K '+name+', you\'re on "the list!"'},
+		{ trigger: new RegExp('feed.+sloth','i'), response: randomItem(['ITALIAN SPAGHETTI!','*omnomnom*', '/me burps'])},
+		{ trigger: new RegExp('(pets|hugs).+sloth','i'), response: randomItem(['http://tinyurl.com/slothishappy', '<3', 'http://tinyurl.com/coolsloth'])},
+		{ trigger: new RegExp('(lick|spam|dose).+sloth','i'), response: '/me stabs '+name},
+		{ trigger: new RegExp('dances with.+sloth','i'), response: '/me dances with '+name},
+		{ trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'}
+	];
 	for(t in chatResponses) {
 		if (text.match(chatResponses[t].trigger)) {
 			bot.speak(chatResponses[t].response); 
