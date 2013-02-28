@@ -299,6 +299,7 @@ bot.on('speak', function (data) {
 	chatResponses.dance	 	= { trigger: new RegExp('dances with.+sloth','i'), response: '/me dances with '+name};
 	chatResponses.latest	= { trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'};
 	chatResponses.archive	= { trigger: new RegExp('^!archive$', 'i'), response: 'Archive room (DJs DO NOT CLICK): http://bit.ly/thePhishArchive'};
+	chatResponses.pnet		= { trigger: new RegExp('^!pnet$', 'i'), response: 'To link your stats, Fan me and then send a PM with !pnet:username (replace username with your .net username). If you update your stats on Phish.net, PM me !pnet to refresh.'};
 
 	for(t in chatResponses) {
 		if (text.match(chatResponses[t].trigger)) {
