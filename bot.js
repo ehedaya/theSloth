@@ -195,9 +195,11 @@ bot.on('endsong', function(data) {
 		myLog('endsong', 'DJ turns: '+djspot['count']);
 		if ((djspot['count'] >= 3) || (data.room.metadata.djcount > 2)) {
 			myLog('endsong', 'djcount was '+data.room.metadata.djcount);
-			djspot['mode'] = djspot['count'] = djspot['on_stage'] = false;
+   	   		djspot['on_stage'] = djspot['mode'] = djspot['count'] = djspot['reservedfor'] = false;
 			bot.speak(randomItem(['That was fun.', 'Whew, I\'m beat.', 'Let me know if you need more DJ help.']));
 			bot.remDj();
+		} else {
+			myLog('endsong', 'Staying on stage; DJ turns: '+djspot['count']);
 		}
 	}
 	if (lastsong) {
