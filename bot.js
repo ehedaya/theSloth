@@ -289,9 +289,7 @@ bot.on('speak', function (data) {
 		{ trigger: new RegExp('^!slide$','i'), response: 'http://thephish.fm/theslide'},
 		{ trigger: new RegExp('^!(about|commands|sloth)$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},
 		{ trigger: new RegExp('^commands$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},
-		{ trigger: new RegExp('^!meettup$','i'), response: 'http://thephish.fm/meettups'},
-		{ trigger: new RegExp('^!ss$','i'), response: 'http://thephish.fm/secreTTsanTTa'},
-		{ trigger: new RegExp('^!whatdidkfhaveforbreakfast$','i'), response: 'Trick question.  KernelForbin did not eat breakfast.'},
+		{ trigger: new RegExp('^!meettup$','i'), response: 'http://thephish.fm/meettup'},
 		{ trigger: new RegExp('^!ttplus$','i'), response: 'TT+ info: http://turntableplus.fm/beta'},
 		{ trigger: new RegExp('^!ttx$','i'), response: 'Turntable X: http://bit.ly/WbRp8P'},
 		{ trigger: new RegExp('^[!+](add(me)?|list|q|qa)$','i'), response: 'K '+name+', you\'re on "the list!"'},
@@ -300,6 +298,7 @@ bot.on('speak', function (data) {
 		{ trigger: new RegExp('(lick|spam|dose).+sloth','i'), response: '/me stabs '+name},
 		{ trigger: new RegExp('dances with.+sloth','i'), response: '/me dances with '+name},
 		{ trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'}
+		{ trigger: new RegExp('^!pnet$', 'i'), response: 'To link your stats, Fan me and then send a PM with !pnet:username (replace username with your .net username). If you update your stats on Phish.net, PM me !pnet to refresh.'}
 	];
 	for(t in chatResponses) {
 		if (text.match(chatResponses[t].trigger)) {
