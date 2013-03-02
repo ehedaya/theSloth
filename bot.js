@@ -291,7 +291,6 @@ bot.on('speak', function (data) {
 		{ trigger: new RegExp('^commands$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},
 		{ trigger: new RegExp('^!meettup$','i'), response: 'http://thephish.fm/meettup'},
 		{ trigger: new RegExp('^!ttplus$','i'), response: 'TT+ info: http://turntableplus.fm/beta'},
-		{ trigger: new RegExp('^!ttx$','i'), response: 'Turntable X: http://bit.ly/WbRp8P'},
 		{ trigger: new RegExp('^[!+](add(me)?|list|q|qa)$','i'), response: 'K '+name+', you\'re on "the list!"'},
 		{ trigger: new RegExp('feed.+sloth','i'), response: randomItem(['ITALIAN SPAGHETTI!','*omnomnom*', '/me burps'])},
 		{ trigger: new RegExp('(pets|hugs).+sloth','i'), response: randomItem(['http://tinyurl.com/slothishappy', '<3', 'http://tinyurl.com/coolsloth'])},
