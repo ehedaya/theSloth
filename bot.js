@@ -1129,6 +1129,20 @@ bot.on('pmmed', function (data) {
 			}
 		});
 	}
-   
-   
+	if (text.match(/^!ago$/i)) {
+		bot.pm("Hmm, give me a second...", senderid);
+		var options = {bufferType: 'buffer', url:apibase+'getOldestFavorite.php?id='+senderid };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('speak', '!ago - Error connecting to '+options['url']);
+			} else {
+				if (isJsonString(res.buffer)) {
+					var json = JSON.parse(res.buffer);
+					bot.pm(json.message, senderid);
+				} else {
+					myLog('speak', '!ago - JSON parse error: '+res.buffer);
+				}
+			}
+		});
+	}
 });
