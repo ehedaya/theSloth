@@ -464,6 +464,16 @@ bot.on('speak', function (data) {
 			}
    		});
    }
+   if (text.match(/^\!phishtracks$/)) {	 
+   		bot.roomInfo(true, function(data) {
+   			if (showdate = parseDate(data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album)) {
+   				bot.speak('http://phishtracks.com/shows/'+showdate);
+   			} else {
+				bot.speak('I couldn\'t find a date in any fields: '+data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album);
+			}
+   		});
+   }
+   
 	if (text.match(/^!birthday/i)) {
 		var options = {bufferType: 'buffer', url:apibase+'getUserBirthdays.php' };
 		http.get(options, function(error, res) {
