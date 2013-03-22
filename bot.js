@@ -116,12 +116,12 @@ bot.on('newsong', function(data) {
 	
 	songLog.addSong(starttime, data.room.metadata.current_song.metadata.artist, data.room.metadata.current_song.metadata.album);
 	
-	if (songLog.getCount('artist', data.room.metadata.current_song.metadata.artist) == 3) {
-		bot.speak("Warning: The artist '"+data.room.metadata.current_song.metadata.artist+"' has been played three times in the last 3 hours.");
+	if (songLog.getCount('artist', data.room.metadata.current_song.metadata.artist) == 4) {
+		bot.speak("Warning: The artist '"+data.room.metadata.current_song.metadata.artist+"' has been played 4 times in the last 3 hours.");
 	}
 	
-	if (songLog.getCount('album', data.room.metadata.current_song.metadata.album) == 2) {
-		bot.speak("Warning: The album '"+data.room.metadata.current_song.metadata.album+"' has been played two times in the last 3 hours.");
+	if (songLog.getCount('album', data.room.metadata.current_song.metadata.album) == 3) {
+		bot.speak("Warning: The album '"+data.room.metadata.current_song.metadata.album+"' has been played 3 times in the last 3 hours.");
 	}
 
 	// Boot DJs according to mode 
