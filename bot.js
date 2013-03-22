@@ -131,11 +131,11 @@ bot.on('newsong', function(data) {
 	recents.addPlay(data.room.metadata.current_song.metadata.album, recents.albums, starttime);
 	
 	if (recents.getPlayCount(data.room.metadata.current_song.metadata.artist, recents.artists) == 3) {
-		bot.speak("Warning: The artist '"+data.room.metadata.current_song.metadata.artist+"' has been played two more times in the last 3 hours.");
+		bot.speak("Warning: The artist '"+data.room.metadata.current_song.metadata.artist+"' has been played three times in the last 3 hours.");
 	}
 	
-	if (recents.getPlayCount(data.room.metadata.current_song.metadata.album, recents.albums) == 3) {
-		bot.speak("Warning: The album '"+data.room.metadata.current_song.metadata.album+"' has been played two more times in the last 3 hours.");
+	if (recents.getPlayCount(data.room.metadata.current_song.metadata.album, recents.albums) == 2) {
+		bot.speak("Warning: The album '"+data.room.metadata.current_song.metadata.album+"' has been played two times in the last 3 hours.");
 	}
 
 	// Boot DJs according to mode 
