@@ -90,13 +90,13 @@ function songLog(callback) {
 		}
 		return count;
 	}
-// 	this.getList = function getList(field) {
-// 		var output = [];
-// 		for(i=0;i<this.historylength;i++) {
-// 			output.push(this.history[i][field]);
-// 		}
-// 		return output.join();
-// 	}
+	this.getList = function getList(field) {
+		var output = [];
+		for(i=0;i<this.history.length;i++) {
+			output.push(this.history[i][field]);
+		}
+		return output.join();
+	}
 }
 
 bot.on('newsong', function(data) { 
@@ -1222,8 +1222,10 @@ bot.on('pmmed', function (data) {
 			bot.pm("Hm, I don't think any tracks by that artist have been played in the last 3 hours.", senderid);
 		}
 	}
-// 	if (text.match(/^!recents/i)) {
-// 		bot.pm(recents.albums, senderid);
-// 		bot.pm(recents.artists, senderid);
-// 	}
+ 	if (text.match(/^!(albums|artists)$/i)) {
+ 		songLog.prune(getEpoch()-(60*60*3));
+		var which = text.substr(1) == 'albums' ? 'album' : 'artist';
+		console.log(which);
+ 		bot.pm("Recent "+which+": "+songLog.getList(which), senderid);
+ 	}
 });
