@@ -2,7 +2,6 @@ var Bot    	= require('ttapi');
 var http   	= require('http-get');
 var md5 = require('MD5');
 var dp = require('./date.js');
-var ra = require('./artists.js');
 var settings = require('./bot.settings.js');
 var bot = new Bot(AUTH, USERID, ROOMID);
 bot.debug = false;
