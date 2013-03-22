@@ -2,6 +2,7 @@ var Bot    	= require('ttapi');
 var http   	= require('http-get');
 var md5 = require('MD5');
 var dp = require('./date.js');
+var ra = require('./artists.js');
 var settings = require('./bot.settings.js');
 var bot = new Bot(AUTH, USERID, ROOMID);
 bot.debug = false;
@@ -70,7 +71,51 @@ function isJsonString(str) {
 function authKey() {
 	return md5(getEpoch()+apikey);
 }
-
+function recents(callback) {
+	this.artists = [];
+	this.albums = [];
+	this.cutoffInSeconds = 3*60*60;	// 3 hours
+	this.addPlay = function addPlay(a, b, s) {
+		for(i=0;i<b.length;i++) {
+			var currentArtist = b[i];
+			if (currentArtist.name == a) {
+				currentArtist.plays.push(s);
+				return true;
+			}
+		}
+		b.push({'name': a, 'plays': [s]});
+	}
+	this.getPlayCount = function getPlayCount(a,b) {
+		var totalPlays = 0;
+		var cutoff = getEpoch() - this.cutoffInSeconds;
+		for(var i=0;i<b.length;i++) {
+			var currentArtist = b[i];
+			if (currentArtist.name == a) {
+				for(var p = 0;p<currentArtist.plays.length;p++) {
+					totalPlays += currentArtist.plays[p] > cutoff ? 1 : 0;
+				}
+			}
+		}
+		return totalPlays;
+	}
+	this.prune = function prune(b) {
+		var cutoff = getEpoch() - this.cutoffInSeconds;
+		for(var i=0;i<b.length;i++) {
+			var currentArtist = b[i];
+			for(var p = 0;p<currentArtist.plays.length;p++) {
+				console.log("P = "+p+" ("+currentArtist.plays[p]+")");
+				var currentPlay = currentArtist.plays[p];
+				console.log("Evaluating "+currentPlay);
+				if (currentPlay < cutoff) {
+					console.log("Cutoff "+currentPlay+" is removed");
+					currentArtist.plays.splice(p, 1); 
+				} else {
+					console.log("Cutoff "+currentPlay+" is ok");
+				}
+			}
+		}
+	}
+}
 
 bot.on('newsong', function(data) { 
 	var dateBlob = data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album;
@@ -86,6 +131,17 @@ bot.on('newsong', function(data) {
 	if (mode.cantDj) { myLog('newsong', 'mode.cantDj value is '+mode.cantDj); }
 	var showdate = parseDate(dateBlob);
 	var lastPlayedResponse = '';
+	
+	recents.addPlay(data.room.metadata.current_song.metadata.artist, recents.artists, starttime);
+	recents.addPlay(data.room.metadata.current_song.metadata.album, recents.albums, starttime);
+	
+	if (recents.getPlayCount(data.room.metadata.current_song.metadata.artist, recents.artists) >= 2) {
+		bot.speak("Warning: The artist '"+data.room.metadata.current_song.metadata.artist+"' has been played two more times in the last 3 hours.");
+	}
+	
+	if (recents.getPlayCount(data.room.metadata.current_song.metadata.album, recents.albums) >= 2) {
+		bot.speak("Warning: The album '"+data.room.metadata.current_song.metadata.album+"' has been played two more times in the last 3 hours.");
+	}
 
 	// Boot DJs according to mode 
 	if (mode.type) {
@@ -157,6 +213,8 @@ bot.on('endsong', function(data) {
 		tracktime = escape(data.room.metadata.current_song.metadata.length),
 		name = data.room.metadata.current_song.djname;
 		mode.cantDj = null;
+	recents.prune(recents.artists);
+	recents.prune(recents.albums);
 	if(mode.type) {
 		if (!mode[userid]) { mode[userid] = 0;  }
 		if(mode.type == 'playN') {
@@ -533,6 +591,10 @@ bot.on('registered', function(data) {
 
 	var user = data.user[0];
 	usersList[user.userid] = user;	
+	
+	if(userid === USERID) {	// Just starting up
+		recents = new recents();
+	}
 	
 	var options = { bufferType: 'buffer', url:apibase+'user.php?key='+authKey()+'&id='+userid+'&name='+name+'&avatarid='+avatarid+'&format=json' };
 	if (blacklist.contains(userid)) {
@@ -1156,5 +1218,23 @@ bot.on('pmmed', function (data) {
 				}
 			}
 		});
+	}
+	if (text.match(/^!album:/i)) {
+		var album = text.substr(7);
+		console.log(recents);
+		if (recents.getPlayCount(album, recents.albums)>0) {
+			bot.pm("The album '"+album+"' has been played "+recents.getPlayCount(album, recents.albums)+" time(s) in the last 3 hours.", senderid);
+		} else {
+			bot.pm("Hm, I don't think any tracks with that album have been played in the last 3 hours.", senderid);
+		}
+	}
+	if (text.match(/^!artist:/i)) {
+		var artist = text.substr(8);
+		console.log(recents);
+		if (recents.getPlayCount(artist, recents.artists)>0) {
+			bot.pm("The artist '"+artist+"' has been played "+recents.getPlayCount(artist, recents.artists)+" time(s) in the last 3 hours.", senderid);
+		} else {
+			bot.pm("Hm, I don't think any tracks with that album have been played in the last 3 hours.", senderid);
+		}
 	}
 });
