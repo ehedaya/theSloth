@@ -102,14 +102,10 @@ function recents(callback) {
 		for(var i=0;i<b.length;i++) {
 			var currentArtist = b[i];
 			for(var p = 0;p<currentArtist.plays.length;p++) {
-				console.log("P = "+p+" ("+currentArtist.plays[p]+")");
 				var currentPlay = currentArtist.plays[p];
-				console.log("Evaluating "+currentPlay);
 				if (currentPlay < cutoff) {
-					console.log("Cutoff "+currentPlay+" is removed");
 					currentArtist.plays.splice(p, 1); 
 				} else {
-					console.log("Cutoff "+currentPlay+" is ok");
 				}
 			}
 		}
@@ -134,11 +130,11 @@ bot.on('newsong', function(data) {
 	recents.addPlay(data.room.metadata.current_song.metadata.artist, recents.artists, starttime);
 	recents.addPlay(data.room.metadata.current_song.metadata.album, recents.albums, starttime);
 	
-	if (recents.getPlayCount(data.room.metadata.current_song.metadata.artist, recents.artists) >= 2) {
+	if (recents.getPlayCount(data.room.metadata.current_song.metadata.artist, recents.artists) == 3) {
 		bot.speak("Warning: The artist '"+data.room.metadata.current_song.metadata.artist+"' has been played two more times in the last 3 hours.");
 	}
 	
-	if (recents.getPlayCount(data.room.metadata.current_song.metadata.album, recents.albums) >= 2) {
+	if (recents.getPlayCount(data.room.metadata.current_song.metadata.album, recents.albums) == 3) {
 		bot.speak("Warning: The album '"+data.room.metadata.current_song.metadata.album+"' has been played two more times in the last 3 hours.");
 	}
 
@@ -1220,7 +1216,6 @@ bot.on('pmmed', function (data) {
 	}
 	if (text.match(/^!album:/i)) {
 		var album = text.substr(7);
-		console.log(recents);
 		if (recents.getPlayCount(album, recents.albums)>0) {
 			bot.pm("The album '"+album+"' has been played "+recents.getPlayCount(album, recents.albums)+" time(s) in the last 3 hours.", senderid);
 		} else {
@@ -1229,11 +1224,14 @@ bot.on('pmmed', function (data) {
 	}
 	if (text.match(/^!artist:/i)) {
 		var artist = text.substr(8);
-		console.log(recents);
 		if (recents.getPlayCount(artist, recents.artists)>0) {
 			bot.pm("The artist '"+artist+"' has been played "+recents.getPlayCount(artist, recents.artists)+" time(s) in the last 3 hours.", senderid);
 		} else {
 			bot.pm("Hm, I don't think any tracks with that album have been played in the last 3 hours.", senderid);
 		}
+	}
+	if (text.match(/^!recents/i)) {
+		bot.pm(recents.albums, senderid);
+		bot.pm(recents.artists, senderid);
 	}
 });
