@@ -1228,4 +1228,24 @@ bot.on('pmmed', function (data) {
 		console.log(which);
  		bot.pm("Recent "+which+": "+songLog.getList(which), senderid);
  	}
+	if (text.match(/^!average:/i)) {
+   		bot.roomInfo(true, function(data) {
+			var interval = text.substr(9);
+			var userid = data.room.metadata.current_dj;
+			var options = {bufferType: 'buffer', url:apibase+'getAveragePlayLength.php?userid='+userid+'&interval='+interval };
+			http.get(options, function(error, res) {
+				if (error) {
+					myLog('pmmed', '!average - Error connecting to '+options['url']);
+				} else {
+					if (isJsonString(res.buffer)) {
+						var json = JSON.parse(res.buffer);
+						bot.pm(json.message, senderid);
+					} else {
+						myLog('pmmed', '!average - JSON parse error: '+res.buffer);
+					}
+				}
+			});
+		});
+	}
+ 	
 });
