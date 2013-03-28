@@ -616,7 +616,7 @@ bot.on('registered', function(data) {
 					if(isJsonString(res.buffer)) {
 						json = JSON.parse(res.buffer);
 						if (json.replay_later_today == true) {
-							bot.pm(json.message);
+							bot.pm(json.message, userid);
 						}
 					} else {
 						myLog('registered', '!replay - Unparsable JSON: '+res.buffer);
