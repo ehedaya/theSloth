@@ -86,7 +86,9 @@ function songLog(callback) {
 	this.getCount = function getCount(field,value) {
 		var count = 0;
 		for(i=0;i<this.history.length;i++) {
-			count += (this.history[i][field]) == value ? 1 : 0;
+			if(this.history[i][field].length>0) {
+				count += (this.history[i][field]) == value ? 1 : 0;		
+			}
 		}
 		return count;
 	}
