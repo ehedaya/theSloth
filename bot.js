@@ -1,10 +1,19 @@
 var Bot    	= require('ttapi');
 var http   	= require('http-get');
+var fs		= require('fs');
 var md5 = require('MD5');
 var dp = require('./date.js');
 var settings = require('./bot.settings.js');
 var bot = new Bot(AUTH, USERID, ROOMID);
 bot.debug = false;
+
+fs.heartbeat =  function() {
+	this.writeFile(".heartbeat", getEpoch(), function(err) {
+		if(err) {
+			console.log(err);
+		}
+	}); 
+}
 
 function parseDate(i) {
 	var r = /[0-9]{1,4}[\-\/\s\.\\]{1,2}[0-9]{1,2}[\-\/\s\.\\]{1,2}[0-9]{1,4}/;
@@ -102,6 +111,7 @@ function songLog(callback) {
 }
 
 bot.on('newsong', function(data) { 
+	fs.heartbeat();
 	var dateBlob = data.room.metadata.current_song.metadata.artist+' '+data.room.metadata.current_song.metadata.song+' '+data.room.metadata.current_song.metadata.album;
 	var songname = 	data.room.metadata.current_song.metadata.song, 
 		artist = 	escape(data.room.metadata.current_song.metadata.artist),
@@ -174,21 +184,17 @@ bot.on('newsong', function(data) {
 	}
 });
 bot.on('roomChanged',  function (data) {
+	fs.heartbeat();
   usersList = { };
   for (var i=0; i<data.users.length; i++) {
     var user = data.users[i];
     user.lastActivity = Date.now();
     usersList[user.userid] = user;
   }
-	var options = { bufferType: 'buffer', url:apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
-	http.get(options, function(error, res) {
-		if (error) {
-			myLog('addDj','bot.on(roomchanged) - Error connecting to '+options['url']);
-		}
-	});
 });
 
 bot.on('endsong', function(data) {
+	fs.heartbeat();
 	var upvotes = data.room.metadata.upvotes,
 		listeners = data.room.metadata.listeners,
 		starttime = Math.floor(data.room.metadata.current_song.starttime),
@@ -239,9 +245,11 @@ bot.on('endsong', function(data) {
 });
 
 bot.on('new_moderator', function (data) {
+	fs.heartbeat();
  });
 
 bot.on('add_dj', function(data) {
+	fs.heartbeat();
 	var new_dj_id = data.user[0].userid;
 	var new_dj_name = data.user[0].name;
 	var new_dj_avatar_id = data.user[0].avatarid;
@@ -282,12 +290,14 @@ bot.on('rem_dj', function(data) {
 		bot.speak('/me waves to the crowd.');
 		djspot['on_stage'] = true;
 	}
+	fs.heartbeat();
 });
 bot.on('update_votes', function (data) {
   var votelog = data.room.metadata.votelog;
   for (var i=0; i<votelog.length; i++) {
     var userid = votelog[i][0];
   }
+  fs.heartbeat();
 });
 
 
@@ -296,6 +306,13 @@ bot.on('speak', function (data) {
    var text = data.text;
    var userid = data.userid;
    var setlist = null;
+   
+   fs.heartbeat();
+   
+   
+   
+   
+   
 
 	var chatResponses = [
 		{ trigger: new RegExp('^!help$','i'), response: 'http://stats.thephish.fm/about.php' },
@@ -550,12 +567,6 @@ bot.on('speak', function (data) {
 		});
 	}
 
-	var options = { bufferType: 'buffer', url:apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
-	http.get(options, function(error, res) {
-		if (error) {
-			myLog('addDj','bot.on(chat) - Error connecting to '+options['url']);
-		}
-	});
    
    
    
@@ -563,7 +574,8 @@ bot.on('speak', function (data) {
 });
 
 bot.on('update_user', function (data) {
- });
+	fs.heartbeat();
+});
 
 bot.on('registered', function(data) {
 	var name = escape(data.user[0].name);
@@ -646,23 +658,13 @@ bot.on('registered', function(data) {
 			}		
 		}
 	}
-	var options = { bufferType: 'buffer', url:apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
-	http.get(options, function(error, res) {
-		if (error) {
-			myLog('addDj','bot.on(registered) - Error connecting to '+options['url']);
-		}
-	});
+	fs.heartbeat();
 
 });
 
 bot.on('deregistered', function(data) {
-  delete usersList[data.user[0].userid];
-	var options = { bufferType: 'buffer', url:apibase+'heartbeat.php?key='+authKey()+'&bot=theSloth' };
-	http.get(options, function(error, res) {
-		if (error) {
-			myLog('addDj','bot.on(deregistered) - Error connecting to '+options['url']);
-		}
-	});
+	delete usersList[data.user[0].userid];
+	fs.heartbeat();
 });
 
 bot.on('pmmed', function (data) { 
@@ -672,6 +674,9 @@ bot.on('pmmed', function (data) {
 	var senderid = data.senderid;
 	var userid = data.userid;
 	var text = data.text;
+
+	fs.heartbeat();
+
 	bot.getProfile(senderid, function(profile) { 
 		var name = profile.name;
 		myLog('pmmed', name+': '+text);
