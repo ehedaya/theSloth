@@ -1,3 +1,5 @@
+logs/
 bot.settings.js
 node_modules/
+.heartbeat
 bot.settings.js.bak

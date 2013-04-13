@@ -8,7 +8,7 @@ var bot = new Bot(AUTH, USERID, ROOMID);
 bot.debug = false;
 
 fs.heartbeat =  function() {
-	this.writeFile(".heartbeat", getEpoch(), function(err) {
+	this.writeFile(__dirname+"/.heartbeat", getEpoch(), function(err) {
 		if(err) {
 			console.log(err);
 		}
