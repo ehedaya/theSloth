@@ -595,6 +595,7 @@ bot.on('registered', function(data) {
 				songLog.addSong(roomHistory[i].created, roomHistory[i].metadata.artist, roomHistory[i].metadata.album);
 			}
 		});
+		myLog('registered', 'theSloth just entered the room.  Probably a reboot.');
 	}
 	
 	var options = { bufferType: 'buffer', url:apibase+'user.php?key='+authKey()+'&id='+userid+'&name='+escape(data.user[0].name)+'&avatarid='+avatarid+'&format=json' };
