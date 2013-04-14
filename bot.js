@@ -253,7 +253,7 @@ bot.on('add_dj', function(data) {
 	var new_dj_id = data.user[0].userid;
 	var new_dj_name = data.user[0].name;
 	var new_dj_avatar_id = data.user[0].avatarid;
-	var options = { bufferType: 'buffer', url:apibase+'user.php?key='+authKey()+'&id='+new_dj_id+'&name='+new_dj_name+'&avatarid='+new_dj_avatar_id+'&format=json' };
+	var options = { bufferType: 'buffer', url:apibase+'user.php?key='+authKey()+'&id='+new_dj_id+'&name='+escape(new_dj_name)+'&avatarid='+new_dj_avatar_id+'&format=json' };
 	http.get(options, function(error, res) {
 		if (error) {
 			myLog('addDj','bot.on(add_dj) - Error connecting to '+options['url']);
@@ -598,7 +598,7 @@ bot.on('registered', function(data) {
 		});
 	}
 	
-	var options = { bufferType: 'buffer', url:apibase+'user.php?key='+authKey()+'&id='+userid+'&name='+name+'&avatarid='+avatarid+'&format=json' };
+	var options = { bufferType: 'buffer', url:apibase+'user.php?key='+authKey()+'&id='+userid+'&name='+escape(data.user[0].name)+'&avatarid='+avatarid+'&format=json' };
 	if (blacklist.contains(userid)) {
 		bot.bootUser(userid, randomItem(blacklistReasons));
 		return;
