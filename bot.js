@@ -85,14 +85,14 @@ function songLog(callback) {
 	this.addSong = function addSong(created, artist, album) {
 		this.history.push({'created':created, 'album':album, 'artist':artist});
 	}
-	this.prune = function prune(cutoff) {
+	this.prune = function(cutoff) {
 		for(i=0;i<this.history.length;i++) {
 			if(this.history[i].created < cutoff) {
 				this.history.splice(i,1);
 			}
 		}
 	}
-	this.getCount = function getCount(field,value) {
+	this.getCount = function(field,value) {
 		var count = 0;
 		for(i=0;i<this.history.length;i++) {
 			if(this.history[i][field].length>0) {
@@ -101,7 +101,7 @@ function songLog(callback) {
 		}
 		return count;
 	}
-	this.getList = function getList(field) {
+	this.getList = function(field) {
 		var output = [];
 		for(i=0;i<this.history.length;i++) {
 			output.push(this.history[i][field]);
