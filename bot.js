@@ -594,7 +594,6 @@ bot.on('registered', function(data) {
 			for(i=roomHistory.length-2;i>=0;i--) {
 				songLog.addSong(roomHistory[i].created, roomHistory[i].metadata.artist, roomHistory[i].metadata.album);
 			}
-			console.log(songLog.history);
 		});
 	}
 	
@@ -1233,7 +1232,6 @@ bot.on('pmmed', function (data) {
  	if (text.match(/^!(albums|artists)$/i)) {
  		songLog.prune(getEpoch()-(60*60*3));
 		var which = text.substr(1) == 'albums' ? 'album' : 'artist';
-		console.log(which);
  		bot.pm("Recent "+which+": "+songLog.getList(which), senderid);
  	}
 	if (text.match(/^!average:/i)) {
