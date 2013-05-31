@@ -351,9 +351,23 @@ bot.on('speak', function (data) {
 		});
 
    }
-   if (text.match(/^!skip$/i)) {
-   		bot.skip();
-   }
+	if (text.match(/^!countdown$/i)) {
+		var options = {bufferType: 'buffer', url:apibase+'getCountdownToNextShow.php' };
+		http.get(options, function(error, res) {
+			if (error) {
+				myLog('speak', '!countdown - Error connecting to '+options['url']);
+			} else {
+				if (isJsonString(res.buffer)) {
+					var json = JSON.parse(res.buffer);
+					if(json.success) {
+						bot.speak(json.message);
+					}
+				} else {
+					myLog('speak', '!countdown - JSON parse error: '+res.buffer);
+				}
+			}
+		});
+	}
    if (text.match(/^!who$/i)) {
    		var usersHere = '';
    		for(var u in usersList) {
