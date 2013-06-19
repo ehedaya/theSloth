@@ -398,10 +398,12 @@ bot.on('speak', function (data) {
 						if (error) {
 							myLog('speak', '!who - Error connecting to '+options['url']);
 						} else {
-							var who = res.buffer;
-							if (who.length > 1) {
-								bot.speak(who);
-							} 
+							if (isJsonString(res.buffer)) {
+								json = JSON.parse(res.buffer);
+								bot.speak(json.message);
+							} else {
+								myLog('speak', '!who Unparseable JSON: '+res.buffer);
+							}	 
 						}
 					});
 				} else {
