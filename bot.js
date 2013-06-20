@@ -388,7 +388,7 @@ bot.on('speak', function (data) {
    if (text.match(/^!who$/i)) {
    		var usersHere = '';
    		for(var u in usersList) {
-   			usersHere+=u.substring(0,11)+',';
+   			usersHere+=(u+',');
    		}
    		if(usersHere.length>10) {
 			bot.roomInfo(true, function(data) {
