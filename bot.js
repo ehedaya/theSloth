@@ -202,7 +202,6 @@ bot.on('endsong', function(data) {
 		tracktime = escape(data.room.metadata.current_song.metadata.length),
 		name = data.room.metadata.current_song.djname;
 		mode.cantDj = null;
-	songLog.prune(getEpoch()-(60*60*3));
 	if(mode.type) {
 		if (!mode[userid]) { mode[userid] = 0;  }
 		if(mode.type == 'playN') {
@@ -309,7 +308,10 @@ bot.on('speak', function (data) {
    
    fs.heartbeat();
    
-   
+   if(ignored && ignored.contains(userid)) {
+   	myLog('speak', 'User '+name+' on ignored list');
+   	return false;
+   }
    
    
    
@@ -624,12 +626,32 @@ bot.on('registered', function(data) {
 	if(userid === USERID) {	// Just starting up
 		songLog = new songLog();
    		bot.roomInfo(true, function(data) {
-   			var roomHistory = data.room.metadata.songlog;
+   			roomHistory = data.room.metadata.songlog;
+			moderators = data.room.metadata.moderator_id;
+			myLog('reboot', 'Fetched moderators ('+moderators.length+')');
 			for(i=roomHistory.length-2;i>=0;i--) {
 				songLog.addSong(roomHistory[i].created, roomHistory[i].metadata.artist, roomHistory[i].metadata.album);
 			}
 		});
-		myLog('registered', 'theSloth just entered the room.  Probably a reboot.');
+		myLog('reboot', 'theSloth just entered the room.  Probably a reboot.');
+	
+		// Get banned lists
+		var options = { bufferType: 'buffer', url:apibase+'getBlacklist.php' };
+		http.get(options, function(error, res) {
+			if (isJsonString(res.buffer)) {
+				var json = JSON.parse(res.buffer);
+				if (json.success) {
+					blacklist = json.banned;
+					ignored	= json.ignored;
+					myLog('reboot', 'Retrieved blacklist ('+json.banned.length+' users)');
+					myLog('reboot', 'Retrieved ignore list ('+json.ignored.length+' users)');
+					return;
+				} 
+			} else {
+				myLog('reboot', 'JSON.parse error on reboot - '+res.buffer+' (URL was '+options.url+')');
+			}
+		});
+
 	}
 	
 	var options = { bufferType: 'buffer', url:apibase+'user.php?key='+authKey()+'&id='+userid+'&name='+escape(data.user[0].name)+'&avatarid='+avatarid+'&format=json' };
@@ -710,6 +732,12 @@ bot.on('pmmed', function (data) {
 	var text = data.text;
 
 	fs.heartbeat();
+
+   if(ignored.contains(senderid)) {
+   	myLog('pmmed', 'User '+senderid+' on ignored list');
+   	return false;
+   }
+
 
 	bot.getProfile(senderid, function(profile) { 
 		var name = profile.name;
@@ -942,6 +970,29 @@ bot.on('pmmed', function (data) {
 			});
 		}
    }
+
+   if (text.match(/^!ignore:/i)) {
+   		if (admins.contains(senderid)) {
+			var badusername = escape(text.substr(8));
+			var options = { bufferType: 'buffer', url:apibase+'ignore.php?key='+authKey()+'&name='+badusername};
+			myLog('pmmed', '!ignore - Attempting to ignore '+badusername+' with '+options['url']+'');
+			http.get(options, function(error, res) {
+					if (error) {
+						var d = new Date();
+							myLog('pmmed', '!ignore - Error connecting to '+options['url']);
+					} else {
+						if (isJsonString(res.buffer)) {
+							result = JSON.parse(res.buffer);
+							bot.pm(result.message, senderid);
+						} else {
+							myLog('pmmed', 'JSON.parse error - '+res.buffer);
+						}
+					}
+			});
+		}
+   }
+
+
 	if (text.match(/^!lame/i)) { 
 		if (moderators.contains(senderid) || admins.contains(senderid)) {
 			myLog('pmmed', '!lame - Downvote issued by '+senderid);
