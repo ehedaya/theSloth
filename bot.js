@@ -984,6 +984,9 @@ bot.on('pmmed', function (data) {
 						if (isJsonString(res.buffer)) {
 							result = JSON.parse(res.buffer);
 							bot.pm(result.message, senderid);
+							if(result.success) {
+								ignored.push(result.userid);
+							}
 						} else {
 							myLog('pmmed', 'JSON.parse error - '+res.buffer);
 						}
