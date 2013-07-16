@@ -968,6 +968,24 @@ bot.on('pmmed', function (data) {
 						}
 					}
 			});
+			
+		// Refresh banned and ignore lists
+		var options = { bufferType: 'buffer', url:apibase+'getBlacklist.php' };
+		http.get(options, function(error, res) {
+			if (isJsonString(res.buffer)) {
+				var json = JSON.parse(res.buffer);
+				if (json.success) {
+					blacklist = json.banned;
+					ignored	= json.ignored;
+					myLog('pmmed', 'Refreshed blacklist ('+json.banned.length+' users)');
+					myLog('pmmed', 'Refreshed ignore list ('+json.ignored.length+' users)');
+					return;
+				} 
+			} else {
+				myLog('pmmed', 'JSON.parse error while refreshing blacklist and ignore list - '+res.buffer+' (URL was '+options.url+')');
+			}
+		});
+			
 		}
    }
 
@@ -984,14 +1002,29 @@ bot.on('pmmed', function (data) {
 						if (isJsonString(res.buffer)) {
 							result = JSON.parse(res.buffer);
 							bot.pm(result.message, senderid);
-							if(result.success) {
-								ignored.push(result.userid);
-							}
 						} else {
 							myLog('pmmed', 'JSON.parse error - '+res.buffer);
 						}
 					}
 			});
+			
+		// Get banned lists
+		var options = { bufferType: 'buffer', url:apibase+'getBlacklist.php' };
+		http.get(options, function(error, res) {
+			if (isJsonString(res.buffer)) {
+				var json = JSON.parse(res.buffer);
+				if (json.success) {
+					blacklist = json.banned;
+					ignored	= json.ignored;
+					myLog('pmmed', 'Refreshed blacklist ('+json.banned.length+' users)');
+					myLog('pmmed', 'Refreshed ignore list ('+json.ignored.length+' users)');
+					return;
+				} 
+			} else {
+				myLog('pmmed', 'JSON.parse error when refreshing blacklist and ignore list - '+res.buffer+' (URL was '+options.url+')');
+			}
+		});
+			
 		}
    }
 
