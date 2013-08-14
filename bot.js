@@ -578,11 +578,9 @@ bot.on('speak', function (data) {
 				if( song.substr('ghost') ) {
 	   				bot.speak('You might be able to read about this :ghost: here: http://lawnmemo.com/'+showdate);
 	   			} else {
-	   				bot.speak('Definitely not a :ghost: .. or maybe I\'m losing it'); 
+					bot.speak('Not a :ghost:');
 	   			}
-   			} else {
-				bot.speak('Not a :ghost:');
-			}
+   			}
    		});
    }
    
