@@ -575,11 +575,15 @@ bot.on('speak', function (data) {
    			var artist = data.room.metadata.current_song.metadata.artist;
    			var album = data.room.metadata.current_song.metadata.album;
    			if (showdate = parseDate(song+' '+artist+' '+album)) {
-				if( song.substr('ghost') ) {
+				if( song.match(/ghost/i) ) {
 	   				bot.speak('You might be able to read about this :ghost: here: http://lawnmemo.com/'+showdate);
+	   				myLog('tdg', 'Matched showdate + ghost for '+showdate);
 	   			} else {
 					bot.speak('Not a :ghost:');
+	   				myLog('tdg', 'Found a showdate, but not a ghost');
 	   			}
+   			} else {
+   				myLog('tdg', 'No showdate');
    			}
    		});
    }
