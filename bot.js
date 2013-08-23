@@ -388,7 +388,7 @@ bot.on('speak', function (data) {
 			}
 		});
 	}
-   if (text.match(/^!who$/i)) {
+   if (text.match(/^!who(else)?$/i)) {
    		var usersHere = '';
    		for(var u in usersList) {
    			usersHere+=(u+',');
