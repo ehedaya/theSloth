@@ -339,7 +339,8 @@ bot.on('speak', function (data) {
 		{ trigger: new RegExp('^!attendance$', 'i'), response: 'http://thephish.fm/attendance'},
         { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://preview.tinyurl.com/thephishreplayroom'},
 		{ trigger: new RegExp('^!tickets$', 'i'), response: 'http://thephish.fm/tickets'},
-		{ trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'}
+		{ trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'},
+		{ trigger: new RegExp('^!draft$', 'i'), response: 'http://thephish.fm/draft'}
 	];
 	for(t=0;t<chatResponses.length;t++) {
 		if (text.match(chatResponses[t].trigger)) {
@@ -388,7 +389,7 @@ bot.on('speak', function (data) {
 			}
 		});
 	}
-   if (text.match(/^!who$/i)) {
+   if (text.match(/^!who(else)?$/i)) {
    		var usersHere = '';
    		for(var u in usersList) {
    			usersHere+=(u+',');
@@ -576,11 +577,15 @@ bot.on('speak', function (data) {
    			var artist = data.room.metadata.current_song.metadata.artist;
    			var album = data.room.metadata.current_song.metadata.album;
    			if (showdate = parseDate(song+' '+artist+' '+album)) {
-				if( song.substr('ghost') ) {
+				if( song.match(/ghost/i) ) {
 	   				bot.speak('You might be able to read about this :ghost: here: http://lawnmemo.com/'+showdate);
+	   				myLog('tdg', 'Matched showdate + ghost for '+showdate);
 	   			} else {
 					bot.speak('Not a :ghost:');
+	   				myLog('tdg', 'Found a showdate, but not a ghost');
 	   			}
+   			} else {
+   				myLog('tdg', 'No showdate');
    			}
    		});
    }
