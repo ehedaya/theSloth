@@ -338,7 +338,8 @@ bot.on('speak', function (data) {
 		{ trigger: new RegExp('^!pnet$', 'i'), response: 'To link your stats, Fan me and then send a PM with !pnet:username (replace username with your .net username). If you update your stats on Phish.net, PM me !pnet to refresh.'},
 		{ trigger: new RegExp('^!attendance$', 'i'), response: 'http://thephish.fm/attendance'},
         { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://preview.tinyurl.com/thephishreplayroom'},
-		{ trigger: new RegExp('^!tickets$', 'i'), response: 'http://thephish.fm/tickets'}
+		{ trigger: new RegExp('^!tickets$', 'i'), response: 'http://thephish.fm/tickets'},
+		{ trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'}
 	];
 	for(t=0;t<chatResponses.length;t++) {
 		if (text.match(chatResponses[t].trigger)) {
