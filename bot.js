@@ -126,7 +126,7 @@ bot.on('newsong', function(data) {
 	var showdate = parseDate(dateBlob);
 	var lastPlayedResponse = '';
 	
-	songLog.addSong(starttime, data.room.metadata.current_song.metadata.artist, data.room.metadata.current_song.metadata.album);
+	/* songLog.addSong(starttime, data.room.metadata.current_song.metadata.artist, data.room.metadata.current_song.metadata.album);
 	
 	if (songLog.getCount('artist', data.room.metadata.current_song.metadata.artist) == 4) {
 		bot.speak(":warning: The artist '"+data.room.metadata.current_song.metadata.artist+"' has been played 4 times in the last 3 hours.");
@@ -135,7 +135,7 @@ bot.on('newsong', function(data) {
 	if (songLog.getCount('album', data.room.metadata.current_song.metadata.album) == 3) {
 		bot.speak(":warning: The album '"+data.room.metadata.current_song.metadata.album+"' has been played 3 times in the last 3 hours.");
 	}
-
+	*/
 	// Boot DJs according to mode 
 	if (mode.type) {
 		if (!mode[userid]) { mode[userid] = 0; }
@@ -337,7 +337,8 @@ bot.on('speak', function (data) {
 		{ trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'},
 		{ trigger: new RegExp('^!pnet$', 'i'), response: 'To link your stats, Fan me and then send a PM with !pnet:username (replace username with your .net username). If you update your stats on Phish.net, PM me !pnet to refresh.'},
 		{ trigger: new RegExp('^!attendance$', 'i'), response: 'http://thephish.fm/attendance'},
-        { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://preview.tinyurl.com/thephishreplayroom'},
+        	{ trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'},
+		{ trigger: new RegExp('^!archiveroom$', 'i'), response: 'http://thephish.fm/archiveroom'},
 		{ trigger: new RegExp('^!tickets$', 'i'), response: 'http://thephish.fm/tickets'},
 		{ trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'},
 		{ trigger: new RegExp('^!draft$', 'i'), response: 'http://thephish.fm/draft'}
@@ -523,7 +524,7 @@ bot.on('speak', function (data) {
 			}
 		});
 	}
-    if (text.match(/^!album$/)) {	 
+   /* if (text.match(/^!album$/)) {	 
    		bot.roomInfo(true, function(data) {
 			if ((data.room.metadata.current_song.metadata.album).length > 1) {
 				bot.speak('Album field: '+data.room.metadata.current_song.metadata.album);
@@ -532,6 +533,7 @@ bot.on('speak', function (data) {
 			}
    		});
    	}
+*/
    if (text.match(/(awesome|great|sick|nasty|good|nice)/i)) {
 		if (!awesomes.contains(userid)) {
 			awesomes.push(userid);
@@ -644,14 +646,14 @@ bot.on('registered', function(data) {
 	usersList[user.userid] = user;	
 	
 	if(userid === USERID) {	// Just starting up
-		songLog = new songLog();
+		// songLog = new songLog();
    		bot.roomInfo(true, function(data) {
    			roomHistory = data.room.metadata.songlog;
 			moderators = data.room.metadata.moderator_id;
 			myLog('reboot', 'Fetched moderators ('+moderators.length+')');
-			for(i=roomHistory.length-2;i>=0;i--) {
+			/*for(i=roomHistory.length-2;i>=0;i--) {
 				songLog.addSong(roomHistory[i].created, roomHistory[i].metadata.artist, roomHistory[i].metadata.album);
-			}
+			}*/
 		});
 		myLog('reboot', 'theSloth just entered the room.  Probably a reboot.');
 	
@@ -805,7 +807,7 @@ bot.on('pmmed', function (data) {
 			}
    		});
    	}
-    if (text.match(/^!album$/)) {	 
+/*    if (text.match(/^!album$/)) {	 
    		bot.roomInfo(true, function(data) {
 			if ((data.room.metadata.current_song.metadata.album).length > 1) {
 				bot.pm(data.room.metadata.current_song.metadata.album, senderid);
@@ -814,6 +816,7 @@ bot.on('pmmed', function (data) {
 			}
    		});
    	}
+*/
     if (text.match(/^!dateblob$/)) {	 
    		bot.roomInfo(true, function(data) {
 			bot.pm(data.room.metadata.current_song.metadata.artist+data.room.metadata.current_song.metadata.song+data.room.metadata.current_song.metadata.album, senderid);
@@ -1357,25 +1360,28 @@ bot.on('pmmed', function (data) {
 	}
 	if (text.match(/^!album:/i)) {
 		var album = text.substr(7);
+		/*
 		if (songLog.getCount('album', album)>0) {
 			bot.pm("The album '"+album+"' has been played "+songLog.getCount('album', album)+" time(s) in the last 3 hours.", senderid);
 		} else {
 			bot.pm("Hm, I don't think any tracks from that album have been played in the last 3 hours.", senderid);
 		}
+		*/
 	}
 	if (text.match(/^!artist:/i)) {
 		var artist = text.substr(8);
-		if (songLog.getCount('artist', artist)>0) {
+		/*if (songLog.getCount('artist', artist)>0) {
 			bot.pm("The artist '"+artist+"' has been played "+songLog.getCount('artist', artist)+" time(s) in the last 3 hours.", senderid);
 		} else {
 			bot.pm("Hm, I don't think any tracks by that artist have been played in the last 3 hours.", senderid);
-		}
+		}*/
 	}
  	if (text.match(/^!(albums|artists)$/i)) {
- 		songLog.prune(getEpoch()-(60*60*3));
+ 		/*songLog.prune(getEpoch()-(60*60*3));
 		var which = text.substr(1) == 'albums' ? 'album' : 'artist';
  		bot.pm("Recent "+which+": "+songLog.getList(which), senderid);
- 	}
+ 		*/
+	}
 	if (text.match(/^!average:/i)) {
    		bot.roomInfo(true, function(data) {
 			var interval = text.substr(9);
