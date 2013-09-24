@@ -15,13 +15,13 @@ then
 	then
         echo "Last activity $diff second(s) ago, rebooting"
 		kill $m
-		/usr/bin/nohup /usr/local/bin/node $BASEDIR/bot.js >> $BASEDIR/logs/theSloth.`date +"%Y%m%d"`.out 2>&1&
+		/usr/bin/nohup /usr//bin/node $BASEDIR/bot.js >> $BASEDIR/logs/theSloth.`date +"%Y%m%d"`.out 2>&1&
 		echo "theSloth was restarted (last activity $diff seconds ago)"
 	else 
 		echo "Last activity $diff second(s) ago"
 	fi
 else
 	echo "Process not found"
-	/usr/bin/nohup /usr/local/bin/node $BASEDIR/bot.js >> $BASEDIR/logs/theSloth.`date +"%Y%m%d"`.out 2>&1&
+	/usr/bin/nohup /usr//bin/node $BASEDIR/bot.js >> $BASEDIR/logs/theSloth.`date +"%Y%m%d"`.out 2>&1&
 fi
 
