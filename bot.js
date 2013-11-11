@@ -337,12 +337,13 @@ bot.on('speak', function (data) {
 		{ trigger: new RegExp('^!new$', 'i'), response: 'http://bit.ly/slothNew'},
 		{ trigger: new RegExp('^!pnet$', 'i'), response: 'To link your stats, Fan me and then send a PM with !pnet:username (replace username with your .net username). If you update your stats on Phish.net, PM me !pnet to refresh.'},
 		{ trigger: new RegExp('^!attendance$', 'i'), response: 'http://thephish.fm/attendance'},
-        	{ trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'},
+		{ trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'},
 		{ trigger: new RegExp('^!archiveroom$', 'i'), response: 'http://thephish.fm/archiveroom'},
 		{ trigger: new RegExp('^!tickets$', 'i'), response: 'http://thephish.fm/tickets'},
 		{ trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'},
 		{ trigger: new RegExp('^!draft$', 'i'), response: 'http://thephish.fm/draft'},
-		{ trigger: new RegExp('^!guest$', 'i'), response: 'http://thephish.fm/guest'}
+		{ trigger: new RegExp('^!guest$', 'i'), response: 'http://thephish.fm/guest'},
+		{ trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: 'http://thephish.fm/secrettstantta'},
 	];
 	for(t=0;t<chatResponses.length;t++) {
 		if (text.match(chatResponses[t].trigger)) {
