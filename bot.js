@@ -343,7 +343,7 @@ bot.on('speak', function (data) {
 		{ trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'},
 		{ trigger: new RegExp('^!draft$', 'i'), response: 'http://thephish.fm/draft'},
 		{ trigger: new RegExp('^!guest$', 'i'), response: 'http://thephish.fm/guest'},
-		{ trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: 'http://thephish.fm/secrettstantta'},
+		{ trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: 'http://thephish.fm/secrettstantta'}
 	];
 	for(t=0;t<chatResponses.length;t++) {
 		if (text.match(chatResponses[t].trigger)) {
