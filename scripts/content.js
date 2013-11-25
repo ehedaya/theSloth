@@ -1,0 +1,105 @@
+TheSloth = function() {
+	this.setupEvents();
+	this.pacify();
+}
+TheSloth.prototype = {
+	constructor:  TheSloth,
+	setupEvents: function() {
+		console.log("Setting up events", this);
+		var self = this;
+		try {
+			window.addEventListener("message", function(data) { 
+				console.log("Generic event", data); 
+			});
+		} catch(e) {
+			console.warn("Error ", data);
+		}
+		
+		// Set up events
+		API.on(API.CHAT, function(obj){
+// 			self.relayEvent("chat", obj)
+			API.getMedia(function(data){
+				self.relayEvent("HISTORY_UPDATE", data)
+			});
+		});
+
+        API.on(API.DJ_ADVANCE, function(obj){
+			self.relayEvent("DJ_ADVANCE", obj)
+        });
+		API.on(API.VOTE_UPDATE, function(obj){
+			self.relayEvent("VOTE_UPDATE", obj)
+		});
+		API.on(API.WAIT_LIST_UPDATE, function(){
+			self.relayEvent("WAIT_LIST_UPDATE", obj)
+		});
+		API.on(API.USER_JOIN, function(obj){
+			self.relayEvent("USER_JOIN", obj)
+		});
+		API.on(API.USER_LEAVE, function(obj){
+			self.relayEvent("USER_LEAVE", obj)
+		});
+		API.on(API.USER_SKIP, function(obj){
+			self.relayEvent("USER_SKIP", obj)
+		});
+		API.on(API.USER_FAN, function(obj){
+			self.relayEvent("USER_FAN", obj)
+		});
+		API.on(API.DJ_UPDATE, function(obj){
+			self.relayEvent("DJ_UPDATE", obj)
+		});
+		API.on(API.CURATE_UPDATE, function(obj){
+			self.relayEvent("CURATE_UPDATE", obj)
+		});
+		API.on(API.ROOM_SCORE_UPDATE, function(obj){
+			self.relayEvent("ROOM_SCORE_UPDATE", obj)
+		});
+		API.on(API.VOTE_SKIP, function(obj){
+			self.relayEvent("VOTE_SKIP", obj)
+		});
+		API.on(API.MOD_SKIP, function(obj){
+			self.relayEvent("MOD_SKIP", obj)
+		});
+		API.on(API.CHAT_COMMAND, function(obj){
+			self.relayEvent("CHAT_COMMAND", obj)
+		});
+		API.on(API.HISTORY_UPDATE, function(obj){
+			self.relayEvent("HISTORY_UPDATE", obj)
+		});
+
+
+	},
+	relayEvent: function(type, payload) {
+		API.getMedia(function(data) {
+			window.nowPlaying = data;
+		});
+		data = { 
+			"type" : type,
+			"payload" : payload,
+			"from" : API.getUser()
+		};
+		$.ajax({
+			crossDomain:true,
+			type: "POST",
+			url: "http://staging.stats.thephish.fm/api/scrobble.php",
+			data: data,
+			success: function(data){
+				console.log(data);
+			}
+		});
+	},
+	pacify: function() {
+		console.log("Pacifying");
+		$('body').css('background-image', 'url(http://i.imgur.com/X8XJV03.png )') ;
+		$("#playback .background img").remove();	
+	}
+}
+
+// Initialize
+	setTimeout(function() {
+		if(API) {
+			console.log(' ready');
+			theSloth = new TheSloth();
+		} else {
+			console.log('not ready');
+		}
+		}, 1000);
