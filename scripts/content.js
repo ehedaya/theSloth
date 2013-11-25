@@ -51,6 +51,7 @@ TheSloth.prototype = {
 			self.relayEvent("CURATE_UPDATE", obj)
 		});
 		API.on(API.ROOM_SCORE_UPDATE, function(obj){
+			console.log(obj);
 			self.relayEvent("ROOM_SCORE_UPDATE", obj)
 		});
 		API.on(API.VOTE_SKIP, function(obj){
