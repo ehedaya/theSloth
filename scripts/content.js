@@ -1,6 +1,6 @@
 TheSloth = function() {
 	this.setupEvents();
-	this.pacify();
+	// this.pacify();
 }
 TheSloth.prototype = {
 	constructor:  TheSloth,
@@ -21,12 +21,13 @@ TheSloth.prototype = {
 		});
 
         API.on(API.DJ_ADVANCE, function(obj){
-			console.log(obj);
+			console.log('dj_advance', obj);
 			self.relayEvent("DJ_ADVANCE", obj, 'scrobble.php')
         });
 		API.on(API.VOTE_UPDATE, function(obj){
 			console.log(obj);
-			self.relayEvent("VOTE_UPDATE", obj, 'scrobble.php')
+			self.relayEvent("VOTE_UPDATE", obj, 'scrobble.php');
+			self.relayEvent("NOW_PLAYING", API.getMedia(), 'now_playing.php');
 		});
 		API.on(API.WAIT_LIST_UPDATE, function(obj){
 			console.log(obj);
@@ -61,7 +62,7 @@ TheSloth.prototype = {
 			self.relayEvent("ROOM_SCORE_UPDATE", obj, 'scrobble.php')
 		});
 		API.on(API.VOTE_SKIP, function(obj){
-			self.relayEvent("VOTE_SKIP", obj, 'scrobble.php')
+			self.relayEvent("VOTE_SKIP", obj, 'scrobble.php');
 		});
 		API.on(API.MOD_SKIP, function(obj){
 			self.relayEvent("MOD_SKIP", obj, 'scrobble.php')
