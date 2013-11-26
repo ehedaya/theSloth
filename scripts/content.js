@@ -9,7 +9,7 @@ TheSloth.prototype = {
 		var self = this;
 		try {
 			window.addEventListener("message", function(data) { 
-				console.log("Generic event", data); 
+				//console.log("Generic event", data); 
 			});
 		} catch(e) {
 			console.warn("Error ", data);
@@ -18,16 +18,17 @@ TheSloth.prototype = {
 		// Set up events
 		API.on(API.CHAT, function(obj){
  			//self.relayEvent("chat", obj)
+			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 		});
 
         API.on(API.DJ_ADVANCE, function(obj){
 			console.log('dj_advance', obj);
-			self.relayEvent("DJ_ADVANCE", obj, 'scrobble.php')
+			self.relayEvent("DJ_ADVANCE", obj, 'scrobble.php');
         });
 		API.on(API.VOTE_UPDATE, function(obj){
 			console.log(obj);
 			self.relayEvent("VOTE_UPDATE", obj, 'scrobble.php');
-			self.relayEvent("NOW_PLAYING", API.getMedia(), 'now_playing.php');
+			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 		});
 		API.on(API.WAIT_LIST_UPDATE, function(obj){
 			console.log(obj);
@@ -58,8 +59,7 @@ TheSloth.prototype = {
 			self.relayEvent("CURATE_UPDATE", obj, 'scrobble.php')
 		});
 		API.on(API.ROOM_SCORE_UPDATE, function(obj){
-			console.log(obj);
-			self.relayEvent("ROOM_SCORE_UPDATE", obj, 'scrobble.php')
+			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 		});
 		API.on(API.VOTE_SKIP, function(obj){
 			self.relayEvent("VOTE_SKIP", obj, 'scrobble.php');
@@ -77,10 +77,6 @@ TheSloth.prototype = {
 
 	},
 	relayEvent: function(type, payload, endpoint) {
-		API.getMedia(function(data) {
-			console.log(data);
-			window.nowPlaying = data;
-		});
 		data = { 
 			"type" : type,
 			"payload" : payload,
