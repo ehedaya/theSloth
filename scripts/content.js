@@ -17,60 +17,67 @@ TheSloth.prototype = {
 		
 		// Set up events
 		API.on(API.CHAT, function(obj){
-// 			self.relayEvent("chat", obj)
-			API.getMedia(function(data){
-				self.relayEvent("HISTORY_UPDATE", data)
-			});
+ 			//self.relayEvent("chat", obj)
 		});
 
         API.on(API.DJ_ADVANCE, function(obj){
-			self.relayEvent("DJ_ADVANCE", obj)
+			console.log(obj);
+			self.relayEvent("DJ_ADVANCE", obj, 'scrobble.php')
         });
 		API.on(API.VOTE_UPDATE, function(obj){
-			self.relayEvent("VOTE_UPDATE", obj)
+			console.log(obj);
+			self.relayEvent("VOTE_UPDATE", obj, 'scrobble.php')
 		});
-		API.on(API.WAIT_LIST_UPDATE, function(){
-			self.relayEvent("WAIT_LIST_UPDATE", obj)
+		API.on(API.WAIT_LIST_UPDATE, function(obj){
+			console.log(obj);
+			self.relayEvent("WAIT_LIST_UPDATE", obj, 'scrobble.php')
 		});
 		API.on(API.USER_JOIN, function(obj){
-			self.relayEvent("USER_JOIN", obj)
+			console.log('user_join', obj);
+			self.relayEvent("USER_JOIN", obj, 'user_arrival_departure.php')
 		});
 		API.on(API.USER_LEAVE, function(obj){
-			self.relayEvent("USER_LEAVE", obj)
+			console.log('user_leave', obj);
+			self.relayEvent("USER_LEAVE", obj, 'user_arrival_departure.php')
 		});
 		API.on(API.USER_SKIP, function(obj){
-			self.relayEvent("USER_SKIP", obj)
+			console.log(obj);
+			self.relayEvent("USER_SKIP", obj, 'scrobble.php')
 		});
 		API.on(API.USER_FAN, function(obj){
-			self.relayEvent("USER_FAN", obj)
+			console.log(obj);
+			self.relayEvent("USER_FAN", obj, 'scrobble.php')
 		});
 		API.on(API.DJ_UPDATE, function(obj){
-			self.relayEvent("DJ_UPDATE", obj)
+			console.log(obj);
+			self.relayEvent("DJ_UPDATE", obj, 'scrobble.php')
 		});
 		API.on(API.CURATE_UPDATE, function(obj){
-			self.relayEvent("CURATE_UPDATE", obj)
+			console.log(obj);
+			self.relayEvent("CURATE_UPDATE", obj, 'scrobble.php')
 		});
 		API.on(API.ROOM_SCORE_UPDATE, function(obj){
 			console.log(obj);
-			self.relayEvent("ROOM_SCORE_UPDATE", obj)
+			self.relayEvent("ROOM_SCORE_UPDATE", obj, 'scrobble.php')
 		});
 		API.on(API.VOTE_SKIP, function(obj){
-			self.relayEvent("VOTE_SKIP", obj)
+			self.relayEvent("VOTE_SKIP", obj, 'scrobble.php')
 		});
 		API.on(API.MOD_SKIP, function(obj){
-			self.relayEvent("MOD_SKIP", obj)
+			self.relayEvent("MOD_SKIP", obj, 'scrobble.php')
 		});
 		API.on(API.CHAT_COMMAND, function(obj){
-			self.relayEvent("CHAT_COMMAND", obj)
+			self.relayEvent("CHAT_COMMAND", obj, 'scrobble.php')
 		});
 		API.on(API.HISTORY_UPDATE, function(obj){
-			self.relayEvent("HISTORY_UPDATE", obj)
+			self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php')
 		});
 
 
 	},
-	relayEvent: function(type, payload) {
+	relayEvent: function(type, payload, endpoint) {
 		API.getMedia(function(data) {
+			console.log(data);
 			window.nowPlaying = data;
 		});
 		data = { 
@@ -81,7 +88,7 @@ TheSloth.prototype = {
 		$.ajax({
 			crossDomain:true,
 			type: "POST",
-			url: "http://staging.stats.thephish.fm/api/scrobble.php",
+			url: "http://staging.stats.thephish.fm/api/" + endpoint,
 			data: data,
 			success: function(data){
 				console.log(data);
