@@ -1,5 +1,3 @@
-console.log("content.js");
-
 TheSloth = function() {
 	this.setupEvents();
 	// this.pacify();
@@ -108,9 +106,9 @@ TheSloth.prototype = {
 // Initialize
 	setTimeout(function() {
 		if(API) {
-			console.log('API loaded.');
+			console.log('API connected.');
 			theSloth = new TheSloth();
 		} else {
-			console.log('API not available yet.');
+			console.log('API not connected.  Retrying....');
 		}
 		}, 1000);
