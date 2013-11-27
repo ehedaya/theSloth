@@ -17,7 +17,7 @@ TheSloth.prototype = {
 		
 		// Set up events
 		API.on(API.CHAT, function(obj){
- 			//self.relayEvent("chat", obj)
+ 			self.relayEvent("CHAT", { "media" : API.getMedia(), "chat": obj}, 'chat.php');
 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 		});
 
@@ -27,7 +27,7 @@ TheSloth.prototype = {
         });
 		API.on(API.VOTE_UPDATE, function(obj){
 			console.log(obj);
-			self.relayEvent("VOTE_UPDATE", obj, 'scrobble.php');
+			//self.relayEvent("VOTE_UPDATE", {"vote": obj, "now_playing": API.getMedia()}, 'vote_update.php');
 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 		});
 		API.on(API.WAIT_LIST_UPDATE, function(obj){
