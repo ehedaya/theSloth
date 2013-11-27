@@ -29,7 +29,7 @@ TheSloth.prototype = {
 		API.on(API.VOTE_UPDATE, function(obj){
 			//self.relayEvent("VOTE_UPDATE", {"vote": obj, "now_playing": API.getMedia()}, 'vote_update.php');
  			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
-// 			self.relayEvent("VOTE_UPDATE", obj, 'scrobble.php');
+ 			self.relayEvent("VOTE_UPDATE", obj, 'vote_update.php');
 		});
 		API.on(API.WAIT_LIST_UPDATE, function(obj){
 			console.log(obj);
