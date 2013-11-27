@@ -1,11 +1,17 @@
 {
   "name":           "theSloth",
-  "version":        "0.0.1",
-  "description":    "Extension for http://plug.dj/thePhish",
+  "version":        "0.0.3",
+  "short_name":		"Stats tracking helper for http://plug.dj/thePhish/",
+  "description":    "This extension relays data about activity in http://plug.dj/thePhish for stats tracking purposes.",
   "browser_action" : {
-    "default_icon": "icon.png",
+    "default_icon": "icon96.png",
   	"default_title" : "thePhish",
   	"default_popup" : "popup.html"
+  },
+  "icons": {
+  	"16" : "icon16.png",
+  	"48" : "icon48.png",
+  	"96" : "icon96.png"
   },
   "content_scripts": [
     {
