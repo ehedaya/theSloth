@@ -10,7 +10,7 @@
   "content_scripts": [
     {
           "matches": ["*://plug.dj/*"],
-      	  "js": ["scripts/jquery.js", "scripts/injector.js"],
+      	  "js": ["scripts/jquery.js", "scripts/jquery-2.0.3.min.map", "scripts/injector.js"],
           "run_at": "document_end"
     }],
   "manifest_version": 2,

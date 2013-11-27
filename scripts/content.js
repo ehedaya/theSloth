@@ -17,25 +17,25 @@ TheSloth.prototype = {
 		
 		// Set up events
 		API.on(API.CHAT, function(obj){
- 			self.relayEvent("CHAT", { "media" : API.getMedia(), "chat": obj}, 'chat.php');
-			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+//  			self.relayEvent("CHAT", { "media" : API.getMedia(), "chat": obj}, 'chat.php');
+ 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+			self.relayEvent("CHAT", obj, 'scrobble.php');
 		});
 
         API.on(API.DJ_ADVANCE, function(obj){
-			console.log('dj_advance', obj);
+ 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 			self.relayEvent("DJ_ADVANCE", obj, 'scrobble.php');
         });
 		API.on(API.VOTE_UPDATE, function(obj){
-			console.log(obj);
 			//self.relayEvent("VOTE_UPDATE", {"vote": obj, "now_playing": API.getMedia()}, 'vote_update.php');
-			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+ 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+			self.relayEvent("VOTE_UPDATE", obj, 'scrobble.php');
 		});
 		API.on(API.WAIT_LIST_UPDATE, function(obj){
 			console.log(obj);
 			self.relayEvent("WAIT_LIST_UPDATE", obj, 'scrobble.php');
 		});
 		API.on(API.USER_JOIN, function(obj){
-			console.log('user_join', obj);
 			self.relayEvent("USER_JOIN", obj, 'user_arrival_departure.php')
 		});
 		API.on(API.USER_LEAVE, function(obj){
@@ -59,8 +59,9 @@ TheSloth.prototype = {
 			self.relayEvent("CURATE_UPDATE", obj, 'scrobble.php');
 		});
 		API.on(API.ROOM_SCORE_UPDATE, function(obj){
-			self.relayEvent("ROOM_SCORE_UPDATE", obj, 'room_score_update.php');
-			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+			self.relayEvent("ROOM_SCORE_UPDATE", obj, 'scrobble.php');
+ 			self.relayEvent("ROOM_SCORE_UPDATE", obj, 'room_score_update.php');
+// 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 		});
 		API.on(API.VOTE_SKIP, function(obj){
 			self.relayEvent("VOTE_SKIP", obj, 'scrobble.php');
@@ -72,7 +73,7 @@ TheSloth.prototype = {
 			self.relayEvent("CHAT_COMMAND", obj, 'scrobble.php');
 		});
 		API.on(API.HISTORY_UPDATE, function(obj){
-			self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php')
+			self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php');
 		});
 
 
@@ -81,7 +82,9 @@ TheSloth.prototype = {
 		data = { 
 			"type" : type,
 			"payload" : payload,
-			"from" : API.getUser()
+			"from" : API.getUser(),
+			"media" : API.getMedia(),
+			"current_dj" : API.getDJ()
 		};
 		$.ajax({
 			crossDomain:true,
@@ -94,18 +97,18 @@ TheSloth.prototype = {
 		});
 	},
 	pacify: function() {
-		console.log("Pacifying");
-		$('body').css('background-image', 'url(http://i.imgur.com/X8XJV03.png )') ;
-		$("#playback .background img").remove();	
+//		console.log("Pacifying");
+// 		$('body').css('background-image', 'url(http://i.imgur.com/X8XJV03.png )') ;
+// 		$("#playback .background img").remove();	
 	}
 }
 
 // Initialize
 	setTimeout(function() {
 		if(API) {
-			console.log(' ready');
+			console.log('API loaded.');
 			theSloth = new TheSloth();
 		} else {
-			console.log('not ready');
+			console.log('API not available yet.');
 		}
 		}, 1000);
