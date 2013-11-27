@@ -1,3 +1,5 @@
+console.log("content.js");
+
 TheSloth = function() {
 	this.setupEvents();
 	// this.pacify();

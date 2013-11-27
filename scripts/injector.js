@@ -6,11 +6,8 @@ ThePhish = function() {
 ThePhish.prototype = {
 
                 constructor : ThePhish,
-
                 injectApp : function(callback){
                         var self = this;//Keep plug object in scope while using jquery callbacks.
-								$.getScript(chrome.extension.getURL("scripts/jquery.js")).done(function() {
-									console.log("Jquery", $);
 									$.getScript(chrome.extension.getURL("scripts/content.js"))
 									.done(function(e){
 											console.log("Extension loaded!");
@@ -18,7 +15,6 @@ ThePhish.prototype = {
 									.fail(function(){
 											console.warn("Extension did not load!");
 									})
-								});
 
                                 callback(self);
 
