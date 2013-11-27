@@ -19,7 +19,7 @@ TheSloth.prototype = {
 		API.on(API.CHAT, function(obj){
 //  			self.relayEvent("CHAT", { "media" : API.getMedia(), "chat": obj}, 'chat.php');
  			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
-			self.relayEvent("CHAT", obj, 'scrobble.php');
+			self.relayEvent("CHAT", obj, 'chat.php');
 		});
 
         API.on(API.DJ_ADVANCE, function(obj){
