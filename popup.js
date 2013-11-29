@@ -1,1 +1,1 @@
-chrome.tabs.executeScript(null, {file: "scripts/theSloth.js"});
+chrome.tabs.executeScript(null, {file: "scripts/content.js"});
