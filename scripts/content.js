@@ -38,8 +38,10 @@ TheSloth.prototype = {
 								success: function(data){
 									json = JSON.parse(data);
 									console.log(json);
-									if(json.success && json.data[0]) {
+									if(json.success && json.data.length == 1) {
 										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+json.data[0].showdate+"' style='color:#009cdd' target='_blank'>"+json.data[0].venue_long+"</a>");
+									} else if (json.success && json.data.length > 1) {
+										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+json.data[0].showdate+"' style='color:#009cdd' target='_blank'>"+json.data.length+" shows on "+showdate+"</a>");
 									} else {
 										self.insertChat(json.reason);
 									}
@@ -104,7 +106,8 @@ TheSloth.prototype = {
 			"payload" : payload,
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
-			"current_dj" : API.getDJ()
+			"current_dj" : API.getDJ(),
+			"version" : "0.0.8"
 		};
 		$.ajax({
 			crossDomain:true,
@@ -141,12 +144,15 @@ TheSloth.prototype = {
 	}
 }
 
-// Initialize
-	setTimeout(function() {
-		if(API) {
+// Wait for the PlugAPI to be available before instantiating
+function initialize() {
+	if(typeof API != "undefined") {
 			console.log('API connected.');
 			theSloth = new TheSloth();
-		} else {
+	} else {
 			console.log('API not connected.  Retrying....');
-		}
-		}, 1000);
+		setTimeout(initialize, 1000);
+	}
+}
+
+initialize();
