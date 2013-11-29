@@ -38,8 +38,8 @@ TheSloth.prototype = {
 								success: function(data){
 									json = JSON.parse(data);
 									console.log(json);
-									if(json.success && json[0]) {
-										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+json[0].showdate+"' style='color:#009cdd' target='_blank'>"+json[0].venue_long+"</a>");
+									if(json.success && json.data[0]) {
+										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+json.data[0].showdate+"' style='color:#009cdd' target='_blank'>"+json.data[0].venue_long+"</a>");
 									} else {
 										self.insertChat(json.reason);
 									}
