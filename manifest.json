@@ -16,7 +16,7 @@
   "content_scripts": [
     {
           "matches": ["*://plug.dj/thephish/"],
-      	  "js": ["scripts/jquery.js", "scripts/injector.js", "scripts/date.js",],
+      	  "js": ["scripts/jquery.js", "scripts/injector.js", "scripts/date.js"],
           "run_at": "document_end"
     }],
   "manifest_version": 2,
