@@ -19,6 +19,13 @@ TheSloth.prototype = {
 		API.on(API.CHAT, function(obj){
 			var text = obj.message;
 			
+			for(t=0;t<self.simpleResponses.length;t++) {
+					if (text.match(self.simpleResponses[t].trigger)) {
+							self.insertChat(self.simpleResponses[t].response);
+							return true; 
+					}
+			}
+			
 			if(text.match(/^##/i)) {
 				// Log a note
 				self.relayEvent("CHAT", obj, 'chat.php');
@@ -47,6 +54,8 @@ TheSloth.prototype = {
 									}
 								}
 							});
+						} else {
+							console.log("Could not parse showdate in "+blob);
 						}
 					});
 				}
@@ -64,26 +73,20 @@ TheSloth.prototype = {
  			self.relayEvent("VOTE_UPDATE", obj, 'vote_update.php');
 		});
 		API.on(API.WAIT_LIST_UPDATE, function(obj){
-			console.log(obj);
 		});
 		API.on(API.USER_JOIN, function(obj){
 			self.relayEvent("USER_JOIN", obj, 'user_arrival_departure.php')
 		});
 		API.on(API.USER_LEAVE, function(obj){
-			console.log('user_leave', obj);
 			self.relayEvent("USER_LEAVE", obj, 'user_arrival_departure.php')
 		});
 		API.on(API.USER_SKIP, function(obj){
-			console.log(obj);
 		});
 		API.on(API.USER_FAN, function(obj){
-			console.log(obj);
 		});
 		API.on(API.DJ_UPDATE, function(obj){
-			console.log(obj);
 		});
 		API.on(API.CURATE_UPDATE, function(obj){
-			console.log(obj);
 		});
 		API.on(API.ROOM_SCORE_UPDATE, function(obj){
  			self.relayEvent("ROOM_SCORE_UPDATE", obj, 'room_score_update.php');
@@ -107,7 +110,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.0.8"
+			"version" : "0.0.9"
 		};
 		$.ajax({
 			crossDomain:true,
@@ -141,7 +144,21 @@ TheSloth.prototype = {
         }  else {
                 callback(false);
         }
-	}
+	},
+	simpleResponses: [
+                { trigger: new RegExp('^!tips$','i'), response: '<a href="http://thephish.fm/tips/" target="_blank">http://thephish.fm/tips/</a>'},
+                { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: '<a href="https://github.com/ehedaya/theSloth/issues/new/" target="_blank">https://github.com/ehedaya/theSloth/issues/new/</a>'},
+                { trigger: new RegExp('^!stats$','i'), response: '<a href="http://stats.thephish.fm" target="_blank">http://stats.thephish.fm</a>'},
+                { trigger: new RegExp('^!gifs$','i'), response: '<a href="http://tinyurl.com/ttgifs" target="_blank">http://tinyurl.com/ttgifs</a>'},
+                { trigger: new RegExp('^!deg$','i'), response: '<a href="http://tinyurl.com/phishdeg" target="_blank">http://tinyurl.com/phishdeg</a>'},
+                { trigger: new RegExp('^!m[e]{1,2}[t]{1,2}up[s]{0,1}$','i'), response: '<a href="http://thephish.fm/meettups" target="_blank">http://thephish.fm/meettups</a>'},
+                { trigger: new RegExp('^!attendance$', 'i'), response: '<a href="http://thephish.fm/attendance" target="_blank">http://thephish.fm/attendance</a>'},
+                { trigger: new RegExp('^!tickets$', 'i'), response: '<a href="http://thephish.fm/tickets" target="_blank">http://thephish.fm/tickets</a>'},
+                { trigger: new RegExp('^!tease$', 'i'), response: '<a href="http://thephish.fm/tease" target="_blank">http://thephish.fm/tease</a>'},
+                { trigger: new RegExp('^!draft$', 'i'), response: '<a href="http://thephish.fm/draft" target="_blank">http://thephish.fm/draft</a>'},
+                { trigger: new RegExp('^!guest$', 'i'), response: '<a href="http://thephish.fm/guest" target="_blank">http://thephish.fm/guest</a>'},
+                { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: '<a href="http://thephish.fm/secrettstantta" target="_blank">http://thephish.fm/secrettstantta</a>'}
+        ]
 }
 
 // Wait for the PlugAPI to be available before instantiating
