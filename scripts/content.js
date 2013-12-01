@@ -39,7 +39,7 @@ TheSloth.prototype = {
 						if(showdate.length) {
 							$.ajax({
 								crossDomain:true,
-								type: "GET",
+								type: "POST",
 								url: "http://staging.stats.thephish.fm/api/getShow.php",
 								data: { date : showdate },
 								success: function(data){
@@ -60,7 +60,7 @@ TheSloth.prototype = {
 					});
 				}
 			}
- 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+ 			// self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 			self.relayEvent("CHAT", obj, 'chat.php');
 		});
 
@@ -68,7 +68,6 @@ TheSloth.prototype = {
  			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
         });
 		API.on(API.VOTE_UPDATE, function(obj){
-			//self.relayEvent("VOTE_UPDATE", {"vote": obj, "now_playing": API.getMedia()}, 'vote_update.php');
  			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
  			self.relayEvent("VOTE_UPDATE", obj, 'vote_update.php');
 		});
@@ -94,11 +93,13 @@ TheSloth.prototype = {
 		API.on(API.VOTE_SKIP, function(obj){
 		});
 		API.on(API.MOD_SKIP, function(obj){
+ 			self.relayEvent("MOD_SKIP", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 		});
 		API.on(API.CHAT_COMMAND, function(obj){
 		});
 		API.on(API.HISTORY_UPDATE, function(obj){
- 			self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php');
+ 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+ 			//self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php');
 		});
 
 
@@ -110,7 +111,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.0.9"
+			"version" : "0.0.10"
 		};
 		$.ajax({
 			crossDomain:true,
@@ -147,6 +148,7 @@ TheSloth.prototype = {
 	},
 	simpleResponses: [
                 { trigger: new RegExp('^!tips$','i'), response: '<a href="http://thephish.fm/tips/" target="_blank">http://thephish.fm/tips/</a>'},
+                { trigger: new RegExp('^!(ext|extension|sloth)$','i'), response: '<a href="http://bit.ly/theSlothExt" target="_blank">http://bit.ly/theSlothExt</a>'},
                 { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: '<a href="https://github.com/ehedaya/theSloth/issues/new/" target="_blank">https://github.com/ehedaya/theSloth/issues/new/</a>'},
                 { trigger: new RegExp('^!stats$','i'), response: '<a href="http://stats.thephish.fm" target="_blank">http://stats.thephish.fm</a>'},
                 { trigger: new RegExp('^!gifs$','i'), response: '<a href="http://tinyurl.com/ttgifs" target="_blank">http://tinyurl.com/ttgifs</a>'},
