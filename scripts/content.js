@@ -1,5 +1,6 @@
 TheSloth = function() {
 	this.setupEvents();
+	this.syncShowCache();
 	// this.pacify();
 }
 TheSloth.prototype = {
@@ -37,20 +38,14 @@ TheSloth.prototype = {
 					var blob = now_playing.author+now_playing.title;
 					self.parseDate(blob, function(showdate) {
 						if(showdate.length) {
-							$.ajax({
-								crossDomain:true,
-								type: "POST",
-								url: "http://staging.stats.thephish.fm/api/getShow.php",
-								data: { date : showdate },
-								success: function(data){
-									json = JSON.parse(data);
-									console.log(json);
-									if(json.success && json.data.length == 1) {
-										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+json.data[0].showdate+"' style='color:#009cdd' target='_blank'>"+json.data[0].venue_long+"</a>");
-									} else if (json.success && json.data.length > 1) {
-										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+json.data[0].showdate+"' style='color:#009cdd' target='_blank'>"+json.data.length+" shows on "+showdate+"</a>");
+							var showlist_json = localStorage.getItem('showlist');
+							var showlist = JSON.parse(showlist_json);
+							$.each(showlist, function(showdate_index,venue_long) {
+								if(showdate_index == showdate) {
+									if(venue_long.length > 1) {
+										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+showdate+"' style='color:#009cdd' target='_blank'>"+venue_long.length+" shows on "+showdate+"</a>");
 									} else {
-										self.insertChat(json.reason);
+										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+showdate+"' style='color:#009cdd' target='_blank'>"+venue_long[0]+"</a>");
 									}
 								}
 							});
@@ -111,7 +106,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.0.10"
+			"version" : "0.0.11"
 		};
 		$.ajax({
 			crossDomain:true,
@@ -160,7 +155,23 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!draft$', 'i'), response: '<a href="http://thephish.fm/draft" target="_blank">http://thephish.fm/draft</a>'},
                 { trigger: new RegExp('^!guest$', 'i'), response: '<a href="http://thephish.fm/guest" target="_blank">http://thephish.fm/guest</a>'},
                 { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: '<a href="http://thephish.fm/secrettstantta" target="_blank">http://thephish.fm/secrettstantta</a>'}
-        ]
+	],
+	syncShowCache: function() {
+		$.ajax({
+			crossDomain:true,
+			type: "GET",
+			url: "http://staging.stats.thephish.fm/api/getAllShows.php",
+			success: function(response){
+				console.log("Refreshed local show list");
+				localStorage.removeItem('showlist');
+				localStorage.setItem('showlist', response);
+			},
+			error: function(response) {
+				error.log("Error retrieving show cache");
+			}
+		});
+	}
+
 }
 
 // Wait for the PlugAPI to be available before instantiating
