@@ -53,7 +53,22 @@ TheSloth.prototype = {
 							console.log("Could not parse showdate in "+blob);
 						}
 					});
-				}
+				} else if (text.match(/^!pnet:/)) {
+                    var pnet_username = escape(text.substr(6));
+                    var userid = obj.fromID;
+                    var payload = { userid: userid, username: pnet_username };
+                    console.log(payload);
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "http://staging.stats.thephish.fm/api/update_pnet.php",
+						data: payload,
+						success: function(data){
+							console.log(data);
+						}
+					});
+   				}
+
 			}
  			// self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 			self.relayEvent("CHAT", obj, 'chat.php');
@@ -106,7 +121,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.0.11"
+			"version" : "0.0.12"
 		};
 		$.ajax({
 			crossDomain:true,
@@ -142,19 +157,19 @@ TheSloth.prototype = {
         }
 	},
 	simpleResponses: [
-                { trigger: new RegExp('^!tips$','i'), response: '<a href="http://thephish.fm/tips/" target="_blank">http://thephish.fm/tips/</a>'},
-                { trigger: new RegExp('^!(ext|extension|sloth)$','i'), response: '<a href="http://bit.ly/theSlothExt" target="_blank">http://bit.ly/theSlothExt</a>'},
-                { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: '<a href="https://github.com/ehedaya/theSloth/issues/new/" target="_blank">https://github.com/ehedaya/theSloth/issues/new/</a>'},
-                { trigger: new RegExp('^!stats$','i'), response: '<a href="http://stats.thephish.fm" target="_blank">http://stats.thephish.fm</a>'},
-                { trigger: new RegExp('^!gifs$','i'), response: '<a href="http://tinyurl.com/ttgifs" target="_blank">http://tinyurl.com/ttgifs</a>'},
-                { trigger: new RegExp('^!deg$','i'), response: '<a href="http://tinyurl.com/phishdeg" target="_blank">http://tinyurl.com/phishdeg</a>'},
-                { trigger: new RegExp('^!m[e]{1,2}[t]{1,2}up[s]{0,1}$','i'), response: '<a href="http://thephish.fm/meettups" target="_blank">http://thephish.fm/meettups</a>'},
-                { trigger: new RegExp('^!attendance$', 'i'), response: '<a href="http://thephish.fm/attendance" target="_blank">http://thephish.fm/attendance</a>'},
-                { trigger: new RegExp('^!tickets$', 'i'), response: '<a href="http://thephish.fm/tickets" target="_blank">http://thephish.fm/tickets</a>'},
-                { trigger: new RegExp('^!tease$', 'i'), response: '<a href="http://thephish.fm/tease" target="_blank">http://thephish.fm/tease</a>'},
-                { trigger: new RegExp('^!draft$', 'i'), response: '<a href="http://thephish.fm/draft" target="_blank">http://thephish.fm/draft</a>'},
-                { trigger: new RegExp('^!guest$', 'i'), response: '<a href="http://thephish.fm/guest" target="_blank">http://thephish.fm/guest</a>'},
-                { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: '<a href="http://thephish.fm/secrettstantta" target="_blank">http://thephish.fm/secrettstantta</a>'}
+                { trigger: new RegExp('^!tips$','i'), response: '<a href="http://thephish.fm/tips/" target="_blank" style="color:#009cdd">http://thephish.fm/tips/</a>'},
+                { trigger: new RegExp('^!(ext|extension|sloth)$','i'), response: '<a href="http://bit.ly/theSlothExt" target="_blank"  style="color:#009cdd">http://bit.ly/theSlothExt</a>'},
+                { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: '<a href="https://github.com/ehedaya/theSloth/issues/new/" target="_blank"  style="color:#009cdd">https://github.com/ehedaya/theSloth/issues/new/</a>'},
+                { trigger: new RegExp('^!stats$','i'), response: '<a href="http://stats.thephish.fm" target="_blank" style="color:#009cdd">http://stats.thephish.fm</a>'},
+                { trigger: new RegExp('^!gifs$','i'), response: '<a href="http://tinyurl.com/ttgifs" target="_blank" style="color:#009cdd">http://tinyurl.com/ttgifs</a>'},
+                { trigger: new RegExp('^!deg$','i'), response: '<a href="http://tinyurl.com/phishdeg" target="_blank" style="color:#009cdd">http://tinyurl.com/phishdeg</a>'},
+                { trigger: new RegExp('^!m[e]{1,2}[t]{1,2}up[s]{0,1}$','i'), response: '<a href="http://thephish.fm/meettups" target="_blank" style="color:#009cdd">http://thephish.fm/meettups</a>'},
+                { trigger: new RegExp('^!attendance$', 'i'), response: '<a href="http://thephish.fm/attendance" target="_blank" style="color:#009cdd">http://thephish.fm/attendance</a>'},
+                { trigger: new RegExp('^!tickets$', 'i'), response: '<a href="http://thephish.fm/tickets" target="_blank" style="color:#009cdd">http://thephish.fm/tickets</a>'},
+                { trigger: new RegExp('^!tease$', 'i'), response: '<a href="http://thephish.fm/tease" target="_blank" style="color:#009cdd">http://thephish.fm/tease</a>'},
+                { trigger: new RegExp('^!draft$', 'i'), response: '<a href="http://thephish.fm/draft" target="_blank" style="color:#009cdd">http://thephish.fm/draft</a>'},
+                { trigger: new RegExp('^!guest$', 'i'), response: '<a href="http://thephish.fm/guest" target="_blank" style="color:#009cdd">http://thephish.fm/guest</a>'},
+                { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: '<a href="http://thephish.fm/secrettstantta" target="_blank" style="color:#009cdd">http://thephish.fm/secrettstantta</a>'}
 	],
 	syncShowCache: function() {
 		$.ajax({
