@@ -61,7 +61,7 @@ TheSloth.prototype = {
 					$.ajax({
 						crossDomain:true,
 						type: "GET",
-						url: "http://staging.stats.thephish.fm/api/update_pnet.php",
+						url: "http://stats.thephish.fm/api/update_pnet.php",
 						data: payload,
 						success: function(data){
 							console.log(data);
@@ -121,12 +121,16 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.0.12"
+			"version" : "0.0.13"
 		};
+		if(data.from.permission < 2) {
+			// Only room moderators can relay API data
+			return false;
+		}
 		$.ajax({
 			crossDomain:true,
 			type: "POST",
-			url: "http://staging.stats.thephish.fm/api/" + endpoint,
+			url: "http://stats.thephish.fm/api/" + endpoint,
 			data: data,
 			success: function(data){
 				console.log(data);
@@ -175,7 +179,7 @@ TheSloth.prototype = {
 		$.ajax({
 			crossDomain:true,
 			type: "GET",
-			url: "http://staging.stats.thephish.fm/api/getAllShows.php",
+			url: "http://stats.thephish.fm/api/getAllShows.php",
 			success: function(response){
 				console.log("Refreshed local show list");
 				localStorage.removeItem('showlist');
