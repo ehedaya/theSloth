@@ -61,7 +61,7 @@ TheSloth.prototype = {
 							console.log(data);
 						}
 					});
-					this.syncShowAttendees();
+					self.syncShowAttendees();
    				} else if (text.match(/^!who(else)?/)) {
 					var now_playing = API.getMedia();
 					var blob = now_playing.author+now_playing.title;
@@ -76,7 +76,7 @@ TheSloth.prototype = {
 									var chat_text = "Show attendees: ";
 									$.each(attendees, function(attendee_index, attendee) {
 										console.log(attendee, attendee.url, attendee.name);
-										chat_text = chat_text + "<a href='"+attendee.url+"' target='_blank' style='color:#009cdd'>"+attendee.name+"</a> ";
+										chat_text = chat_text + "<a href='"+attendee.url+"' target='_blank' style='color:#009cdd'>"+attendee.name+"</a>, ";
 										if(attendee_index == attendees.length-1) {
 											self.insertChat(chat_text);								
 										}
