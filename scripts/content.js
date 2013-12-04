@@ -1,20 +1,14 @@
 TheSloth = function() {
 	this.setupEvents();
 	this.syncShowCache();
+	this.syncShowAttendees();
 	// this.pacify();
 }
 TheSloth.prototype = {
 	constructor:  TheSloth,
 	setupEvents: function() {
-		console.log("Setting up events", this);
+		console.log("Setting up events");
 		var self = this;
-		try {
-			window.addEventListener("message", function(data) { 
-				//console.log("Generic event", data); 
-			});
-		} catch(e) {
-			console.warn("Error ", data);
-		}
 		
 		// Set up events
 		API.on(API.CHAT, function(obj){
@@ -67,46 +61,88 @@ TheSloth.prototype = {
 							console.log(data);
 						}
 					});
+					this.syncShowAttendees();
+   				} else if (text.match(/^!who(else)?/)) {
+					var now_playing = API.getMedia();
+					var blob = now_playing.author+now_playing.title;
+					self.parseDate(blob, function(showdate) {
+						if(showdate.length) {
+							var show_attendee_json = localStorage.getItem('show_attendees');
+							var show_attendees = JSON.parse(show_attendee_json);
+							var found_attendees = false;
+							$.each(show_attendees, function(showdate_index,attendees) {
+								if(showdate_index == showdate) {
+									found_attendees = true;
+									var chat_text = "Show attendees: ";
+									$.each(attendees, function(attendee_index, attendee) {
+										console.log(attendee, attendee.url, attendee.name);
+										chat_text = chat_text + "<a href='"+attendee.url+"' target='_blank' style='color:#009cdd'>"+attendee.name+"</a> ";
+										if(attendee_index == attendees.length-1) {
+											self.insertChat(chat_text);								
+										}
+									});
+								}
+							});
+							if(!found_attendees) {
+								var chat_text = "I don't know anyone who attended this show.";
+								self.insertChat(chat_text);
+							}
+						} else {
+							console.log("Could not parse showdate in "+blob);
+						}
+					});
    				}
 
 			}
- 			// self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 			self.relayEvent("CHAT", obj, 'chat.php');
 		});
 
         API.on(API.DJ_ADVANCE, function(obj){
- 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+ 			self.relayEvent("DJ_ADVANCE", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
         });
+		
 		API.on(API.VOTE_UPDATE, function(obj){
  			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
  			self.relayEvent("VOTE_UPDATE", obj, 'vote_update.php');
 		});
+		
 		API.on(API.WAIT_LIST_UPDATE, function(obj){
 		});
+		
 		API.on(API.USER_JOIN, function(obj){
 			self.relayEvent("USER_JOIN", obj, 'user_arrival_departure.php')
 		});
+		
 		API.on(API.USER_LEAVE, function(obj){
 			self.relayEvent("USER_LEAVE", obj, 'user_arrival_departure.php')
 		});
+		
 		API.on(API.USER_SKIP, function(obj){
 		});
+		
 		API.on(API.USER_FAN, function(obj){
 		});
+		
 		API.on(API.DJ_UPDATE, function(obj){
 		});
+		
 		API.on(API.CURATE_UPDATE, function(obj){
 		});
+		
 		API.on(API.ROOM_SCORE_UPDATE, function(obj){
  			self.relayEvent("ROOM_SCORE_UPDATE", obj, 'room_score_update.php');
 		});
+		
 		API.on(API.VOTE_SKIP, function(obj){
 		});
+		
 		API.on(API.MOD_SKIP, function(obj){
  			self.relayEvent("MOD_SKIP", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
 		});
+		
 		API.on(API.CHAT_COMMAND, function(obj){
 		});
+		
 		API.on(API.HISTORY_UPDATE, function(obj){
  			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
  			//self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php');
@@ -121,9 +157,9 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.0.13"
+			"version" : "0.1"
 		};
-		if(data.from.permission < 2) {
+		if(data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
 			// Only room moderators can relay API data
 			return false;
 		}
@@ -189,8 +225,22 @@ TheSloth.prototype = {
 				error.log("Error retrieving show cache");
 			}
 		});
+	},
+	syncShowAttendees: function() {
+		$.ajax({
+			crossDomain:true,
+			type: "GET",
+			url: "http://stats.thephish.fm/api/getUsersAtShow.php",
+			success: function(response){
+				console.log("Refreshed show attendee list");
+				localStorage.removeItem('show_attendees');
+				localStorage.setItem('show_attendees', response);
+			},
+			error: function(response) {
+				error.log("Error retrieving show cache");
+			}
+		});
 	}
-
 }
 
 // Wait for the PlugAPI to be available before instantiating
