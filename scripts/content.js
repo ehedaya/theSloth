@@ -145,7 +145,7 @@ TheSloth.prototype = {
 		
 		API.on(API.HISTORY_UPDATE, function(obj){
  			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
- 			//self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php');
+ 			self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php');
 		});
 
 
@@ -157,9 +157,11 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.1"
+			"version" : "0.1.1"
 		};
-		if(data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
+		if (type == 'USER_JOIN') {
+			// Allow all users to relay this event
+		} else if(data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
 			// Only room moderators can relay API data
 			return false;
 		}
