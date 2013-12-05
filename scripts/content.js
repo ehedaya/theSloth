@@ -44,14 +44,13 @@ TheSloth.prototype = {
 								}
 							});
 						} else {
-							console.log("Could not parse showdate in "+blob);
+							console.warn("Could not parse showdate in "+blob);
 						}
 					});
 				} else if (text.match(/^!pnet:/)) {
                     var pnet_username = escape(text.substr(6));
                     var userid = obj.fromID;
                     var payload = { userid: userid, username: pnet_username };
-                    console.log(payload);
 					$.ajax({
 						crossDomain:true,
 						type: "GET",
@@ -77,7 +76,6 @@ TheSloth.prototype = {
 									found_attendees = true;
 									var chat_text = "Show attendees: ";
 									$.each(attendees, function(attendee_index, attendee) {
-										console.log(attendee, attendee.url, attendee.name);
 										chat_text = chat_text + "<a href='"+attendee.url+"' target='_blank' style='color:#009cdd'>"+attendee.name+"</a>, ";
 										if(attendee_index == attendees.length-1) {
 											self.insertChat(chat_text);								
@@ -90,7 +88,7 @@ TheSloth.prototype = {
 								self.insertChat(chat_text);
 							}
 						} else {
-							console.log("Could not parse showdate in "+blob);
+							console.warn("Could not parse showdate in "+blob);
 						}
 					});
    				} else if (text.match(/^!countdown?/)) {
@@ -169,7 +167,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.1.2"
+			"version" : "0.1.3"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
@@ -186,11 +184,6 @@ TheSloth.prototype = {
 				console.log(data);
 			}
 		});
-	},
-	pacify: function() {
-//		console.log("Pacifying");
-// 		$('body').css('background-image', 'url(http://i.imgur.com/X8XJV03.png )') ;
-// 		$("#playback .background img").remove();	
 	},
 	insertChat: function(message) {
 		$('#chat-messages').append('<div class="message">'+message+'</div>');
@@ -263,7 +256,7 @@ function initialize() {
 			console.log('API connected.');
 			theSloth = new TheSloth();
 	} else {
-			console.log('API not connected.  Retrying....');
+			console.warn('API not connected.  Retrying....');
 		setTimeout(initialize, 1000);
 	}
 }
