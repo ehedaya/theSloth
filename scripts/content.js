@@ -93,6 +93,16 @@ TheSloth.prototype = {
 							console.log("Could not parse showdate in "+blob);
 						}
 					});
+   				} else if (text.match(/^!countdown?/)) {
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "http://stats.thephish.fm/api/getCountdown.php",
+						success: function(data){
+							var json = JSON.parse(data);
+							self.insertChat(json.response);
+						}
+					});
    				}
 
 			}
