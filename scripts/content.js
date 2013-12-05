@@ -59,9 +59,11 @@ TheSloth.prototype = {
 						data: payload,
 						success: function(data){
 							console.log(data);
+							var json = JSON.parse(data);
+							self.insertChat(json.response);
+							self.syncShowAttendees();
 						}
 					});
-					self.syncShowAttendees();
    				} else if (text.match(/^!who(else)?/)) {
 					var now_playing = API.getMedia();
 					var blob = now_playing.author+now_playing.title;
@@ -157,7 +159,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.1.1"
+			"version" : "0.1.2"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
