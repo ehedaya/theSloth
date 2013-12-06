@@ -92,7 +92,7 @@ TheSloth.prototype = {
 							console.warn("Could not parse showdate in "+blob);
 						}
 					});
-   				} else if (text.match(/^!countdown?/)) {
+   				} else if (text.match(/^!countdown/)) {
 					$.ajax({
 						crossDomain:true,
 						type: "GET",
@@ -100,6 +100,18 @@ TheSloth.prototype = {
 						success: function(data){
 							var json = JSON.parse(data);
 							self.insertChat(json.response, obj.chatID);
+						}
+					});
+   				} else if (text.match(/^!(replay|event)/)) {
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "http://stats.thephish.fm/api/get_next_replay.php",
+						success: function(data){
+							var json = JSON.parse(data);
+							if(json.success) {
+								self.insertChat(json.response, obj.chatID);
+							}
 						}
 					});
    				}
@@ -169,7 +181,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.2.1"
+			"version" : "0.2.2"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
