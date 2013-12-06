@@ -218,7 +218,9 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!tease$', 'i'), response: '<a href="http://thephish.fm/tease" target="_blank" style="color:#009cdd">http://thephish.fm/tease</a>'},
                 { trigger: new RegExp('^!draft$', 'i'), response: '<a href="http://thephish.fm/draft" target="_blank" style="color:#009cdd">http://thephish.fm/draft</a>'},
                 { trigger: new RegExp('^!guest$', 'i'), response: '<a href="http://thephish.fm/guest" target="_blank" style="color:#009cdd">http://thephish.fm/guest</a>'},
-                { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: '<a href="http://thephish.fm/secrettstantta" target="_blank" style="color:#009cdd">http://thephish.fm/secrettstantta</a>'}
+                { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: '<a href="http://thephish.fm/secrettstantta" target="_blank" style="color:#009cdd">http://thephish.fm/secrettstantta</a>'},
+                { trigger: new RegExp('^!replayroom$', 'i'), response: '<a href="http://thephish.fm/replayroom" target="_blank" style="color:#009cdd">http://thephish.fm/replayroom</a>'}
+                
 	],
 	syncShowCache: function() {
 		$.ajax({
