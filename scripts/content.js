@@ -35,16 +35,21 @@ TheSloth.prototype = {
 						if(showdate.length) {
 							var showlist_json = localStorage.getItem('showlist');
 							var showlist = JSON.parse(showlist_json);
+							var found_show = false;
 							$.each(showlist, function(showdate_index,venue_long) {
 								if(showdate_index == showdate) {
 									if(venue_long.length > 1) {
+										found_show = true;
 										self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" "+venue_long.length+" shows on "+showdate, obj.chatID);
 									} else {
+										found_show = true;
 										self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate, obj.chatID);
 									}
 								}
 							});
-							self.insertChat("No Phish show on "+showdate);
+							if(!found_show) {
+								self.insertChat("No Phish show on "+showdate, obj.chatID);
+							}
 						} else {
 							self.insertChat("No showdate in "+blob);
 						}
@@ -202,7 +207,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.2.3"
+			"version" : "0.2.4"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
