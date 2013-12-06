@@ -44,8 +44,9 @@ TheSloth.prototype = {
 									}
 								}
 							});
+							self.insertChat("No Phish show on "+showdate);
 						} else {
-							console.warn("Could not parse showdate in "+blob);
+							self.insertChat("No showdate in "+blob);
 						}
 					});
 				} else if (text.match(/^!pnet:/)) {
@@ -111,6 +112,8 @@ TheSloth.prototype = {
 							var json = JSON.parse(data);
 							if(json.success) {
 								self.insertChat(json.response, obj.chatID);
+							} else {
+								console.warn("Error in !replay", data);
 							}
 						}
 					});
@@ -121,11 +124,21 @@ TheSloth.prototype = {
 		});
 
         API.on(API.DJ_ADVANCE, function(obj){
- 			self.relayEvent("DJ_ADVANCE", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+        	var now_playing = API.getMedia();
+        	var blob = now_playing.author+now_playing.title;
+        	self.parseDate(blob, function(showdate) {
+	 			self.relayEvent("DJ_ADVANCE", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
+        	});
         });
 		
 		API.on(API.VOTE_UPDATE, function(obj){
- 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+        	var now_playing = API.getMedia();
+        	var blob = now_playing.author+now_playing.title;
+        	self.parseDate(blob, function(showdate) {
+	 			self.relayEvent("VOTE_UPDATE", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
+        	});
+
+
  			self.relayEvent("VOTE_UPDATE", obj, 'vote_update.php');
 		});
 		
@@ -161,14 +174,22 @@ TheSloth.prototype = {
 		});
 		
 		API.on(API.MOD_SKIP, function(obj){
- 			self.relayEvent("MOD_SKIP", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+        	var now_playing = API.getMedia();
+        	var blob = now_playing.author+now_playing.title;
+        	self.parseDate(blob, function(showdate) {
+	 			self.relayEvent("MOD_SKIP", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
+        	});
 		});
 		
 		API.on(API.CHAT_COMMAND, function(obj){
 		});
 		
 		API.on(API.HISTORY_UPDATE, function(obj){
- 			self.relayEvent("NOW_PLAYING", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore()}, 'now_playing.php');
+        	var now_playing = API.getMedia();
+        	var blob = now_playing.author+now_playing.title;
+        	self.parseDate(blob, function(showdate) {
+	 			self.relayEvent("HISTORY_UPDATE", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
+        	});
  			self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php');
 		});
 
@@ -181,7 +202,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.2.2"
+			"version" : "0.2.3"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
