@@ -169,7 +169,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.1.3"
+			"version" : "0.2.1"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
@@ -196,7 +196,6 @@ TheSloth.prototype = {
 			url: "http://stats.thephish.fm/api/getReplyPermission.php",
 			success: function(response){
 				json = JSON.parse(response);
-				console.log(json);
 				if(json.success && json.permission) {
 					API.sendChat(message);
 				}
