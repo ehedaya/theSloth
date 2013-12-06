@@ -23,6 +23,7 @@ TheSloth.prototype = {
 			
 			if(text.match(/^##/i)) {
 				// Log a note
+				obj.track_time = API.getTimeElapsed();
 				self.relayEvent("CHAT", obj, 'chat.php');
 			} else if (text.match(/^!/i)) {
 				// Chat command
