@@ -16,7 +16,7 @@ TheSloth.prototype = {
 			
 			for(t=0;t<self.simpleResponses.length;t++) {
 					if (text.match(self.simpleResponses[t].trigger)) {
-							self.insertChat(self.simpleResponses[t].response);
+							self.insertChat(self.simpleResponses[t].response, obj.chatID);
 							return true; 
 					}
 			}
@@ -38,9 +38,9 @@ TheSloth.prototype = {
 							$.each(showlist, function(showdate_index,venue_long) {
 								if(showdate_index == showdate) {
 									if(venue_long.length > 1) {
-										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+showdate+"' style='color:#009cdd' target='_blank'>"+venue_long.length+" shows on "+showdate+"</a>");
+										self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" "+venue_long.length+" shows on "+showdate, obj.chatID);
 									} else {
-										self.insertChat("Setlist: <a href='http://phish.net/setlists/?d="+showdate+"' style='color:#009cdd' target='_blank'>"+venue_long[0]+"</a>");
+										self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate, obj.chatID);
 									}
 								}
 							});
@@ -60,7 +60,7 @@ TheSloth.prototype = {
 						success: function(data){
 							console.log(data);
 							var json = JSON.parse(data);
-							self.insertChat(json.response);
+							self.insertChat(json.response, obj.chatID);
 							self.syncShowAttendees();
 						}
 					});
@@ -77,16 +77,16 @@ TheSloth.prototype = {
 									found_attendees = true;
 									var chat_text = "Show attendees: ";
 									$.each(attendees, function(attendee_index, attendee) {
-										chat_text = chat_text + "<a href='"+attendee.url+"' target='_blank' style='color:#009cdd'>"+attendee.name+"</a>, ";
+										chat_text = chat_text + attendee.name+" ";
 										if(attendee_index == attendees.length-1) {
-											self.insertChat(chat_text);								
+											self.insertChat(chat_text, obj.chatID);								
 										}
 									});
 								}
 							});
 							if(!found_attendees) {
 								var chat_text = "I don't know anyone who attended this show.";
-								self.insertChat(chat_text);
+								self.insertChat(chat_text, obj.chatID);
 							}
 						} else {
 							console.warn("Could not parse showdate in "+blob);
@@ -99,7 +99,7 @@ TheSloth.prototype = {
 						url: "http://stats.thephish.fm/api/getCountdown.php",
 						success: function(data){
 							var json = JSON.parse(data);
-							self.insertChat(json.response);
+							self.insertChat(json.response, obj.chatID);
 						}
 					});
    				}
@@ -187,8 +187,24 @@ TheSloth.prototype = {
 			}
 		});
 	},
-	insertChat: function(message) {
-		$('#chat-messages').append('<div class="message">'+message+'</div>');
+	insertChat: function(message, chatID) {
+		var user = API.getUser();
+		$.ajax({
+			crossDomain:true,
+			type: "GET",
+			data: {event_hash: chatID, userid: user.id},
+			url: "http://stats.thephish.fm/api/getReplyPermission.php",
+			success: function(response){
+				json = JSON.parse(response);
+				console.log(json);
+				if(json.success && json.permission) {
+					API.sendChat(message);
+				}
+			},
+			error: function(response) {
+				error.log("Error requesting reply permission");
+			}
+		});
 	},
 	parseDate: function(blob, callback) {
         var r = /[0-9]{1,4}[\-\/\s\.\\]{1,2}[0-9]{1,2}[\-\/\s\.\\]{1,2}[0-9]{1,4}/;
@@ -205,21 +221,22 @@ TheSloth.prototype = {
                 callback(false);
         }
 	},
+	
 	simpleResponses: [
-                { trigger: new RegExp('^!tips$','i'), response: '<a href="http://thephish.fm/tips/" target="_blank" style="color:#009cdd">http://thephish.fm/tips/</a>'},
-                { trigger: new RegExp('^!(ext|extension|sloth)$','i'), response: '<a href="http://bit.ly/theSlothExt" target="_blank"  style="color:#009cdd">http://bit.ly/theSlothExt</a>'},
-                { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: '<a href="https://github.com/ehedaya/theSloth/issues/new/" target="_blank"  style="color:#009cdd">https://github.com/ehedaya/theSloth/issues/new/</a>'},
-                { trigger: new RegExp('^!stats$','i'), response: '<a href="http://stats.thephish.fm" target="_blank" style="color:#009cdd">http://stats.thephish.fm</a>'},
-                { trigger: new RegExp('^!gifs$','i'), response: '<a href="http://tinyurl.com/ttgifs" target="_blank" style="color:#009cdd">http://tinyurl.com/ttgifs</a>'},
-                { trigger: new RegExp('^!deg$','i'), response: '<a href="http://tinyurl.com/phishdeg" target="_blank" style="color:#009cdd">http://tinyurl.com/phishdeg</a>'},
-                { trigger: new RegExp('^!m[e]{1,2}[t]{1,2}up[s]{0,1}$','i'), response: '<a href="http://thephish.fm/meettups" target="_blank" style="color:#009cdd">http://thephish.fm/meettups</a>'},
-                { trigger: new RegExp('^!attendance$', 'i'), response: '<a href="http://thephish.fm/attendance" target="_blank" style="color:#009cdd">http://thephish.fm/attendance</a>'},
-                { trigger: new RegExp('^!tickets$', 'i'), response: '<a href="http://thephish.fm/tickets" target="_blank" style="color:#009cdd">http://thephish.fm/tickets</a>'},
-                { trigger: new RegExp('^!tease$', 'i'), response: '<a href="http://thephish.fm/tease" target="_blank" style="color:#009cdd">http://thephish.fm/tease</a>'},
-                { trigger: new RegExp('^!draft$', 'i'), response: '<a href="http://thephish.fm/draft" target="_blank" style="color:#009cdd">http://thephish.fm/draft</a>'},
-                { trigger: new RegExp('^!guest$', 'i'), response: '<a href="http://thephish.fm/guest" target="_blank" style="color:#009cdd">http://thephish.fm/guest</a>'},
-                { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: '<a href="http://thephish.fm/secrettstantta" target="_blank" style="color:#009cdd">http://thephish.fm/secrettstantta</a>'},
-                { trigger: new RegExp('^!replayroom$', 'i'), response: '<a href="http://thephish.fm/replayroom" target="_blank" style="color:#009cdd">http://thephish.fm/replayroom</a>'}
+                { trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'},
+                { trigger: new RegExp('^!(ext|extension|sloth)$','i'), response: 'http://bit.ly/theSlothExt'},
+                { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: 'https://github.com/ehedaya/theSloth/issues/new/'},
+                { trigger: new RegExp('^!stats$','i'), response: 'http://stats.thephish.fm'},
+                { trigger: new RegExp('^!gifs$','i'), response: 'http://tinyurl.com/ttgifs'},
+                { trigger: new RegExp('^!deg$','i'), response: 'http://tinyurl.com/phishdeg'},
+                { trigger: new RegExp('^!m[e]{1,2}[t]{1,2}up[s]{0,1}$','i'), response: 'http://thephish.fm/meettups'},
+                { trigger: new RegExp('^!attendance$', 'i'), response: 'http://thephish.fm/attendance'},
+                { trigger: new RegExp('^!tickets$', 'i'), response: 'http://thephish.fm/tickets'},
+                { trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'},
+                { trigger: new RegExp('^!draft$', 'i'), response: 'http://thephish.fm/draft'},
+                { trigger: new RegExp('^!guest$', 'i'), response: 'http://thephish.fm/guest'},
+                { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: 'http://thephish.fm/secrettstantta'},
+                { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'}
                 
 	],
 	syncShowCache: function() {
