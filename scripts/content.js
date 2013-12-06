@@ -137,6 +137,7 @@ TheSloth.prototype = {
 		});
 		
 		API.on(API.CURATE_UPDATE, function(obj){
+ 			self.relayEvent("CURATE_UPDATE", obj, 'curate_update.php');
 		});
 		
 		API.on(API.ROOM_SCORE_UPDATE, function(obj){
