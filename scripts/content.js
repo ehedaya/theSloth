@@ -131,17 +131,11 @@ TheSloth.prototype = {
         API.on(API.DJ_ADVANCE, function(obj){
         	var now_playing = API.getMedia();
         	var blob = now_playing.author+now_playing.title;
-        	self.parseDate(blob, function(showdate) {
-	 			self.relayEvent("DJ_ADVANCE", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
-        	});
+			self.relayNowPlaying('DJ_ADVANCE');        	
         });
 		
 		API.on(API.VOTE_UPDATE, function(obj){
-        	var now_playing = API.getMedia();
-        	var blob = now_playing.author+now_playing.title;
-        	self.parseDate(blob, function(showdate) {
-	 			self.relayEvent("VOTE_UPDATE", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
-        	});
+			self.relayNowPlaying('VOTE_UPDATE');        	
 
 
  			self.relayEvent("VOTE_UPDATE", obj, 'vote_update.php');
@@ -179,22 +173,14 @@ TheSloth.prototype = {
 		});
 		
 		API.on(API.MOD_SKIP, function(obj){
-        	var now_playing = API.getMedia();
-        	var blob = now_playing.author+now_playing.title;
-        	self.parseDate(blob, function(showdate) {
-	 			self.relayEvent("MOD_SKIP", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
-        	});
+			self.relayNowPlaying('MOD_SKIP');        	
 		});
 		
 		API.on(API.CHAT_COMMAND, function(obj){
 		});
 		
 		API.on(API.HISTORY_UPDATE, function(obj){
-        	var now_playing = API.getMedia();
-        	var blob = now_playing.author+now_playing.title;
-        	self.parseDate(blob, function(showdate) {
-	 			self.relayEvent("HISTORY_UPDATE", {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
-        	});
+			self.relayNowPlaying('HISTORY_UPDATE');        	
  			self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php');
 		});
 
@@ -207,7 +193,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.2.4"
+			"version" : "0.2.5"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
@@ -222,6 +208,29 @@ TheSloth.prototype = {
 			data: data,
 			success: function(data){
 				console.log(data);
+			}
+		});
+	},
+	relayNowPlaying: function(event_name) {
+		var self = this;
+		var now_playing = API.getMedia();
+		var blob = now_playing.author+now_playing.title;
+		var showlist_json = localStorage.getItem('showlist');
+		var showlist = JSON.parse(showlist_json);
+		this.parseDate(blob, function(showdate) {
+			if(showdate.length) {
+				var found_show = false;
+				$.each(showlist, function(showdate_index,venue_long) {
+					if(showdate_index == showdate) {
+						found_show = true;
+						self.relayEvent(event_name, {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
+					}
+				});
+				if(!found_show) {
+					console.error("No Phish show on "+showdate);
+				}
+			} else {
+// 				console.info("No showdate parsed in "+blob);
 			}
 		});
 	},
