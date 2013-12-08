@@ -123,17 +123,15 @@ TheSloth.prototype = {
 						}
 					});
    				} else if (text.match(/^!song/)) {
-   					now_playing = API.getMedia();
-   					var showlist_json = localStorage.getItem('showlist');
-   					showlist = JSON.parse(showlist_json);
-   					var blob = now_playing.author+now_playing.title;
-   					self.parseDate(blob, function(showdate) {
+					self.parsePhishShowdate(function(showdate) {
+						var now_playing = API.getMedia();
    						var message = "Now playing: "+now_playing.author+" "+now_playing.title;
    						if(showdate.length) {
+   							console.log(showdate);
 							message +=  " ("+showlist[showdate][0]+")";
    						}
    						self.insertChat(message, obj.chatID);
-   					});
+					});
    				}
 
 			}
@@ -218,11 +216,9 @@ TheSloth.prototype = {
 					}
 				});
 				if(!found_show) {
-					console.error("No Phish show on "+showdate);
 					callback(false);
 				}
 			} else {
- 				console.info("No showdate parsed in "+blob);
  				callback(false);
 			}
 		});
@@ -235,7 +231,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.3.1"
+			"version" : "0.3.2"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
