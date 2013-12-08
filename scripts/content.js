@@ -122,6 +122,18 @@ TheSloth.prototype = {
 							}
 						}
 					});
+   				} else if (text.match(/^!song/)) {
+   					now_playing = API.getMedia();
+   					var showlist_json = localStorage.getItem('showlist');
+   					showlist = JSON.parse(showlist_json);
+   					var blob = now_playing.author+now_playing.title;
+   					self.parseDate(blob, function(showdate) {
+   						var message = "Now playing: "+now_playing.author+" "+now_playing.title;
+   						if(showdate.length) {
+							message +=  " ("+showlist[showdate][0]+")";
+   						}
+   						self.insertChat(message, obj.chatID);
+   					});
    				}
 
 			}
@@ -216,13 +228,14 @@ TheSloth.prototype = {
 		});
 	},
 	relayEvent: function(type, payload, endpoint) {
+		var self = this;
 		data = { 
 			"type" : type,
 			"payload" : payload,
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.3"
+			"version" : "0.3.1"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
@@ -235,8 +248,21 @@ TheSloth.prototype = {
 			type: "POST",
 			url: "http://stats.thephish.fm/api/" + endpoint,
 			data: data,
-			success: function(data){
-				console.log(data);
+			success: function(response){
+				console.log(response);
+				response = JSON.parse(response);
+				
+				// Attempt to speak the currently playing track if it hasn't been announced
+				if(endpoint == 'now_playing.php') {
+					var message = "Now playing: "+data.media.author+" "+data.media.title;
+					if(payload.showdate.length) {
+						var showlist_json = localStorage.getItem('showlist');
+						var showlist = JSON.parse(showlist_json);
+						message +=  " ("+showlist[payload.showdate][0]+")";
+					}
+//					console.log(message, response.media_hash);
+					self.insertChat(message, response.media_hash);
+				}
 			}
 		});
 	},
@@ -276,7 +302,8 @@ TheSloth.prototype = {
 	
 	simpleResponses: [
                 { trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'},
-                { trigger: new RegExp('^!(ext|extension|sloth)$','i'), response: 'http://bit.ly/theSlothExt'},
+                { trigger: new RegExp('^!(about|commands|sloth)$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},                
+                { trigger: new RegExp('^!(ext|extension)$','i'), response: 'http://bit.ly/theSlothExt'},
                 { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: 'https://github.com/ehedaya/theSloth/issues/new/'},
                 { trigger: new RegExp('^!stats$','i'), response: 'http://stats.thephish.fm'},
                 { trigger: new RegExp('^!gifs$','i'), response: 'http://tinyurl.com/ttgifs'},
@@ -286,7 +313,6 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!tickets$', 'i'), response: 'http://thephish.fm/tickets'},
                 { trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'},
                 { trigger: new RegExp('^!draft$', 'i'), response: 'http://thephish.fm/draft'},
-                { trigger: new RegExp('^!guest$', 'i'), response: 'http://thephish.fm/guest'},
                 { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: 'http://thephish.fm/secrettstantta'},
                 { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'}
                 
