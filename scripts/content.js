@@ -125,9 +125,9 @@ TheSloth.prototype = {
    				} else if (text.match(/^!song/)) {
 					self.parsePhishShowdate(function(showdate) {
 						var now_playing = API.getMedia();
-   						var message = "Now playing: "+now_playing.author+" "+now_playing.title;
+						var current_dj = API.getDJ()
+						var message = current_dj.username+" is playing "+now_playing.author+" "+now_playing.title;
    						if(showdate.length) {
-   							console.log(showdate);
 							message +=  " ("+showlist[showdate][0]+")";
    						}
    						self.insertChat(message, obj.chatID);
@@ -211,7 +211,6 @@ TheSloth.prototype = {
 				$.each(showlist, function(showdate_index,venue_long) {
 					if(showdate_index == showdate) {
 						found_show = true;
-						console.log(showdate);
 						callback(showdate);
 					}
 				});
@@ -231,7 +230,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.3.2"
+			"version" : "0.3.3"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
@@ -250,7 +249,8 @@ TheSloth.prototype = {
 				
 				// Attempt to speak the currently playing track if it hasn't been announced
 				if(endpoint == 'now_playing.php') {
-					var message = "Now playing: "+data.media.author+" "+data.media.title;
+					var current_dj = API.getDJ()
+					var message = current_dj.username+" started playing "+data.media.author+" "+data.media.title;
 					if(payload.showdate.length) {
 						var showlist_json = localStorage.getItem('showlist');
 						var showlist = JSON.parse(showlist_json);
