@@ -127,7 +127,6 @@ TheSloth.prototype = {
 						var current_dj = API.getDJ()
 						var message = current_dj.username+" is playing "+now_playing.author+" "+now_playing.title;
    						if(showdate.length) {
-   							self.logger(showdate);
 							message +=  " ("+showlist[showdate][0]+")";
    						}
    						self.insertChat(message, obj.chatID);
@@ -216,6 +215,7 @@ TheSloth.prototype = {
         }
 	},	
 	parsePhishShowdate: function(callback) {
+		var self = this;
 		var now_playing = API.getMedia();
 		var blob = now_playing.author+now_playing.title;
 		var showlist_json = localStorage.getItem('showlist');
@@ -226,7 +226,6 @@ TheSloth.prototype = {
 				$.each(showlist, function(showdate_index,venue_long) {
 					if(showdate_index == showdate) {
 						found_show = true;
-						self.logger(showdate);
 						callback(showdate);
 					}
 				});
