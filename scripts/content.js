@@ -2,13 +2,12 @@ TheSloth = function() {
 	this.setupEvents();
 	this.syncShowCache();
 	this.syncShowAttendees();
-	// this.pacify();
 }
 TheSloth.prototype = {
 	constructor:  TheSloth,
 	setupEvents: function() {
-		console.log("Setting up events");
 		var self = this;
+		self.logger("Setting up events");
 		
 		// Set up events
 		API.on(API.CHAT, function(obj){
@@ -64,7 +63,7 @@ TheSloth.prototype = {
 						url: "http://stats.thephish.fm/api/update_pnet.php",
 						data: payload,
 						success: function(data){
-							console.log(data);
+							self.logger(data);
 							var json = JSON.parse(data);
 							self.insertChat(json.response, obj.chatID);
 							self.syncShowAttendees();
@@ -128,6 +127,7 @@ TheSloth.prototype = {
 						var current_dj = API.getDJ()
 						var message = current_dj.username+" is playing "+now_playing.author+" "+now_playing.title;
    						if(showdate.length) {
+   							self.logger(showdate);
 							message +=  " ("+showlist[showdate][0]+")";
    						}
    						self.insertChat(message, obj.chatID);
@@ -200,6 +200,21 @@ TheSloth.prototype = {
 
 
 	},
+	parseDate: function(blob, callback) {
+        var r = /[0-9]{1,4}[\-\/\s\.\\]{1,2}[0-9]{1,2}[\-\/\s\.\\]{1,2}[0-9]{1,4}/;
+        var showdate = blob.match(r); 
+        if (showdate) {
+                var d = Date.parse(showdate[0]);
+                if (d) {
+                        var d2 = d.toString('yyyy-MM-dd');
+                        callback(d2);
+                } else {
+                        callback(false);
+                }
+        }  else {
+                callback(false);
+        }
+	},	
 	parsePhishShowdate: function(callback) {
 		var now_playing = API.getMedia();
 		var blob = now_playing.author+now_playing.title;
@@ -211,6 +226,7 @@ TheSloth.prototype = {
 				$.each(showlist, function(showdate_index,venue_long) {
 					if(showdate_index == showdate) {
 						found_show = true;
+						self.logger(showdate);
 						callback(showdate);
 					}
 				});
@@ -244,7 +260,7 @@ TheSloth.prototype = {
 			url: "http://stats.thephish.fm/api/" + endpoint,
 			data: data,
 			success: function(response){
-				console.log(response);
+				self.logger(response);
 				response = JSON.parse(response);
 				
 				// Attempt to speak the currently playing track if it hasn't been announced
@@ -256,7 +272,7 @@ TheSloth.prototype = {
 						var showlist = JSON.parse(showlist_json);
 						message +=  " ("+showlist[payload.showdate][0]+")";
 					}
-//					console.log(message, response.media_hash);
+//					self.logger(message, response.media_hash);
 					self.insertChat(message, response.media_hash);
 				}
 			}
@@ -280,21 +296,7 @@ TheSloth.prototype = {
 			}
 		});
 	},
-	parseDate: function(blob, callback) {
-        var r = /[0-9]{1,4}[\-\/\s\.\\]{1,2}[0-9]{1,2}[\-\/\s\.\\]{1,2}[0-9]{1,4}/;
-        var showdate = blob.match(r); 
-        if (showdate) {
-                var d = Date.parse(showdate[0]);
-                if (d) {
-                        var d2 = d.toString('yyyy-MM-dd');
-                        callback(d2);
-                } else {
-                        callback(false);
-                }
-        }  else {
-                callback(false);
-        }
-	},
+
 	
 	simpleResponses: [
                 { trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'},
@@ -314,12 +316,13 @@ TheSloth.prototype = {
                 
 	],
 	syncShowCache: function() {
+		var self = this;
 		$.ajax({
 			crossDomain:true,
 			type: "GET",
 			url: "http://stats.thephish.fm/api/getAllShows.php",
 			success: function(response){
-				console.log("Refreshed local show list");
+				self.logger("Refreshed local show list");
 				localStorage.removeItem('showlist');
 				localStorage.setItem('showlist', response);
 			},
@@ -329,12 +332,13 @@ TheSloth.prototype = {
 		});
 	},
 	syncShowAttendees: function() {
+		var self = this;
 		$.ajax({
 			crossDomain:true,
 			type: "GET",
 			url: "http://stats.thephish.fm/api/getUsersAtShow.php",
 			success: function(response){
-				console.log("Refreshed show attendee list");
+				self.logger("Refreshed show attendee list");
 				localStorage.removeItem('show_attendees');
 				localStorage.setItem('show_attendees', response);
 			},
@@ -342,16 +346,19 @@ TheSloth.prototype = {
 				error.log("Error retrieving show cache");
 			}
 		});
+	},
+	logger: function(message) {
+		console.log("theSloth: "+message);
 	}
 }
 
 // Wait for the PlugAPI to be available before instantiating
 function initialize() {
 	if(typeof API != "undefined") {
-			console.log('API connected.');
+			console.log('theSloth: API connected.');
 			theSloth = new TheSloth();
 	} else {
-			console.warn('API not connected.  Retrying....');
+			console.warn('theSloth: API not connected.  Retrying....');
 		setTimeout(initialize, 1000);
 	}
 }
