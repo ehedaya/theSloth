@@ -26,31 +26,20 @@ TheSloth.prototype = {
 				self.relayEvent("CHAT", obj, 'chat.php');
 			} else if (text.match(/^!/i)) {
 				// Chat command
-				if(text.match(/^!setlist/i)) {
+				if(text.match(/^!setlist$/i)) {
+					self.logger('Responding to !setlist');
 					// Fetch setlist information and insert into chat
-					var now_playing = API.getMedia();
-					var blob = now_playing.author+now_playing.title;
-					self.parseDate(blob, function(showdate) {
-						if(showdate.length) {
-							var showlist_json = localStorage.getItem('showlist');
-							var showlist = JSON.parse(showlist_json);
-							var found_show = false;
-							$.each(showlist, function(showdate_index,venue_long) {
-								if(showdate_index == showdate) {
-									if(venue_long.length > 1) {
-										found_show = true;
-										self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" "+venue_long.length+" shows on "+showdate, obj.chatID);
-									} else {
-										found_show = true;
-										self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate, obj.chatID);
-									}
-								}
-							});
-							if(!found_show) {
-								self.insertChat("No Phish show on "+showdate, obj.chatID);
+					self.parsePhishShowdate(function(showdate) {
+						var showlist_json = localStorage.getItem('showlist');
+						var showlist = JSON.parse(showlist_json);
+						if(showdate) {
+							if(showlist[showdate].length > 1) {
+								self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" "+showlist[showdate].length+" shows on "+showdate, obj.chatID);
+							} else {
+								self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" ("+showlist[showdate][0]+")", obj.chatID);
 							}
 						} else {
-							self.insertChat("No showdate in "+blob);
+							self.logger("Did not return showdate", showdate);
 						}
 					});
 				} else if (text.match(/^!pnet:/)) {
@@ -245,7 +234,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.3.3"
+			"version" : "0.3.4"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
@@ -311,7 +300,8 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'},
                 { trigger: new RegExp('^!draft$', 'i'), response: 'http://thephish.fm/draft'},
                 { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: 'http://thephish.fm/secrettstantta'},
-                { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'}
+                { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'},
+                { trigger: new RegExp('^!pnet$', 'i'), response: 'Enter all the shows you attended into Phish.net, then type !pnet:your_phishnet_username into the chat to be included in !who lists.'}
                 
 	],
 	syncShowCache: function() {
