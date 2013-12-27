@@ -59,33 +59,17 @@ TheSloth.prototype = {
 						}
 					});
    				} else if (text.match(/^!who(else)?/)) {
-					var now_playing = API.getMedia();
-					var blob = now_playing.author+now_playing.title;
-					self.parseDate(blob, function(showdate) {
-						if(showdate.length) {
-							var show_attendee_json = localStorage.getItem('show_attendees');
-							var show_attendees = JSON.parse(show_attendee_json);
-							var found_attendees = false;
-							$.each(show_attendees, function(showdate_index,attendees) {
-								if(showdate_index == showdate) {
-									found_attendees = true;
-									var chat_text = "Show attendees: ";
-									$.each(attendees, function(attendee_index, attendee) {
-										chat_text = chat_text + attendee.name+" ";
-										if(attendee_index == attendees.length-1) {
-											self.insertChat(chat_text, obj.chatID);								
-										}
-									});
-								}
-							});
-							if(!found_attendees) {
-								var chat_text = "I don't know anyone who attended this show.";
-								self.insertChat(chat_text, obj.chatID);
-							}
+					self.parsePhishShowdate(function(showdate) {
+						var show_attendee_json = localStorage.getItem('show_attendees');
+						var show_attendees = JSON.parse(show_attendee_json);
+						if(show_attendees[showdate] && show_attendees[showdate].length) {
+							var attendees = show_attendees[showdate].join(", ");
+							var chat_text = "Show attendees: " + attendees;
 						} else {
-							console.warn("Could not parse showdate in "+blob);
+							var chat_text = "I don't know anyone who attended this show.";
 						}
-					});
+						self.insertChat(chat_text, obj.chatID);
+   					});
    				} else if (text.match(/^!countdown/)) {
 					$.ajax({
 						crossDomain:true,
@@ -234,7 +218,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.3.4"
+			"version" : "0.3.5"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
