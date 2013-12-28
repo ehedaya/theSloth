@@ -100,7 +100,7 @@ TheSloth.prototype = {
 						var current_dj = API.getDJ()
 						var message = current_dj.username+" is playing "+now_playing.author+" "+now_playing.title;
    						if(showdate.length) {
-							message +=  " ("+showlist[showdate][0]+")";
+							message +=  " ("+showlist[showdate][0]+" http://stats.thephish.fm/"+showdate+" )";
    						}
    						self.insertChat(message, obj.chatID);
 					});
@@ -242,7 +242,7 @@ TheSloth.prototype = {
 					if(payload.showdate.length) {
 						var showlist_json = localStorage.getItem('showlist');
 						var showlist = JSON.parse(showlist_json);
-						message +=  " ("+showlist[payload.showdate][0]+")";
+						message +=  " ("+showlist[payload.showdate][0]+" http://stats.thephish.fm/"+payload.showdate+" )";
 					}
 //					self.logger(message, response.media_hash);
 					self.insertChat(message, response.media_hash);
