@@ -1,5 +1,6 @@
 $(document).ready(function() {
-	$('#content').hide();
+	$('#phish_content').hide();
+	$('#alt_content').hide();
 	console.log('test');
 	$('#setlist small').text('Loading setlist');
 // 	TemplateCache = {
@@ -17,11 +18,18 @@ $(document).ready(function() {
 		success: function(data){
 			var json = JSON.parse(data);
 			console.log(json);
-			var show = json.list[0].show;
-			$('#show .setlist').html(show.setlistdata_txt);
-			$('#show .venue_long').html('<a href="'+show.tinyurl+'" target="_blank">'+show.venue_long+'</a>');
+			var recent_play = json.list[0];
+			$('.author span').text(recent_play.author);
+			$('.title span').text(recent_play.title);
+			if(recent_play.show) {
+				var show = recent_play.show;
+				$('#phish_content .setlist').html(show.setlistdata_txt);
+				$('#phish_content .venue_long').html('<a href="'+show.tinyurl+'" target="_blank">'+show.venue_long+'</a>');
+				$('#phish_content').show();
+			} else {
+				$('#alt_content').show();
+			}
 			$('#loader').remove();
-			$('#content').show();
 		}
 	});
 });
