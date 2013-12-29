@@ -5,13 +5,34 @@
 	<link href="bootstrap.min.css" rel="stylesheet" type="text/css"/>    
     <script src="scripts/jquery.js"></script>
     <script src="popup.js"></script>
+    <script type="text/javascript">
+    	$(document).ready(function() {
+    		$('body p').html('test');
+    	});
+    </script>
   </head>
-  <body>
+  <body width="300">
   	<div class="container">
-	    <h3>stats.thephish.fm</h3>
-	    <p>Thanks for joining the team!  <br/>
-	    <small>-Emil and theSloth</small></p>
+		<div id="show" style="width:300px;">
+			<div id="loader" style="padding: 1em;">
+	
+				<div class="progress progress-striped active">
+				  <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+					  LOADING
+				  </div>
+				</div>
+			</div>
+
+			<div id="content">
+				<h3>Most recently played show</h3>
+				<h4 class="venue_long"></h4>
+				<h5>Setlist</h5>
+				<small class="setlist"></small>
+			</div>
+		</div>
+<!-- 
 	    <img src="theSloth.png" />
+ -->
 	</div>
   </body>
 </html>
