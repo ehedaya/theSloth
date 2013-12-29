@@ -218,7 +218,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.4.0"
+			"version" : "0.4.1"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
