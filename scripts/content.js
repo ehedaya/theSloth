@@ -112,6 +112,7 @@ TheSloth.prototype = {
 		});
 
         API.on(API.DJ_ADVANCE, function(obj){
+        	console.log('DJ ADVANCE', obj);
 			self.parsePhishShowdate(function(showdate) {
 				self.relayEvent('DJ_ADVANCE', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
 			});
@@ -219,8 +220,42 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.4.2"
+			"version" : "0.4.3"
 		};
+		
+		// Only speak user's own plays when a vote update happens and keep a list in localStorage
+ 		if (API.getUser().id == API.getDJ().id) {
+			// Generate a unique string to identify this play on this day
+			var date = new Date();
+			var media_hash = API.getMedia().id+date.toString('yyyy-MM-dd');
+			
+			// Fetch the list of already spoken plays
+			var my_plays = JSON.parse(localStorage.getItem('my_plays')) || [];
+			
+			// See if it's in the list
+			var already_spoken = false;
+			$.each(my_plays, function(i,v) {
+				if(v == media_hash) {
+					already_spoken = true;
+				}
+			});
+			
+			// Update the list, save it, and speak a 'now playing' message if it's not in the list
+			if(!already_spoken) {
+				my_plays.push(media_hash);
+				localStorage.setItem('my_plays', JSON.stringify(my_plays));
+				self.parsePhishShowdate(function(showdate) {
+					var message = "/me started playing "+API.getMedia().author+" "+API.getMedia().title;
+					if(showdate.length) {
+						var showlist_json = localStorage.getItem('showlist');
+						var showlist = JSON.parse(showlist_json);
+						message +=  " ("+showlist[showdate][0]+" http://stats.thephish.fm/"+showdate+" )";
+					}
+					API.sendChat(message);
+				});
+			} 
+ 		}
+		
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
 		} else if(data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
@@ -233,21 +268,9 @@ TheSloth.prototype = {
 			url: "http://stats.thephish.fm/api/" + endpoint,
 			data: data,
 			success: function(response){
-				self.logger(response);
-				response = JSON.parse(response);
-				
-				// Attempt to speak the currently playing track if it hasn't been announced
-// 				if(endpoint == 'now_playing.php') {
-// 					var current_dj = API.getDJ()
-// 					var message = current_dj.username+" started playing "+data.media.author+" "+data.media.title;
-// 					if(payload.showdate.length) {
-// 						var showlist_json = localStorage.getItem('showlist');
-// 						var showlist = JSON.parse(showlist_json);
-// 						message +=  " ("+showlist[payload.showdate][0]+" http://stats.thephish.fm/"+payload.showdate+" )";
-// 					}
-//					self.logger(message, response.media_hash);
-//					self.insertChat(message, response.media_hash);
-				}
+				console.log(data, response, JSON.parse(response));
+// 				self.logger(data);
+// 				self.logger(JSON.parse(response));
 			}
 		});
 	},
