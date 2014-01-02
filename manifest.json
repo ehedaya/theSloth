@@ -1,6 +1,6 @@
 {
   "name":           "theSloth",
-  "version":        "0.4.1",
+  "version":        "0.4.2",
   "short_name":		"Stats tracking helper for http://plug.dj/thePhish/",
   "description":    "This extension relays data about activity in http://plug.dj/thePhish for stats tracking purposes.",
   "browser_action" : {
@@ -20,7 +20,7 @@
           "run_at": "document_end"
     }],
 	"sandbox": {
-		"pages": ["templates/setlist.html"]
+		"pages": ["templates/*"]
 	},
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "manifest_version": 2,
@@ -29,6 +29,7 @@
         "scripts/jquery.js",
         "scripts/date.js",
         "scripts/handlebars.min.js",
+        "scripts/bootstrap.min.js",
         "manifest.json"
   ]
 }

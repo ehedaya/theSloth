@@ -12,10 +12,11 @@ TheSloth.prototype = {
 		// Set up events
 		API.on(API.CHAT, function(obj){
 			var text = obj.message;
+			console.log(obj);
 			
 			for(t=0;t<self.simpleResponses.length;t++) {
 					if (text.match(self.simpleResponses[t].trigger)) {
-							self.insertChat(self.simpleResponses[t].response, obj.chatID);
+							self.insertChat(self.simpleResponses[t].response, obj);
 							return true; 
 					}
 			}
@@ -34,9 +35,9 @@ TheSloth.prototype = {
 						var showlist = JSON.parse(showlist_json);
 						if(showdate) {
 							if(showlist[showdate].length > 1) {
-								self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" "+showlist[showdate].length+" shows on "+showdate, obj.chatID);
+								self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" "+showlist[showdate].length+" shows on "+showdate, obj);
 							} else {
-								self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" ("+showlist[showdate][0]+")", obj.chatID);
+								self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" ("+showlist[showdate][0]+")", obj);
 							}
 						} else {
 							self.logger("Did not return showdate", showdate);
@@ -54,7 +55,7 @@ TheSloth.prototype = {
 						success: function(data){
 							self.logger(data);
 							var json = JSON.parse(data);
-							self.insertChat(json.response, obj.chatID);
+							self.insertChat(json.response, obj);
 							self.syncShowAttendees();
 						}
 					});
@@ -68,7 +69,7 @@ TheSloth.prototype = {
 						} else {
 							var chat_text = "I don't know anyone who attended this show.";
 						}
-						self.insertChat(chat_text, obj.chatID);
+						self.insertChat(chat_text, obj);
    					});
    				} else if (text.match(/^!countdown/)) {
 					$.ajax({
@@ -77,7 +78,7 @@ TheSloth.prototype = {
 						url: "http://stats.thephish.fm/api/getCountdown.php",
 						success: function(data){
 							var json = JSON.parse(data);
-							self.insertChat(json.response, obj.chatID);
+							self.insertChat(json.response, obj);
 						}
 					});
    				} else if (text.match(/^!(replay|event)/)) {
@@ -88,7 +89,7 @@ TheSloth.prototype = {
 						success: function(data){
 							var json = JSON.parse(data);
 							if(json.success) {
-								self.insertChat(json.response, obj.chatID);
+								self.insertChat(json.response, obj);
 							} else {
 								console.warn("Error in !replay", data);
 							}
@@ -102,7 +103,7 @@ TheSloth.prototype = {
    						if(showdate.length) {
 							message +=  " ("+showlist[showdate][0]+" http://stats.thephish.fm/"+showdate+" )";
    						}
-   						self.insertChat(message, obj.chatID);
+   						self.insertChat(message, obj);
 					});
    				}
 
@@ -218,7 +219,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.4.1"
+			"version" : "0.4.2"
 		};
 		if (type == 'USER_JOIN') {
 			// Allow all users to relay this event
@@ -236,37 +237,25 @@ TheSloth.prototype = {
 				response = JSON.parse(response);
 				
 				// Attempt to speak the currently playing track if it hasn't been announced
-				if(endpoint == 'now_playing.php') {
-					var current_dj = API.getDJ()
-					var message = current_dj.username+" started playing "+data.media.author+" "+data.media.title;
-					if(payload.showdate.length) {
-						var showlist_json = localStorage.getItem('showlist');
-						var showlist = JSON.parse(showlist_json);
-						message +=  " ("+showlist[payload.showdate][0]+" http://stats.thephish.fm/"+payload.showdate+" )";
-					}
+// 				if(endpoint == 'now_playing.php') {
+// 					var current_dj = API.getDJ()
+// 					var message = current_dj.username+" started playing "+data.media.author+" "+data.media.title;
+// 					if(payload.showdate.length) {
+// 						var showlist_json = localStorage.getItem('showlist');
+// 						var showlist = JSON.parse(showlist_json);
+// 						message +=  " ("+showlist[payload.showdate][0]+" http://stats.thephish.fm/"+payload.showdate+" )";
+// 					}
 //					self.logger(message, response.media_hash);
-					self.insertChat(message, response.media_hash);
+//					self.insertChat(message, response.media_hash);
 				}
 			}
 		});
 	},
-	insertChat: function(message, chatID) {
+	insertChat: function(message, chatObj) {
 		var user = API.getUser();
-		$.ajax({
-			crossDomain:true,
-			type: "GET",
-			data: {event_hash: chatID, userid: user.id},
-			url: "http://stats.thephish.fm/api/getReplyPermission.php",
-			success: function(response){
-				json = JSON.parse(response);
-				if(json.success && json.permission) {
-					API.sendChat(message);
-				}
-			},
-			error: function(response) {
-				error.log("Error requesting reply permission");
-			}
-		});
+		if(user.id == chatObj.fromID) {
+			API.sendChat(message);
+		}
 	},
 
 	
@@ -285,7 +274,8 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!draft$', 'i'), response: 'http://thephish.fm/draft'},
                 { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: 'http://thephish.fm/secrettstantta'},
                 { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'},
-                { trigger: new RegExp('^!pnet$', 'i'), response: 'Enter all the shows you attended into Phish.net, then type !pnet:your_phishnet_username into the chat to be included in !who lists.'}
+                { trigger: new RegExp('^!pnet$', 'i'), response: 'Enter all the shows you attended into Phish.net, then type !pnet:your_phishnet_username into the chat to be included in !who lists.'},
+                { trigger: new RegExp('^!whatever$', 'i'), response: '¯\\_(ツ)_/¯'}
                 
 	],
 	syncShowCache: function() {
