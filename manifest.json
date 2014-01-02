@@ -20,7 +20,7 @@
           "run_at": "document_end"
     }],
 	"sandbox": {
-		"pages": ["templates/setlist.html"]
+		"pages": ["templates/*"]
 	},
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "manifest_version": 2,
@@ -29,6 +29,7 @@
         "scripts/jquery.js",
         "scripts/date.js",
         "scripts/handlebars.min.js",
+        "scripts/bootstrap.min.js",
         "manifest.json"
   ]
 }

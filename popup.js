@@ -6,7 +6,6 @@ $(document).ready(function() {
 	TemplateCache = {
 		get: function(filename, callback) {
 			$.get('templates/'+filename+'.html', function(data) {
-				console.log(data);
 				callback(Handlebars.compile(data));
 			});
 		}
@@ -20,13 +19,36 @@ $(document).ready(function() {
 			var json = JSON.parse(data);
 			var recent_play = json.list[0];
 			TemplateCache.get('setlist', function(template) {
-				console.log(template);
-				console.log(recent_play);
 				var html = template(recent_play);
-				console.log(html);
-				$('#content').html(html);
+				$('#now_playing').html(html);
 			});
+// 			if(recent_play.show) {
+// 				console.log(recent_play.show);
+// 				$.ajax({
+// 					crossDomain: true,
+// 					type: "GET",
+// 					url: "http://stats.thephish.fm/api/getUsersAtShow.php",
+// 					data: { showdate : show.showdate }, 
+// 					success: function(attendees) {
+// 						console.log(attendees);
+// 					}
+// 				});
+// 			}
 			$('#loader').remove();
+		}
+	});
+	
+	$.ajax({
+		crossDomain: true,
+		type: "GET",
+		url: "http://stats.thephish.dev/api/getLinks.php",
+		success: function(data) {
+			var json = JSON.parse(data);
+			console.log(json);
+			TemplateCache.get('links', function(template) {
+				var html = template(json);
+				$('#links').html(html);
+			});
 		}
 	});
 });
