@@ -1,0 +1,30 @@
+
+{{#each .}}
+		<div class="panel panel-default">
+		  <div class="panel-heading">
+			<h3 class="panel-title">
+			<a href="{{url}}" class="btn btn-default btn-xs pull-right">Add to calendar</a>
+			{{date_format event_start.date 'dddd, MMMM, d YYYY'}} <span>({{time_since event_start.date}})</span></h3>
+		  </div>
+		  <div class="panel-body">
+		  	{{#if is_show_replay}}
+				{{#each show}}
+					<h4>{{date_format showdate 'MMMM d, YYYY'}}<br/> 
+						<a href="{{tinyurl}}">{{venue}}, {{city}} {{state}}, {{country}}</a></h4>
+						{{#if description}}
+						<p>{{description}}</p>
+						{{/if}}
+					<div class="setlist well well-sm">
+						<h5><u>Setlist</u></h5>
+						{{{setlistdata}}}
+					</div>
+				{{/each}}
+			{{else}}
+				<h4>{{title}}</h4>
+				<p>{{description}}</p>
+			{{/if}}
+		  </div>
+		</div>
+{{else}}
+	<p class="well">No upcoming events.</p>
+{{/each}}

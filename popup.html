@@ -2,39 +2,36 @@
 <html>
   <head>
     <title>theSloth</title>
+    <base target="_blank" src="http://stats.thephish.fm/">
 	<link href="bootstrap.min.css" rel="stylesheet" type="text/css"/>    
     <script src="scripts/jquery.js"></script>
     <script src="scripts/handlebars.min.js"></script>
     <script src="scripts/bootstrap.min.js"></script>
+    <script src="scripts/moment.min.js"></script>
     <script src="popup.js"></script>
     <style type="text/css">
     	.tab-pane { padding-top: 1em; }
     	td, th { font-size: 0.8em; }
+    	#recent_plays { font-size: 0.9em; }
     </style>
   </head>
   <body width="300">
   	<div class="container">
 		<div style="width:400px; min-height: 400px;">
-			<ul class="nav nav-tabs">
+			<ul class="nav nav-pills">
 			  <li class="active"><a href="#now_playing" data-toggle="tab">Now playing</a></li>
-			  <li><a href="#links" data-toggle="tab">Links</a></li>
+			  <li><a href="#recent_plays" data-toggle="tab">Recent</a></li>
+<!-- 
+			  <li><a href="#events" data-toggle="tab">Events</a></li>
+ -->
 			</ul>
 			
 			<div class="tab-content">
-				<div class="tab-pane active" id="now_playing">
-					<div id="now_playing">
-						<div id="loader">
-
-							<div class="progress progress-striped active">
-							  <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-								  LOADING
-							  </div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="tab-pane" id="links">
-				</div>
+				<div class="tab-pane active" id="now_playing"></div>
+				<div class="tab-pane" id="recent_plays"></div>
+<!-- 
+				<div class="tab-pane" id="events"></div>
+ -->
 			</div>
 			
 			
