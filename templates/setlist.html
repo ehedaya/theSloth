@@ -1,18 +1,14 @@
-				<h3>Now playing</h3>
-				<p class="author"><strong>Author</strong>: {{author}}</p>
-				<p class="title"><strong>Title</strong>: {{title}}</p>
-				{{#if show}}
-					<hr/>
-					<h4><a href="{{show.tinyurl}}" target="stats">{{show.venue_long}}</a></h4>
-					<h5>Setlist</h5>
-					<small>{{{show.setlistdata_txt}}}</small>
-					<p><small>View show on <a href="{{phish_net_url}}">Phish.net</a></small></p>
-				{{else}}
-				
-				{{/if}}
-				<hr/>
-				<div style="text-align:center;">
-					<a href="http://thephish.fm" target="blog" class="btn btn-sm">Read blog</a>&middot;
-					<a href="http://stats.thephish.fm" target="stats" class="btn btn-sm">stats.thephish.fm</a>&middot;
-					<a href="http://plug.dj/thephish" target="plugdj" class="btn btn-sm">plug.dj/thephish</a>
-				</div>				
+		<div class="well well-sm" style="margin-top: 1em;">
+			<p><strong>Author</strong>: {{author}}</p>
+			<p><strong>Title</strong>: {{title}}</p>
+			<p><small>Played by <a href="{{user.url}}" target="_blank">{{user.name}}</a></small></p>
+		</div>
+		{{#if show}}
+			<hr/>
+			<h4><a href="{{show.tinyurl}}" target="stats">{{show.venue_long}}</a></h4>
+			<h5>Setlist</h5>
+			<small>{{{show.setlistdata_txt}}}</small>
+			<p><small>View show on <a href="{{phish_net_url}}">Phish.net</a></small></p>
+		{{else}}
+
+		{{/if}}
