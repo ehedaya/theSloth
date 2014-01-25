@@ -220,7 +220,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.4.4"
+			"version" : "0.4.5"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
@@ -298,7 +298,8 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: 'http://thephish.fm/secrettstantta'},
                 { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'},
                 { trigger: new RegExp('^!pnet$', 'i'), response: 'Enter all the shows you attended into Phish.net, then type !pnet:your_phishnet_username into the chat to be included in !who lists.'},
-                { trigger: new RegExp('^!whatever$', 'i'), response: '¯\\_(ツ)_/¯'}
+                { trigger: new RegExp('^!whatever$', 'i'), response: '¯\\_(ツ)_/¯'},
+                { trigger: new RegExp('^!g?chat$', 'i'), response: 'http://bit.ly/thephishchat'}
                 
 	],
 	syncShowCache: function() {
