@@ -220,7 +220,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.4.5"
+			"version" : "0.4.6"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
@@ -256,9 +256,7 @@ TheSloth.prototype = {
 			} 
  		}
 		
-		if (type == 'USER_JOIN') {
-			// Allow all users to relay this event
-		} else if(data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
+		if (data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
 			// Only room moderators can relay API data
 			return false;
 		}
