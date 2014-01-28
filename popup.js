@@ -9,7 +9,11 @@ $(document).ready(function() {
 	Handlebars.registerHelper('time_since', function(input_date, format) {
 		return moment(input_date).fromNow();
 	});
-
+	
+	Handlebars.registerHelper('humanize_duration', function(seconds) {
+		return moment.duration(seconds, 'seconds').humanize()
+	});
+	
 
 	$.get('templates/loading.html', function(html) {
 		$('#now_playing').html(html);
@@ -59,19 +63,19 @@ $(document).ready(function() {
 		}
 	});
 	
-// 	$.ajax({
-// 		crossDomain: true,
-// 		type: "GET",
-// 		url: "http://stats.thephish.dev/api/getEvents.php",
-// 		data: { future_events_only : true },
-// 		success: function(data) {
-// 			var json = JSON.parse(data);
-// 			console.log(data);
-// 			TemplateCache.get('events', function(template) {
-// 				var html = template(json);
-// 				console.log(html);
-// 				$('#events').html(html);
-// 			});
-// 		}
-// 	});
+	$.ajax({
+		crossDomain: true,
+		type: "GET",
+		url: "http://stats.thephish.fm/api/getGrooveStatus.php",
+		success: function(data) {
+			var json = JSON.parse(data);
+			TemplateCache.get('groove', function(template) {
+				var html = template(json);
+				$('#groove').html(html);
+				if(json.groove_open) {
+					$('#groove_status').text(json.songs.list.length).addClass("label-success");
+				}
+			});
+		}
+	});
 });

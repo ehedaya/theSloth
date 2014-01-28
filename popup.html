@@ -12,7 +12,7 @@
     <style type="text/css">
     	.tab-pane { padding-top: 1em; }
     	td, th { font-size: 0.8em; }
-    	#recent_plays { font-size: 0.9em; }
+    	#recent_plays, #groove { font-size: 0.9em; }
     </style>
   </head>
   <body width="300">
@@ -21,6 +21,7 @@
 			<ul class="nav nav-pills">
 			  <li class="active"><a href="#now_playing" data-toggle="tab">Now playing</a></li>
 			  <li><a href="#recent_plays" data-toggle="tab">Recent</a></li>
+			  <li><a href="#groove" data-toggle="tab">Groove <span id="groove_status" class="label"></span></a></li>
 <!-- 
 			  <li><a href="#events" data-toggle="tab">Events</a></li>
  -->
@@ -29,6 +30,7 @@
 			<div class="tab-content">
 				<div class="tab-pane active" id="now_playing"></div>
 				<div class="tab-pane" id="recent_plays"></div>
+				<div class="tab-pane" id="groove"></div>
 <!-- 
 				<div class="tab-pane" id="events"></div>
  -->

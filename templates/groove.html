@@ -1,0 +1,32 @@
+	{{#if groove_open}}
+		<h4>Open Mike's Groove</h4>
+		<p>Started {{time_since start.date}}.  Song count: {{songs.list.length}}</p>
+
+	{{else}}
+		<h4>Last Mike's Groove</h4>
+		<p>Ended {{time_since end.date}}. Song count: {{songs.list.length}}, duration: {{humanize_duration duration}}</p>
+	{{/if}}
+
+<hr/>
+
+{{#songs.list}}
+			<div class="play">
+				<h5>{{author}} - {{title}} <small>{{length}}</small></h5>
+				{{#if show.venue_long}}
+				<h5 class="showdate"><a href="{{show.tinyurl}}" target="_blank">{{show.venue_long}}</a></h5>
+				{{/if}}
+				<small>					
+					Played <a href="#{{id}}" title="{{date_format created.date 'h:mm a'}}" class="myTooltip" data-toggle="tooltip" target="_blank">{{created_since}}</a> <span class="dj">by <a href="{{user.url}}">{{user.name}}</a></span></a>
+					
+
+				</small>
+				{{#if notes}}
+					<div class="notes well well-sm">
+					{{#each notes}}
+						<span class="note_entry"><span class="note_content">"{{content}}"</span> <small>&mdash; <a href="{{user.url}}" target="_blank">{{user.name}}</a> @ {{track_time_formatted}}</small></span><br/>
+					{{/each}}
+					</div>
+				{{/if}}				
+			</div>
+			<hr/>
+{{/songs.list}}
