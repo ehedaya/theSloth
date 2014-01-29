@@ -24,6 +24,14 @@ ThePhish.prototype = {
 											console.warn("Failed to inject date.js.");
 									})
 
+									$.getScript(chrome.extension.getURL("scripts/moment.min.js"))
+									.done(function(e) {
+										console.log("Injected moment.js");
+									})
+									.fail(function(){
+											console.warn("Failed to inject moment.js.");
+									})
+
                                 callback(self);
 
                 }
