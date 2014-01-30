@@ -119,6 +119,26 @@ TheSloth.prototype = {
    						}
    						self.insertChat(message, obj);
 					});
+   				} else if (text.match(/^!groove$/)) {
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "http://stats.thephish.fm/api/getGrooveStatus.php",
+						success: function(data){
+							var json = JSON.parse(data);
+							if(json.success) {
+								var groove_status = json.groove_open ? "Open Mike's Groove" : "Last Mike's Groove";
+								var started_or_ended = json.groove_open ? "Started" : "Ended";
+								var started_or_ended_since = json.groove_open ? moment(json.start.date).fromNow() : moment(json.end.date).fromNow();
+								var duration = moment.duration(json.duration, 'seconds').humanize();
+	
+								var response = groove_status + '.  ' + started_or_ended + ' ' started_or_ended_since + '. Song count: ' + json.songs.list.length + '. Duration : ' + duration;
+								self.insertChat(response, obj);
+							} else {
+								console.warn("Error in !replay", data);
+							}
+						}
+					});
    				}
 
 			}
