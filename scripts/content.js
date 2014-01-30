@@ -91,8 +91,22 @@ TheSloth.prototype = {
 							if(json.success) {
 								self.insertChat(json.response, obj);
 							} else {
-								console.warn("Error in !replay", data);
+								console.warn("Error in !replay response", data);
 							}
+						}
+					});
+   				} else if (text.match(/^!tdg$/)) {
+					self.parsePhishShowdate(function(showdate) {
+						if(showdate) {
+							var now_playing = API.getMedia();
+							var blob = now_playing.author+now_playing.title;
+							if(blob.match(/ghost/i)) {
+								var response = "You might be able to read about this ghost here: http://lawnmemo.com/" + showdate;
+							} else {
+								var response = "This play does not appear to contain any :ghost:s";
+							}
+						} else {
+							var response = "Showdate not detected";
 						}
 					});
    				} else if (text.match(/^!song/)) {
@@ -220,7 +234,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.4.7"
+			"version" : "0.4.8"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
