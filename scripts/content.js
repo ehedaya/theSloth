@@ -72,30 +72,36 @@ TheSloth.prototype = {
 						self.insertChat(chat_text, obj);
    					});
    				} else if (text.match(/^!countdown/)) {
-					$.ajax({
-						crossDomain:true,
-						type: "GET",
-						url: "http://stats.thephish.fm/api/getCountdown.php",
-						success: function(data){
-							var json = JSON.parse(data);
-							self.insertChat(json.response, obj);
-						}
-					});
-   				} else if (text.match(/^!(replay|event)/)) {
-					$.ajax({
-						crossDomain:true,
-						type: "GET",
-						url: "http://stats.thephish.fm/api/get_next_replay.php",
-						success: function(data){
-							var json = JSON.parse(data);
-							if(json.success) {
+					var user = API.getUser();
+					if(user.id == obj.fromID) {
+						$.ajax({
+							crossDomain:true,
+							type: "GET",
+							url: "http://stats.thephish.fm/api/getCountdown.php",
+							success: function(data){
+								var json = JSON.parse(data);
 								self.insertChat(json.response, obj);
-							} else {
-								console.warn("Error in !replay response", data);
 							}
-						}
-					});
-   				} else if (text.match(/^!tdg$/)) {
+						});
+					}
+   				} else if (text.match(/^!(replay|event)/)) {
+					var user = API.getUser();
+					if(user.id == obj.fromID) {
+						$.ajax({
+							crossDomain:true,
+							type: "GET",
+							url: "http://stats.thephish.fm/api/get_next_replay.php",
+							success: function(data){
+								var json = JSON.parse(data);
+								if(json.success) {
+									self.insertChat(json.response, obj);
+								} else {
+									console.warn("Error in !replay response", data);
+								}
+							}
+						});
+					}
+   				} else if (text.match(/^!(tdg|ghost)$/)) {
 					self.parsePhishShowdate(function(showdate) {
 						if(showdate) {
 							var now_playing = API.getMedia();
@@ -121,24 +127,52 @@ TheSloth.prototype = {
    						self.insertChat(message, obj);
 					});
    				} else if (text.match(/^!groove$/)) {
-					$.ajax({
-						crossDomain:true,
-						type: "GET",
-						url: "http://stats.thephish.fm/api/getGrooveStatus.php",
-						success: function(data){
-							console.log('groove',data);
-							var json = JSON.parse(data);
-							if(json.success) {
-								var groove_status = json.groove_open ? "Open Mike's Groove" : "Last Mike's Groove";
-								var started_or_ended = json.groove_open ? "started" : "ended";
-								var started_or_ended_since = json.end_since;
-								var duration = json.duration_time;
+					var user = API.getUser();
+					if(user.id == obj.fromID) {
+						$.ajax({
+							crossDomain:true,
+							type: "GET",
+							url: "http://stats.thephish.fm/api/getGrooveStatus.php",
+							success: function(data){
+								console.log('groove',data);
+								var json = JSON.parse(data);
+								if(json.success) {
+									var groove_status = json.groove_open ? "Open Mike's Groove" : "Last Mike's Groove";
+									var started_or_ended = json.groove_open ? "started" : "ended";
+									var started_or_ended_since = json.end_since;
+									var duration = json.duration_time;
 	
-								var response = groove_status + '  ' + started_or_ended + ' ' + started_or_ended_since + '. Song count ' + json.songs.list.length + ', duration ' + duration;
-								self.insertChat(response, obj);
-							} else {
-								console.warn("Error in !replay", data);
+									var response = groove_status + '  ' + started_or_ended + ' ' + started_or_ended_since + '. Song count ' + json.songs.list.length + ', duration ' + duration;
+									self.insertChat(response, obj);
+								} else {
+									console.warn("Error in !groove", data);
+								}
 							}
+						});
+					}
+   				} else if (text.match(/^!last$/)) {
+					var user = API.getUser();
+					if(user.id == obj.fromID) {
+						$.ajax({
+							crossDomain:true,
+							type: "GET",
+							url: "http://stats.thephish.fm//api/getLastPlayedByShow.php",
+							success: function(data){
+								var json = JSON.parse(data);
+								if(json.success) {
+									self.insertChat(json.response, obj);
+								} else {
+									console.warn("Error in !last", data);
+								}
+							}
+						});
+   					}
+   				} else if (text.match(/^!phishtracks$/)) {
+					self.parsePhishShowdate(function(showdate) {
+						if(showdate.length) {
+							self.insertChat('http://www.phishtracks.com/shows/'+showdate, obj);
+						} else {
+							self.insertChat('I don\'t know the showdate', obj);
 						}
 					});
    				}
@@ -256,7 +290,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.4.8"
+			"version" : "0.5.0"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
@@ -319,7 +353,7 @@ TheSloth.prototype = {
 	simpleResponses: [
                 { trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'},
                 { trigger: new RegExp('^!(about|commands|sloth)$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},                
-                { trigger: new RegExp('^!(ext|extension)$','i'), response: 'http://bit.ly/theSlothExt'},
+                { trigger: new RegExp('^!(sloth)$','i'), response: 'http://bit.ly/theSlothExt'},
                 { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: 'https://github.com/ehedaya/theSloth/issues/new/'},
                 { trigger: new RegExp('^!stats$','i'), response: 'http://stats.thephish.fm'},
                 { trigger: new RegExp('^!gifs$','i'), response: 'http://tinyurl.com/ttgifs'},
@@ -333,6 +367,7 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'},
                 { trigger: new RegExp('^!pnet$', 'i'), response: 'Enter all the shows you attended into Phish.net, then type !pnet:your_phishnet_username into the chat to be included in !who lists.'},
                 { trigger: new RegExp('^!whatever$', 'i'), response: '¯\\_(ツ)_/¯'},
+                { trigger: new RegExp('^!ext', 'i'), response: 'http://thephish.fm/tips#extensions'},
                 { trigger: new RegExp('^!g?chat$', 'i'), response: 'http://bit.ly/thephishchat'}
                 
 	],
