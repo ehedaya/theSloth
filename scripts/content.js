@@ -290,7 +290,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.1"
+			"version" : "0.5.2"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
@@ -352,7 +352,7 @@ TheSloth.prototype = {
 	
 	simpleResponses: [
                 { trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'},
-                { trigger: new RegExp('^!(about|commands|sloth)$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},                
+                { trigger: new RegExp('^!(about|commands)$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},                
                 { trigger: new RegExp('^!(sloth)$','i'), response: 'http://bit.ly/theSlothExt'},
                 { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: 'https://github.com/ehedaya/theSloth/issues/new/'},
                 { trigger: new RegExp('^!stats$','i'), response: 'http://stats.thephish.fm'},
@@ -368,7 +368,13 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!pnet$', 'i'), response: 'Enter all the shows you attended into Phish.net, then type !pnet:your_phishnet_username into the chat to be included in !who lists.'},
                 { trigger: new RegExp('^!whatever$', 'i'), response: '¯\\_(ツ)_/¯'},
                 { trigger: new RegExp('^!ext', 'i'), response: 'http://thephish.fm/tips#extensions'},
-                { trigger: new RegExp('^!g?chat$', 'i'), response: 'http://bit.ly/thephishchat'}
+                { trigger: new RegExp('^!g?chat$', 'i'), response: 'http://bit.ly/thephishchat'},
+                { trigger: new RegExp('^!getreplay$', 'i'), response: 'http://thephish.fm/how-to-dj-a-replay'},
+                { trigger: new RegExp('^!schedule$', 'i'), response: 'http://thephish.fm/replays'},
+                { trigger: new RegExp('^!request$', 'i'), response: 'http://thephish.fm/requestform'},
+                { trigger: new RegExp('^!facebook$', 'i'), response: 'https://www.facebook.com/groups/thephish/'},
+                { trigger: new RegExp('^!twitter$', 'i'), response: 'https://twitter.com/thephishfromtt'},
+                { trigger: new RegExp('^!blog$', 'i'), response: 'http://thephish.fm/'}
                 
 	],
 	syncShowCache: function() {
