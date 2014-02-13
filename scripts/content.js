@@ -290,7 +290,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.2"
+			"version" : "0.5.3"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage

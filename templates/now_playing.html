@@ -1,6 +1,10 @@
 		<div class="well well-sm" style="margin-top: 1em;">
-			<p><strong>Author</strong>: {{author}}</p>
-			<p><strong>Title</strong>: {{title}}</p>
+			{{#if author}}
+				<p><strong>Author</strong>: {{author}}</p>
+			{{/if}}
+			{{#if title}}
+				<p><strong>Title</strong>: {{title}}</p>
+			{{/if}}
 			<p><small>Played by <a href="{{user.url}}" target="_blank">{{user.name}}</a></small></p>
 		</div>
 		{{#if show}}

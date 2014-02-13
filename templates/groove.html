@@ -11,7 +11,19 @@
 
 {{#songs.list}}
 			<div class="play">
-				<h5>{{author}} - {{title}} <small>{{length}}</small></h5>
+				<h5>
+					{{#if author}}
+						{{author}}
+					{{/if}} 
+						{{#if author}}
+							{{#if title}}
+								-
+							{{/if}}
+						{{/if}}
+					{{#if title}}
+						{{title}}
+					{{/if}} 
+					<small>{{length}}</small></h5>
 				{{#if show.venue_long}}
 				<h5 class="showdate"><a href="{{show.tinyurl}}" target="_blank">{{show.venue_long}}</a></h5>
 				{{/if}}
