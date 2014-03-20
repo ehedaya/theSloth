@@ -156,7 +156,7 @@ TheSloth.prototype = {
 						$.ajax({
 							crossDomain:true,
 							type: "GET",
-							url: "http://stats.thephish.fm//api/getLastPlayedByShow.php",
+							url: "http://stats.thephish.fm/api/getLastPlayedByShow.php",
 							success: function(data){
 								var json = JSON.parse(data);
 								if(json.success) {
@@ -175,7 +175,31 @@ TheSloth.prototype = {
 							self.insertChat('I don\'t know the showdate', obj);
 						}
 					});
-   				}
+   				} else if (text.match(/^\*{2}/) {
+					var user = API.getUser();
+					if(user.id == obj.fromID) {
+						var re = /(\*{2})(.*)([0-9a-f]{6})/;
+						var matches = text.match(re);
+						if(matches.length) {
+							var claim_token = matches[matches.length-1];
+							$.ajax({
+								crossDomain:true,
+								type: "GET",
+								data: { "userid": user.id, "claim_token": claim_token },
+								url: "http://stats.thephish.fm/api/register.php",
+								success: function(data){
+									var json = JSON.parse(data);
+									if(json.success) {
+										self.insertChat(json.response, obj);
+									} else {
+										console.warn("Error while attempting to register", data);
+									}
+								}
+							});
+						}
+					}
+   				};
+
 
 			}
 			self.relayEvent("CHAT", obj, 'chat.php');
@@ -290,7 +314,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.3"
+			"version" : "0.5.5"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
