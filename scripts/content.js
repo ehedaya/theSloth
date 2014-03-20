@@ -398,7 +398,8 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!request$', 'i'), response: 'http://thephish.fm/requestform'},
                 { trigger: new RegExp('^!facebook$', 'i'), response: 'https://www.facebook.com/groups/thephish/'},
                 { trigger: new RegExp('^!twitter$', 'i'), response: 'https://twitter.com/thephishfromtt'},
-                { trigger: new RegExp('^!blog$', 'i'), response: 'http://thephish.fm/'}
+                { trigger: new RegExp('^!blog$', 'i'), response: 'http://thephish.fm/'},
+                { trigger: new RegExp('^!dates$', 'i'), response: 'http://thephish.fm/dates'}
                 
 	],
 	syncShowCache: function() {
