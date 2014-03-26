@@ -139,7 +139,7 @@ TheSloth.prototype = {
 								if(json.success) {
 									var groove_status = json.groove_open ? "Open Mike's Groove" : "Last Mike's Groove";
 									var started_or_ended = json.groove_open ? "started" : "ended";
-									var started_or_ended_since = json.end_since;
+									var started_or_ended_since = json.groove_open ? json.start_since : json.end_since;
 									var duration = json.duration_time;
 	
 									var response = groove_status + '  ' + started_or_ended + ' ' + started_or_ended_since + '. Song count ' + json.songs.list.length + ', duration ' + duration;
@@ -294,7 +294,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.5"
+			"version" : "0.5.6"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
