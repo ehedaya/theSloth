@@ -294,7 +294,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.7"
+			"version" : "0.5.8"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
@@ -381,7 +381,8 @@ TheSloth.prototype = {
                 { trigger: new RegExp('^!blog$', 'i'), response: 'http://thephish.fm/'},
                 { trigger: new RegExp('^!dates$', 'i'), response: 'http://thephish.fm/dates'},
                 { trigger: new RegExp('^!adding$', 'i'), response: 'http://thephish.fm/tips#adding'},
-                { trigger: new RegExp('^!nola$', 'i'), response: 'http://thephish.fm/nola'}
+                { trigger: new RegExp('^!nola$', 'i'), response: 'http://thephish.fm/nola'},
+                { trigger: new RegExp('^!lyrics$', 'i'), response: 'http://thephish.fm/lyrics'}
                 
 	],
 	syncShowCache: function() {
