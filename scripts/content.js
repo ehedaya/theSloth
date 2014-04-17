@@ -325,7 +325,20 @@ TheSloth.prototype = {
 						var showlist = JSON.parse(showlist_json);
 						message +=  " ("+showlist[showdate][0]+" http://stats.thephish.fm/"+showdate+" )";
 					}
-					API.sendChat(message);
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "http://stats.thephish.fm/api/getLastPlayedByShow.php",
+						success: function(data){
+							var json = JSON.parse(data);
+							if(json.success) {
+								message += (". " + json.response);
+							} else {
+								console.warn("Error in !last", data);
+							}
+							API.sendChat(message);
+						}
+					});		
 				});
 			} 
  		}
