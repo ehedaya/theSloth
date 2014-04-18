@@ -156,6 +156,9 @@ TheSloth.prototype = {
 						$.ajax({
 							crossDomain:true,
 							type: "GET",
+							data: {
+								"include_show_link" : true
+							},
 							url: "http://stats.thephish.fm/api/getLastPlayedByShow.php",
 							success: function(data){
 								var json = JSON.parse(data);
@@ -294,7 +297,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.9"
+			"version" : "0.5.11"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
@@ -323,7 +326,6 @@ TheSloth.prototype = {
 					if(showdate.length) {
 						var showlist_json = localStorage.getItem('showlist');
 						var showlist = JSON.parse(showlist_json);
-						message +=  " ("+showlist[showdate][0]+" http://stats.thephish.fm/"+showdate+" )";
 					}
 					$.ajax({
 						crossDomain:true,
@@ -334,7 +336,7 @@ TheSloth.prototype = {
 							if(json.success) {
 								message += (". " + json.response);
 							} else {
-								console.warn("Error in !last", data);
+								console.warn("Error in !autolast", data);
 							}
 							API.sendChat(message);
 						}
