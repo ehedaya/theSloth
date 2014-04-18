@@ -291,13 +291,20 @@ TheSloth.prototype = {
 	},
 	relayEvent: function(type, payload, endpoint) {
 		var self = this;
+		var host = API.getHost();
+		
+		// KF's room only!
+		if(host.id != "50aeaefd3e083e18fa2d05aa") {
+			return false;
+		}
+		
 		data = { 
 			"type" : type,
 			"payload" : payload,
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.11"
+			"version" : "0.5.12"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
