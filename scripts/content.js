@@ -157,12 +157,14 @@ TheSloth.prototype = {
 							crossDomain:true,
 							type: "GET",
 							data: {
-								"include_show_link" : true
+								"include_show_link" : true,
+								"media_id" : API.getMedia().id
 							},
 							url: "http://stats.thephish.fm/api/getLastPlayedByShow.php",
 							success: function(data){
 								var json = JSON.parse(data);
 								if(json.success) {
+   					console.log('last detected');
 									self.insertChat(json.response, obj);
 								} else {
 									console.warn("Error in !last", data);
@@ -291,12 +293,6 @@ TheSloth.prototype = {
 	},
 	relayEvent: function(type, payload, endpoint) {
 		var self = this;
-		var host = API.getHost();
-		
-		// KF's room only!
-		if(host.id != "50aeaefd3e083e18fa2d05aa") {
-			return false;
-		}
 		
 		data = { 
 			"type" : type,
@@ -304,7 +300,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.12"
+			"version" : "0.5.14"
 		};
 		
 		// Only speak user's own plays when a vote update happens and keep a list in localStorage
@@ -338,6 +334,9 @@ TheSloth.prototype = {
 						crossDomain:true,
 						type: "GET",
 						url: "http://stats.thephish.fm/api/getLastPlayedByShow.php",
+						data: {
+							"media_id" : API.getMedia().id
+						},
 						success: function(data){
 							var json = JSON.parse(data);
 							if(json.success) {
