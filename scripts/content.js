@@ -2,6 +2,7 @@ TheSloth = function() {
 	this.setupEvents();
 	this.syncShowCache();
 	this.syncShowAttendees();
+	this.fetchSimpleResponses();
 }
 TheSloth.prototype = {
 	constructor:  TheSloth,
@@ -15,10 +16,10 @@ TheSloth.prototype = {
 			console.log(obj);
 			
 			for(t=0;t<self.simpleResponses.length;t++) {
-					if (text.match(self.simpleResponses[t].trigger)) {
-							self.insertChat(self.simpleResponses[t].response, obj);
-							return true; 
-					}
+				if (text.match(self.simpleResponses[t].trigger)) {
+					self.insertChat(self.simpleResponses[t].response, obj);
+					return true; 
+				}
 			}
 			
 			if(text.match(/^##/i)) {
@@ -164,7 +165,6 @@ TheSloth.prototype = {
 							success: function(data){
 								var json = JSON.parse(data);
 								if(json.success) {
-   					console.log('last detected');
 									self.insertChat(json.response, obj);
 								} else {
 									console.warn("Error in !last", data);
@@ -300,57 +300,9 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.14"
+			"version" : "0.5.16"
 		};
-		
-		// Only speak user's own plays when a vote update happens and keep a list in localStorage
- 		if (API.getDJ() && API.getUser().id == API.getDJ().id) {
-			// Generate a unique string to identify this play on this day
-			var date = new Date();
-			var media_hash = API.getMedia().id+date.toString('yyyy-MM-dd');
-			
-			// Fetch the list of already spoken plays
-			var my_plays = JSON.parse(localStorage.getItem('my_plays')) || [];
-			
-			// See if it's in the list
-			var already_spoken = false;
-			$.each(my_plays, function(i,v) {
-				if(v == media_hash) {
-					already_spoken = true;
-				}
-			});
-			
-			// Update the list, save it, and speak a 'now playing' message if it's not in the list
-			if(!already_spoken) {
-				my_plays.push(media_hash);
-				localStorage.setItem('my_plays', JSON.stringify(my_plays));
-				self.parsePhishShowdate(function(showdate) {
-					var message = "/me started playing "+API.getMedia().author+" "+API.getMedia().title;
-					if(showdate.length) {
-						var showlist_json = localStorage.getItem('showlist');
-						var showlist = JSON.parse(showlist_json);
-					}
-					$.ajax({
-						crossDomain:true,
-						type: "GET",
-						url: "http://stats.thephish.fm/api/getLastPlayedByShow.php",
-						data: {
-							"media_id" : API.getMedia().id
-						},
-						success: function(data){
-							var json = JSON.parse(data);
-							if(json.success) {
-								message += (". " + json.response);
-							} else {
-								console.warn("Error in !autolast", data);
-							}
-							API.sendChat(message);
-						}
-					});		
-				});
-			} 
- 		}
-		
+				
 		if (data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
 			// Only room moderators can relay API data
 			return false;
@@ -362,8 +314,9 @@ TheSloth.prototype = {
 			data: data,
 			success: function(response){
 				console.log(data, response, JSON.parse(response));
-// 				self.logger(data);
-// 				self.logger(JSON.parse(response));
+				if(response.to_be_spoken && response.to_be_spoken.length) {
+					self.insertChat(response.to_be_spoken);
+				}
 			}
 		});
 	},
@@ -372,40 +325,24 @@ TheSloth.prototype = {
 		if(user.id == chatObj.fromID) {
 			API.sendChat(message);
 		}
+	},	
+	simpleResponses: [],
+	fetchSimpleResponses: function() {
+		var $this = this;
+		$.getJSON('http://stats.thephish.fm/api/getSimpleResponses.php', function(responses) {
+			var updatedSimpleResponses = [];
+			_.each(responses, function(a) { 
+				updatedSimpleResponses.push(
+					{
+						'trigger': new RegExp(a.regexp, 'i'), 
+						'response': a.response 
+					}
+				); 
+			});
+			console.log('Updated simple responses');
+			$this.simpleResponses = updatedSimpleResponses;
+		});
 	},
-
-	
-	simpleResponses: [
-                { trigger: new RegExp('^!tips$','i'), response: 'http://thephish.fm/tips/'},
-                { trigger: new RegExp('^!(about|commands)$','i'), response: 'https://github.com/ehedaya/theSloth/wiki/Commands'},                
-                { trigger: new RegExp('^!(sloth)$','i'), response: 'http://bit.ly/theSlothExt'},
-                { trigger: new RegExp('^!(bugs|bug|feature|features)$','i'), response: 'https://github.com/ehedaya/theSloth/issues/new/'},
-                { trigger: new RegExp('^!stats$','i'), response: 'http://stats.thephish.fm'},
-                { trigger: new RegExp('^!gifs$','i'), response: 'http://tinyurl.com/ttgifs'},
-                { trigger: new RegExp('^!deg$','i'), response: 'http://tinyurl.com/phishdeg'},
-                { trigger: new RegExp('^!m[e]{1,2}[t]{1,2}up[s]{0,1}$','i'), response: 'http://thephish.fm/meettups'},
-                { trigger: new RegExp('^!attendance$', 'i'), response: 'http://thephish.fm/attendance'},
-                { trigger: new RegExp('^!tickets$', 'i'), response: 'http://thephish.fm/tickets'},
-                { trigger: new RegExp('^!tease$', 'i'), response: 'http://thephish.fm/tease'},
-                { trigger: new RegExp('^!draft$', 'i'), response: 'http://thephish.fm/draft'},
-                { trigger: new RegExp('^!(ss|secretsanta|secrettsantta|secrettsanta|secretsantta)$', 'i'), response: 'http://thephish.fm/secrettstantta'},
-                { trigger: new RegExp('^!replayroom$', 'i'), response: 'http://thephish.fm/replayroom'},
-                { trigger: new RegExp('^!pnet$', 'i'), response: 'Enter all the shows you attended into Phish.net, then type !pnet:your_phishnet_username into the chat to be included in !who lists.'},
-                { trigger: new RegExp('^!whatever$', 'i'), response: '¯\\_(ツ)_/¯'},
-                { trigger: new RegExp('^!ext', 'i'), response: 'http://thephish.fm/tips#extensions'},
-                { trigger: new RegExp('^!g?chat$', 'i'), response: 'http://thephish.fm/gchat'},
-                { trigger: new RegExp('^!getreplay$', 'i'), response: 'http://thephish.fm/how-to-dj-a-replay'},
-                { trigger: new RegExp('^!schedule$', 'i'), response: 'http://thephish.fm/replays'},
-                { trigger: new RegExp('^!request$', 'i'), response: 'http://thephish.fm/requestform'},
-                { trigger: new RegExp('^!facebook$', 'i'), response: 'https://www.facebook.com/groups/thephish/'},
-                { trigger: new RegExp('^!twitter$', 'i'), response: 'https://twitter.com/thephishfromtt'},
-                { trigger: new RegExp('^!blog$', 'i'), response: 'http://thephish.fm/'},
-                { trigger: new RegExp('^!dates$', 'i'), response: 'http://thephish.fm/dates'},
-                { trigger: new RegExp('^!adding$', 'i'), response: 'http://thephish.fm/tips#adding'},
-                { trigger: new RegExp('^!nola$', 'i'), response: 'http://thephish.fm/nola'},
-                { trigger: new RegExp('^!lyrics$', 'i'), response: 'http://thephish.fm/lyrics'}
-                
-	],
 	syncShowCache: function() {
 		var self = this;
 		$.ajax({
