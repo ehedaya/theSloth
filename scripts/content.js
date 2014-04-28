@@ -300,7 +300,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.17"
+			"version" : "0.5.18"
 		};
 				
 		if (data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
@@ -314,8 +314,9 @@ TheSloth.prototype = {
 			data: data,
 			success: function(response){
 				console.log(data, response, JSON.parse(response));
-				if(response.to_be_spoken && response.to_be_spoken.length) {
-					self.insertChat(response.to_be_spoken, {"fromID" : API.getUser()});
+				var response_JSON = JSON.parse(response);
+				if(response_JSON.to_be_spoken && response_JSON.to_be_spoken.length) {
+					self.insertChat(response_JSON.to_be_spoken, {"fromID" : API.getUser()});
 				}
 			}
 		});
