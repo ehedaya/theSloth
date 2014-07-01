@@ -61,9 +61,10 @@ TheSloth.prototype = {
 						}
 					});
    				} else if (text.match(/^!who(else)?/)) {
-					self.parsePhishShowdate(function(showdate) {
-						var show_attendee_json = localStorage.getItem('show_attendees');
-						var show_attendees = JSON.parse(show_attendee_json);
+					var show_attendee_json = localStorage.getItem('show_attendees');
+					var show_attendees = JSON.parse(show_attendee_json);
+   					if(self.now_playing_showdate) {
+   						var showdate = self.now_playing_showdate;
 						if(show_attendees[showdate] && show_attendees[showdate].length) {
 							var attendees = show_attendees[showdate].join(", ");
 							var chat_text = "Show attendees: " + attendees;
@@ -71,7 +72,17 @@ TheSloth.prototype = {
 							var chat_text = "I don't know anyone who attended this show.";
 						}
 						self.insertChat(chat_text, obj);
-   					});
+   					} else {
+						self.parsePhishShowdate(function(showdate) {
+							if(show_attendees[showdate] && show_attendees[showdate].length) {
+								var attendees = show_attendees[showdate].join(", ");
+								var chat_text = "Show attendees: " + attendees;
+							} else {
+								var chat_text = "I don't know anyone who attended this show.";
+							}
+							self.insertChat(chat_text, obj);
+						});
+					}
    				} else if (text.match(/^!countdown/)) {
 					var user = API.getUser();
 					if(user.id == obj.fromID) {
@@ -300,7 +311,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.18"
+			"version" : "0.5.19"
 		};
 				
 		if (data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
@@ -317,6 +328,15 @@ TheSloth.prototype = {
 				var response_JSON = JSON.parse(response);
 				if(response_JSON.to_be_spoken && response_JSON.to_be_spoken.length) {
 					self.insertChat(response_JSON.to_be_spoken, {"fromID" : API.getUser()});
+				}
+				if(response_JSON.db_play) {
+					var d = response_JSON.db_play;
+					if(d.show && d.show.showdate) {
+						self.now_playing_showdate = d.show.showdate;
+					} else {
+						self.now_playing_showdate = null;
+					}
+					console.log(self.now_playing_showdate);
 				}
 			}
 		});
