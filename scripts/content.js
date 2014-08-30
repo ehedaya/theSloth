@@ -376,7 +376,7 @@ TheSloth.prototype = {
 				localStorage.setItem('showlist', response);
 			},
 			error: function(response) {
-				error.log("Error retrieving show cache");
+				console.log("Error retrieving show cache");
 			}
 		});
 	},
@@ -392,7 +392,7 @@ TheSloth.prototype = {
 				localStorage.setItem('show_attendees', response);
 			},
 			error: function(response) {
-				error.log("Error retrieving show cache");
+				console.log("Error retrieving show cache");
 			}
 		});
 	},
