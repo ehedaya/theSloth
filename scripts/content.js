@@ -311,7 +311,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.20"
+			"version" : "0.5.21"
 		};
 				
 		if (data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
