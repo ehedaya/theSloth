@@ -201,13 +201,13 @@ TheSloth.prototype = {
         API.on(API.DJ_ADVANCE, function(obj){
         	console.log('DJ ADVANCE', obj);
 			self.parsePhishShowdate(function(showdate) {
-				self.relayEvent('DJ_ADVANCE', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
+				self.relayEvent('DJ_ADVANCE', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getScore(), "showdate": showdate }, 'now_playing.php');
 			});
         });
 		
 		API.on(API.VOTE_UPDATE, function(obj){
 			self.parsePhishShowdate(function(showdate) {
-				self.relayEvent('VOTE_UPDATE', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
+				self.relayEvent('VOTE_UPDATE', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getScore(), "showdate": showdate }, 'now_playing.php');
 			});
  			self.relayEvent("VOTE_UPDATE", obj, 'vote_update.php');
 		});
@@ -245,7 +245,7 @@ TheSloth.prototype = {
 		
 		API.on(API.MOD_SKIP, function(obj){
 			self.parsePhishShowdate(function(showdate) {
-				self.relayEvent('MOD_SKIP', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
+				self.relayEvent('MOD_SKIP', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getScore(), "showdate": showdate }, 'now_playing.php');
 			});
 		});
 		
@@ -254,7 +254,7 @@ TheSloth.prototype = {
 		
 		API.on(API.HISTORY_UPDATE, function(obj){
 			self.parsePhishShowdate(function(showdate) {
-				self.relayEvent('HISTORY_UPDATE', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getRoomScore(), "showdate": showdate }, 'now_playing.php');
+				self.relayEvent('HISTORY_UPDATE', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getScore(), "showdate": showdate }, 'now_playing.php');
 			});
  			self.relayEvent("HISTORY_UPDATE", obj, 'history_update.php');
 		});
@@ -311,7 +311,7 @@ TheSloth.prototype = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.19"
+			"version" : "0.5.20"
 		};
 				
 		if (data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
