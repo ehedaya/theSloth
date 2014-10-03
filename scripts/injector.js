@@ -14,15 +14,7 @@ ThePhish.prototype = {
 									})
 									.fail(function(){
 											console.warn("Failed to inject content.js");
-									})
-									
-									$.getScript(chrome.extension.getURL("scripts/date.js"))
-									.done(function(e) {
-										console.log("Injected date.js");
-									})
-									.fail(function(){
-											console.warn("Failed to inject date.js.");
-									})
+									})									
 
 									$.getScript(chrome.extension.getURL("scripts/moment.min.js"))
 									.done(function(e) {

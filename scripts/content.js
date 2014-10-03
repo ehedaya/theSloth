@@ -1,19 +1,12 @@
-TheSloth = function() {
-	this.setupEvents();
-	this.syncShowCache();
-	this.syncShowAttendees();
-	this.fetchSimpleResponses();
-}
-TheSloth.prototype = {
-	constructor:  TheSloth,
+TheSloth = {
+//	constructor:  TheSloth,
 	setupEvents: function() {
 		var self = this;
-		self.logger("Setting up events");
+		("Setting up events");
 		
 		// Set up events
 		API.on(API.CHAT, function(obj){
 			var text = obj.message;
-			console.log(obj);
 			
 			for(t=0;t<self.simpleResponses.length;t++) {
 				if (text.match(self.simpleResponses[t].trigger)) {
@@ -27,9 +20,10 @@ TheSloth.prototype = {
 				obj.track_time = API.getTimeElapsed();
 				self.relayEvent("CHAT", obj, 'chat.php');
 			} else if (text.match(/^!/i)) {
+			console.debug("Chat command");
 				// Chat command
 				if(text.match(/^!setlist$/i)) {
-					self.logger('Responding to !setlist');
+					('Responding to !setlist');
 					// Fetch setlist information and insert into chat
 					self.parsePhishShowdate(function(showdate) {
 						var showlist_json = localStorage.getItem('showlist');
@@ -41,7 +35,7 @@ TheSloth.prototype = {
 								self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" ("+showlist[showdate][0]+")", obj);
 							}
 						} else {
-							self.logger("Did not return showdate", showdate);
+							("Did not return showdate", showdate);
 						}
 					});
 				} else if (text.match(/^!pnet:/)) {
@@ -54,7 +48,7 @@ TheSloth.prototype = {
 						url: "http://stats.thephish.fm/api/update_pnet.php",
 						data: payload,
 						success: function(data){
-							self.logger(data);
+							(data);
 							var json = JSON.parse(data);
 							self.insertChat(json.response, obj);
 							self.syncShowAttendees();
@@ -146,7 +140,7 @@ TheSloth.prototype = {
 							type: "GET",
 							url: "http://stats.thephish.fm/api/getGrooveStatus.php",
 							success: function(data){
-								console.log('groove',data);
+								console.debug('groove',data);
 								var json = JSON.parse(data);
 								if(json.success) {
 									var groove_status = json.groove_open ? "Open Mike's Groove" : "Last Mike's Groove";
@@ -199,7 +193,7 @@ TheSloth.prototype = {
 		});
 
         API.on(API.DJ_ADVANCE, function(obj){
-        	console.log('DJ ADVANCE', obj);
+        	console.debug('DJ ADVANCE', obj);
 			self.parsePhishShowdate(function(showdate) {
 				self.relayEvent('DJ_ADVANCE', {"now_playing": API.getMedia(), "dj": API.getDJ(), "score": API.getScore(), "showdate": showdate }, 'now_playing.php');
 			});
@@ -265,12 +259,11 @@ TheSloth.prototype = {
         var r = /[0-9]{1,4}[\-\/\s\.\\]{1,2}[0-9]{1,2}[\-\/\s\.\\]{1,2}[0-9]{1,4}/;
         var showdate = blob.match(r); 
         if (showdate) {
-                var d = Date.parse(showdate[0]);
+                var d = moment(showdate[0]);
                 if (d) {
-                        var d2 = d.toString('yyyy-MM-dd');
-                        callback(d2);
+ 					callback(d.format('YYYY-MM-DD'));
                 } else {
-                        callback(false);
+					callback(false);
                 }
         }  else {
                 callback(false);
@@ -304,14 +297,16 @@ TheSloth.prototype = {
 	},
 	relayEvent: function(type, payload, endpoint) {
 		var self = this;
-		
+		if(window.location.href != "https://plug.dj/thephish") {
+			return false;
+		}
 		data = { 
 			"type" : type,
 			"payload" : payload,
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.5.21"
+			"version" : "0.6.1"
 		};
 				
 		if (data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
@@ -324,9 +319,9 @@ TheSloth.prototype = {
 			url: "http://stats.thephish.fm/api/" + endpoint,
 			data: data,
 			success: function(response){
-				console.log(data, response, JSON.parse(response));
+				console.debug(data, response, JSON.parse(response));
 				var response_JSON = JSON.parse(response);
-				if(response_JSON.to_be_spoken && response_JSON.to_be_spoken.length) {
+				if(response_JSON && response_JSON.to_be_spoken && response_JSON.to_be_spoken.length) {
 					self.insertChat(response_JSON.to_be_spoken, {"fromID" : API.getUser()});
 				}
 				if(response_JSON.db_play) {
@@ -371,7 +366,7 @@ TheSloth.prototype = {
 			type: "GET",
 			url: "http://stats.thephish.fm/api/getAllShows.php",
 			success: function(response){
-				self.logger("Refreshed local show list");
+				("Refreshed local show list");
 				localStorage.removeItem('showlist');
 				localStorage.setItem('showlist', response);
 			},
@@ -387,7 +382,7 @@ TheSloth.prototype = {
 			type: "GET",
 			url: "http://stats.thephish.fm/api/getUsersAtShow.php",
 			success: function(response){
-				self.logger("Refreshed show attendee list");
+				("Refreshed show attendee list");
 				localStorage.removeItem('show_attendees');
 				localStorage.setItem('show_attendees', response);
 			},
@@ -397,17 +392,21 @@ TheSloth.prototype = {
 		});
 	},
 	logger: function(message) {
-		console.log("theSloth: "+message);
+		console.debug("theSloth: "+message);
 	}
 }
 
 // Wait for the PlugAPI to be available before instantiating
 function initialize() {
 	if(typeof API != "undefined") {
-			console.log('theSloth: API connected.');
-			theSloth = new TheSloth();
+			console.debug('theSloth: API connected.');
+			TheSloth.setupEvents();
+			TheSloth.syncShowCache();
+			TheSloth.syncShowAttendees();
+			TheSloth.fetchSimpleResponses();
+
 	} else {
-			console.warn('theSloth: API not connected.  Retrying....');
+			console.debug('theSloth: API not connected.  Retrying....');
 		setTimeout(initialize, 1000);
 	}
 }
