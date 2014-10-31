@@ -7,23 +7,26 @@ TheSloth = {
 		// Set up events
 		API.on(API.CHAT, function(obj){
 			var text = obj.message;
+			console.debug("Chat event", obj);
 			
 			for(t=0;t<self.simpleResponses.length;t++) {
 				if (text.match(self.simpleResponses[t].trigger)) {
 					self.insertChat(self.simpleResponses[t].response, obj);
+					console.debug("Matched simple response");
 					return true; 
 				}
 			}
 			
 			if(text.match(/^##/i)) {
 				// Log a note
+				console.debug("Sending note");
 				obj.track_time = API.getTimeElapsed();
 				self.relayEvent("CHAT", obj, 'chat.php');
 			} else if (text.match(/^!/i)) {
-			console.debug("Chat command");
 				// Chat command
+				console.debug("Chat command detected");
 				if(text.match(/^!setlist$/i)) {
-					('Responding to !setlist');
+					console.debug('Responding to !setlist');
 					// Fetch setlist information and insert into chat
 					self.parsePhishShowdate(function(showdate) {
 						var showlist_json = localStorage.getItem('showlist');
@@ -35,17 +38,18 @@ TheSloth = {
 								self.insertChat("Setlist: http://phish.net/setlists/?d="+showdate+" ("+showlist[showdate][0]+")", obj);
 							}
 						} else {
-							("Did not return showdate", showdate);
+
 						}
 					});
 				} else if (text.match(/^!pnet:/)) {
+					console.debug('Responding to !pnet:');
                     var pnet_username = escape(text.substr(6));
                     var userid = obj.fromID;
                     var payload = { userid: userid, username: pnet_username };
 					$.ajax({
 						crossDomain:true,
 						type: "GET",
-						url: "http://stats.thephish.fm/api/update_pnet.php",
+						url: "https://stats.thephish.fm/api/update_pnet.php",
 						data: payload,
 						success: function(data){
 							(data);
@@ -55,6 +59,7 @@ TheSloth = {
 						}
 					});
    				} else if (text.match(/^!who(else)?/)) {
+   					console.debug("!who(else)?");
 					var show_attendee_json = localStorage.getItem('show_attendees');
 					var show_attendees = JSON.parse(show_attendee_json);
    					if(self.now_playing_showdate) {
@@ -78,12 +83,13 @@ TheSloth = {
 						});
 					}
    				} else if (text.match(/^!countdown/)) {
+   					console.debug("Countdown");
 					var user = API.getUser();
 					if(user.id == obj.fromID) {
 						$.ajax({
 							crossDomain:true,
 							type: "GET",
-							url: "http://stats.thephish.fm/api/getCountdown.php",
+							url: "https://stats.thephish.fm/api/getCountdown.php",
 							success: function(data){
 								var json = JSON.parse(data);
 								self.insertChat(json.response, obj);
@@ -91,12 +97,13 @@ TheSloth = {
 						});
 					}
    				} else if (text.match(/^!(replay|event)/)) {
+   					console.debug("Replay or event");
 					var user = API.getUser();
 					if(user.id == obj.fromID) {
 						$.ajax({
 							crossDomain:true,
 							type: "GET",
-							url: "http://stats.thephish.fm/api/get_next_replay.php",
+							url: "https://stats.thephish.fm/api/get_next_replay.php",
 							success: function(data){
 								var json = JSON.parse(data);
 								if(json.success) {
@@ -108,6 +115,7 @@ TheSloth = {
 						});
 					}
    				} else if (text.match(/^!(tdg|ghost)$/)) {
+	   				console.debug("Ghost");
 					self.parsePhishShowdate(function(showdate) {
 						if(showdate) {
 							var now_playing = API.getMedia();
@@ -123,6 +131,7 @@ TheSloth = {
 						self.insertChat(response, obj);
 					});
    				} else if (text.match(/^!song/)) {
+	   				console.debug("Song");
 					self.parsePhishShowdate(function(showdate) {
 						var now_playing = API.getMedia();
 						var current_dj = API.getDJ()
@@ -133,12 +142,13 @@ TheSloth = {
    						self.insertChat(message, obj);
 					});
    				} else if (text.match(/^!groove$/)) {
+	   				console.debug("Groove");
 					var user = API.getUser();
 					if(user.id == obj.fromID) {
 						$.ajax({
 							crossDomain:true,
 							type: "GET",
-							url: "http://stats.thephish.fm/api/getGrooveStatus.php",
+							url: "https://stats.thephish.fm/api/getGrooveStatus.php",
 							success: function(data){
 								console.debug('groove',data);
 								var json = JSON.parse(data);
@@ -156,18 +166,21 @@ TheSloth = {
 							}
 						});
 					}
-   				} else if (text.match(/^!last$/)) {
+   				} else if (text.match(/^!last/)) {
+	   				console.debug("!last");
 					var user = API.getUser();
-					if(user.id == obj.fromID) {
+					if(user.id == obj.uid) {
+						console.debug("Self");
 						$.ajax({
 							crossDomain:true,
 							type: "GET",
 							data: {
 								"include_show_link" : true,
-								"media_id" : API.getMedia().id
+								"media_id" : API.getMedia().cid
 							},
-							url: "http://stats.thephish.fm/api/getLastPlayedByShow.php",
+							url: "https://stats.thephish.fm/api/getLastPlayedByShow.php",
 							success: function(data){
+							console.debug("Reponse", data);
 								var json = JSON.parse(data);
 								if(json.success) {
 									self.insertChat(json.response, obj);
@@ -178,6 +191,7 @@ TheSloth = {
 						});
    					}
    				} else if (text.match(/^!phishtracks$/)) {
+	   				console.debug("Phishtracks link");
 					self.parsePhishShowdate(function(showdate) {
 						if(showdate.length) {
 							self.insertChat('http://www.phishtracks.com/shows/'+showdate, obj);
@@ -185,6 +199,8 @@ TheSloth = {
 							self.insertChat('I don\'t know the showdate', obj);
 						}
 					});
+   				} else {
+   					console.debug("Fell out");
    				}
 
 
@@ -306,7 +322,7 @@ TheSloth = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.6.1"
+			"version" : "0.6.2"
 		};
 				
 		if (data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
@@ -316,7 +332,7 @@ TheSloth = {
 		$.ajax({
 			crossDomain:true,
 			type: "POST",
-			url: "http://stats.thephish.fm/api/" + endpoint,
+			url: "https://stats.thephish.fm/api/" + endpoint,
 			data: data,
 			success: function(response){
 				console.debug(data, response, JSON.parse(response));
@@ -338,14 +354,14 @@ TheSloth = {
 	},
 	insertChat: function(message, chatObj) {
 		var user = API.getUser();
-		if(user.id == chatObj.fromID) {
+		if(user.id == chatObj.uid) {
 			API.sendChat(message);
 		}
 	},	
 	simpleResponses: [],
 	fetchSimpleResponses: function() {
 		var $this = this;
-		$.getJSON('http://stats.thephish.fm/api/getSimpleResponses.php', function(responses) {
+		$.getJSON('https://stats.thephish.fm/api/getSimpleResponses.php', function(responses) {
 			var updatedSimpleResponses = [];
 			_.each(responses, function(a) { 
 				updatedSimpleResponses.push(
@@ -364,7 +380,7 @@ TheSloth = {
 		$.ajax({
 			crossDomain:true,
 			type: "GET",
-			url: "http://stats.thephish.fm/api/getAllShows.php",
+			url: "https://stats.thephish.fm/api/getAllShows.php",
 			success: function(response){
 				("Refreshed local show list");
 				localStorage.removeItem('showlist');
@@ -380,7 +396,7 @@ TheSloth = {
 		$.ajax({
 			crossDomain:true,
 			type: "GET",
-			url: "http://stats.thephish.fm/api/getUsersAtShow.php",
+			url: "https://stats.thephish.fm/api/getUsersAtShow.php",
 			success: function(response){
 				("Refreshed show attendee list");
 				localStorage.removeItem('show_attendees');
