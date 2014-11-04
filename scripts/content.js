@@ -44,7 +44,7 @@ TheSloth = {
 				} else if (text.match(/^!pnet:/)) {
 					console.debug('Responding to !pnet:');
                     var pnet_username = escape(text.substr(6));
-                    var userid = obj.fromID;
+                    var userid = obj.uid;
                     var payload = { userid: userid, username: pnet_username };
 					$.ajax({
 						crossDomain:true,
@@ -85,7 +85,7 @@ TheSloth = {
    				} else if (text.match(/^!countdown/)) {
    					console.debug("Countdown");
 					var user = API.getUser();
-					if(user.id == obj.fromID) {
+					if(user.id == obj.uid) {
 						$.ajax({
 							crossDomain:true,
 							type: "GET",
@@ -99,7 +99,7 @@ TheSloth = {
    				} else if (text.match(/^!(replay|event)/)) {
    					console.debug("Replay or event");
 					var user = API.getUser();
-					if(user.id == obj.fromID) {
+					if(user.id == obj.uid) {
 						$.ajax({
 							crossDomain:true,
 							type: "GET",
@@ -144,7 +144,7 @@ TheSloth = {
    				} else if (text.match(/^!groove$/)) {
 	   				console.debug("Groove");
 					var user = API.getUser();
-					if(user.id == obj.fromID) {
+					if(user.id == obj.uid) {
 						$.ajax({
 							crossDomain:true,
 							type: "GET",
@@ -322,7 +322,7 @@ TheSloth = {
 			"from" : API.getUser(),
 			"media" : API.getMedia(),
 			"current_dj" : API.getDJ(),
-			"version" : "0.6.2"
+			"version" : "0.6.3"
 		};
 				
 		if (data.from.permission < 2 && data.from.id != '522e0fb696fba524e5174326') {
