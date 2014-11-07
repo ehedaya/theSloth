@@ -1,6 +1,6 @@
 {
   "name":           "theSloth",
-  "version":        "0.5.7",
+  "version":        "0.6.3",
   "short_name":		"Stats tracking helper for http://plug.dj/thePhish/",
   "description":    "This extension relays data about activity in http://plug.dj/thePhish for stats tracking purposes.",
   "browser_action" : {
@@ -16,7 +16,7 @@
   "content_scripts": [
     {
           "matches": ["*://plug.dj/thephish/"],
-      	  "js": ["scripts/jquery.js", "scripts/injector.js", "scripts/date.js"],
+      	  "js": ["scripts/jquery.js", "scripts/injector.js"],
           "run_at": "document_end"
     }],
 	"sandbox": {
@@ -27,7 +27,6 @@
    "web_accessible_resources": [
         "scripts/content.js",
         "scripts/jquery.js",
-        "scripts/date.js",
         "scripts/handlebars.min.js",
         "scripts/bootstrap.min.js",
         "scripts/moment.min.js",
