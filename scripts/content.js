@@ -13,6 +13,9 @@ TheSloth = {
 		console.debug("theSloth: Setting up events");
 
 		Dubtrack.room.chat.model.on('change', function(model) {
+			if($this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
+				return false;
+			}
 			console.debug("theSloth: Chat detected", model.toJSON());
 			var data = model.get('data');
 			var activeSong = Dubtrack.room.player.activeSong.toJSON();
@@ -36,6 +39,16 @@ TheSloth = {
 						message : text
 					}
 					$this.relayEvent(payload, 'chat.php');
+				} else if (text.match(/^!auto(woot|bop|dub|awesome)/)) {
+					var pref = $this.getPreference('autowoot');
+					if(text.match(/on/)) {
+						$this.setPreference('autodub', 'on');
+						pref = $this.getPreference('autodub');
+					} else if (text.match(/off/)) {
+						$this.setPreference('autodub', 'off');
+						pref = $this.getPreference('autodub');								
+					}
+					$this.insertChat("Autodub is " + pref); 
 				} else if (text.match(/^!pnet:/)) {
 					console.debug('Responding to !pnet:');
                     var pnet_username = escape(text.substr(6));
@@ -161,6 +174,9 @@ TheSloth = {
 		Dubtrack.room.player.activeSong.on('change', function(model) {
 			console.debug("theSloth: Room change detected", model.toJSON());
 			$this.relayCurrentTrack();
+			if($this.getPreference('autodub') == "on") {
+				$('.dubup').click();
+			}
 		});
 	},
 	insertChat(message) {
@@ -168,7 +184,25 @@ TheSloth = {
 		Dubtrack.room.chat.$('input').val(message);
 		Dubtrack.room.chat.$('button').click();
 	},
+	getPreference: function(name) {
+		var prefName = "theSloth.preference." + name;
+		var val = localStorage.getItem(prefName);
+		if(val) {
+			console.debug("theSloth: getPreference", prefName, val);
+			return val
+		} else {
+			console.debug("theSloth: getPreference not found", prefName, val);
+		}
+	},
+	setPreference: function(name,value) {
+		var prefName = "theSloth.preference." + name;
+		localStorage.setItem(prefName, value);
+		return this.getPreference(prefName);
+	},
 	relayCurrentTrack: function(){
+			if(this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
+				return false;
+			}
  		var $this = this;
 		var r = Dubtrack.room.player.activeSong.toJSON();
 		$this.parseDate(r.songInfo.name, function(showdate) {
@@ -207,6 +241,9 @@ TheSloth = {
         }
 	},	
 	relayEvent: function(payload, endpoint) {
+		if(this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
+			return false;
+		}
 		var $this = this;
 		var self = this;
 		console.debug("Relaying event", payload, endpoint);
