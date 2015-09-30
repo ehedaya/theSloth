@@ -66,8 +66,95 @@ TheSloth = {
 						}
 						$this.insertChat(chat_text);
 					});
+   				} else if (text.match(/^!last/)) {
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						data: {
+							"include_show_link" : true,
+							"media_id" : activeSong.songInfo.fkid
+						},
+						url: "https://stats.thephish.fm/api/getLastPlayedByShow.php",
+						success: function(data){
+						console.debug("Reponse", data);
+							var json = JSON.parse(data);
+							if(json.success) {
+								$this.insertChat(json.response);
+							} else {
+								console.warn("Error in !last", data);
+							}
+						}
+					});
+   				} else if (text.match(/^!phishtracks$/)) {
+					$this.parseDate(activeSong.songInfo.name, function(showdate) {
+						if(showdate.length) {
+							$this.insertChat('http://www.phishtracks.com/shows/'+showdate);
+						} else {
+							$this.insertChat('I don\'t know the showdate');
+						}
+					});
+   				} else if (text.match(/^!groove$/)) {
+	   				console.debug("Groove");
+					var user = data.user._id;
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "https://stats.thephish.fm/api/getGrooveStatus.php",
+						success: function(data){
+							console.debug('groove',data);
+							var json = JSON.parse(data);
+							if(json.success) {
+								var groove_status = json.groove_open ? "Open Mike's Groove" : "Last Mike's Groove";
+								var started_or_ended = json.groove_open ? "started" : "ended";
+								var started_or_ended_since = json.groove_open ? json.start_since : json.end_since;
+								var duration = json.duration_time;
+
+								var response = groove_status + '  ' + started_or_ended + ' ' + started_or_ended_since + '. Song count ' + json.songs.list.length + ', duration ' + duration;
+								$this.insertChat(response);
+							} else {
+								console.warn("Error in !groove", data);
+							}
+						}
+					});
+   				} else if (text.match(/^!(tdg|ghost)$/)) {
+	   				console.debug("Ghost");
+						$this.parseDate(activeSong.songInfo.name, function(showdate) {
+						if(showdate) {
+							if(activeSong.songInfo.name.match(/ghost/i)) {
+								var response = "You might be able to read about this ghost here: http://lawnmemo.com/" + showdate;
+							} else {
+								var response = "This play does not appear to contain any :ghost:s";
+							}
+						} else {
+							var response = "Showdate not detected";
+						}
+						$this.insertChat(response);
+					});
+   				} else if (text.match(/^!(replay|event)/)) {
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "https://stats.thephish.fm/api/get_next_replay.php",
+						success: function(data){
+							var json = JSON.parse(data);
+							if(json.success) {
+								$this.insertChat(json.response);
+							} else {
+								console.warn("Error in !replay response", data);
+							}
+						}
+					});
+   				} else if (text.match(/^!countdown/)) {
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "https://stats.thephish.fm/api/getCountdown.php",
+						success: function(data){
+							var json = JSON.parse(data);
+							$this.insertChat(json.response);
+						}
+					});
 				}
-				
 			}
 		});
 		
