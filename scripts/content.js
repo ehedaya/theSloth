@@ -14,36 +14,95 @@ TheSloth = {
 
 		Dubtrack.room.chat.model.on('change', function(model) {
 			console.debug("theSloth: Chat detected", model.toJSON());
+			var data = model.get('data');
+			var activeSong = Dubtrack.room.player.activeSong.toJSON();
+			
+			if(data && data.req && data.req.message) {
+				var text = data.req.message;
+				
+				console.debug("theSloth: Parsing message", text);
+				var matched_response = _.find($this.simpleResponses, function(r) { return text.match(r.trigger) });
+				if(matched_response) {
+					TheSloth.insertChat(matched_response.response);
+				}
+				
+				if(text.match(/^##/i)) {
+					// Log a note
+					console.debug("Sending note");
+					var payload = {
+						track_time : Dubtrack.room.player.getCurrentTime(),
+						hash : activeSong.song._id,
+						from : data.user._id,
+						message : text
+					}
+					$this.relayEvent(payload, 'chat.php');
+				} else if (text.match(/^!pnet:/)) {
+					console.debug('Responding to !pnet:');
+                    var pnet_username = escape(text.substr(6));
+                    var userid = data.user._id;
+                    var payload = { userid: userid, username: pnet_username };
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "https://stats.thephish.fm/api/update_pnet.php",
+						data: payload,
+						success: function(data){
+							(data);
+							var json = JSON.parse(data);
+							$this.insertChat(json.response);
+							$this.syncShowAttendees();
+						}
+					});
+   				} else if (text.match(/^!who(else)?/)) {
+   					console.debug("Parsing !who data");
+					var show_attendee_json = localStorage.getItem('show_attendees');
+					var show_attendees = JSON.parse(show_attendee_json);
+					$this.parseDate(activeSong.songInfo.name, function(showdate) {
+						if(showdate && show_attendees[showdate] && show_attendees[showdate].length) {
+							var attendees = show_attendees[showdate].join(", ");
+							var chat_text = "Show attendees: " + attendees;
+						} else {
+							var chat_text = "I don't know anyone who attended this show.";
+						}
+						$this.insertChat(chat_text);
+					});
+				}
+				
+			}
 		});
 		
-		Dubtrack.room.model.on('change', function(model) {
+		Dubtrack.room.player.activeSong.on('change', function(model) {
 			console.debug("theSloth: Room change detected", model.toJSON());
 			$this.relayCurrentTrack();
 		});
 	},
+	insertChat(message) {
+		console.debug("Chatting", message);
+		Dubtrack.room.chat.$('input').val(message);
+		Dubtrack.room.chat.$('button').click();
+	},
 	relayCurrentTrack: function(){
-		var $this = this;
-		$.getJSON(this.options.dubtrack.apiBase + '/room/' + this.options.dubtrack.roomId + '/playlist/active', function(response) {
-			if(response && response.code == 200) {
-				console.debug("theSloth: relayCurrentTrack - Current track", response.data);
-				$this.parseDate(response.data.songInfo.name, function(showdate) {
-					var r = response.data;
-					var payload = {
-						now_playing: {
-							cid: r.songInfo.fkid,
-							author: r.songInfo.songArtist,
-							title: r.songInfo.name,
-							format: r.songInfo.type == "soundcloud" ? 2 : 1,
-							duration: r.songInfo.songLength / 1000,
-							dj_id: r.song._user,
-							positive: r.song.updubs,
-							negative: r.song.downdubs,
-							curates: 0
-						}
-					}
-					$this.relayEvent(payload, 'now_playing.php')
-				});
+ 		var $this = this;
+		var r = Dubtrack.room.player.activeSong.toJSON();
+		$this.parseDate(r.songInfo.name, function(showdate) {
+			var payload = {
+				now_playing: {
+					cid: r.songInfo.fkid,
+					author: r.songInfo.songArtist,
+					title: r.songInfo.name,
+					format: r.songInfo.type == "soundcloud" ? 2 : 1,
+					duration: Math.floor(r.songInfo.songLength / 1000),
+					dj_id: r.song._user,
+					positive: r.song.updubs,
+					negative: r.song.downdubs,
+					curates: 0,
+					showdate: showdate,
+					hash: r.song._id,
+					created: moment(r.song.played).format('X')
+				}
 			}
+			console.debug("theSloth: relay payload", payload);
+			$this.relayEvent(payload, 'now_playing.php')
 		});
 	},
 	parseDate: function(blob, callback) {
@@ -60,35 +119,10 @@ TheSloth = {
                 callback(false);
         }
 	},	
-	parsePhishShowdate: function(callback) {
-		var self = this;
-		var now_playing = API.getMedia();
-		if(!now_playing) {
-			return false;
-		}
-		var blob = now_playing.author+now_playing.title;
-		var showlist_json = localStorage.getItem('showlist');
-		var showlist = JSON.parse(showlist_json);
-		this.parseDate(blob, function(showdate) {
-			if(showdate.length) {
-				var found_show = false;
-				$.each(showlist, function(showdate_index,venue_long) {
-					if(showdate_index == showdate) {
-						found_show = true;
-						callback(showdate);
-					}
-				});
-				if(!found_show) {
-					callback(false);
-				}
-			} else {
- 				callback(false);
-			}
-		});
-	},
 	relayEvent: function(payload, endpoint) {
-		console.debug("Relaying event", payload, endpoint);
+		var $this = this;
 		var self = this;
+		console.debug("Relaying event", payload, endpoint);
 		if(window.location.href != "https://www.dubtrack.fm/join/thephish") {
 			return false;
 		}
@@ -103,26 +137,19 @@ TheSloth = {
 				console.debug(data, response, JSON.parse(response));
 				var response_JSON = JSON.parse(response);
 				if(response_JSON && response_JSON.to_be_spoken && response_JSON.to_be_spoken.length) {
-					self.insertChat(response_JSON.to_be_spoken, {"fromID" : API.getUser()});
+					$this.insertChat(response_JSON.to_be_spoken, {"fromID" : API.getUser()});
 				}
 				if(response_JSON.db_play) {
 					var d = response_JSON.db_play;
 					if(d.show && d.show.showdate) {
-						self.now_playing_showdate = d.show.showdate;
+						$this.now_playing_showdate = d.show.showdate;
 					} else {
-						self.now_playing_showdate = null;
+						$this.now_playing_showdate = null;
 					}
-					console.log(self.now_playing_showdate);
+					console.log($this.now_playing_showdate);
 				}
 			}
 		});
-	},
-	insertChat: function(message, chatObj) {
-		console.debug("insertChat");
-// 		var user = API.getUser();
-// 		if(user.id == chatObj.uid) {
-// 			API.sendChat(message);
-// 		}
 	},	
 	simpleResponses: [],
 	fetchSimpleResponses: function() {
