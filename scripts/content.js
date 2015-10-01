@@ -14,6 +14,7 @@ TheSloth = {
 
 		Dubtrack.room.chat.model.on('change', function(model) {
 			if($this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
+				console.error("Not in correct room", Dubtrack.room.model.get('_id'));
 				return false;
 			}
 			console.debug("theSloth: Chat detected", model.toJSON());
@@ -98,10 +99,11 @@ TheSloth = {
 							}
 						}
 					});
-   				} else if (text.match(/^!phishtracks$/)) {
+   				} else if (text.match(/^!(phishtracks|setlist)$/)) {
+   					var url_base = text.indexOf("phishtracks") > 0 ? "http://phishtracks.com/shows/" : "http://phish.net/setlists/?d=";
 					$this.parseDate(activeSong.songInfo.name, function(showdate) {
 						if(showdate.length) {
-							$this.insertChat('http://www.phishtracks.com/shows/'+showdate);
+							$this.insertChat(url_base+showdate);
 						} else {
 							$this.insertChat('I don\'t know the showdate');
 						}
@@ -205,6 +207,9 @@ TheSloth = {
 			}
  		var $this = this;
 		var r = Dubtrack.room.player.activeSong.toJSON();
+		if(!r || !r.songInfo || !r.songInfo.fkid) {
+			return false;
+		}
 		$this.parseDate(r.songInfo.name, function(showdate) {
 			var payload = {
 				now_playing: {
@@ -261,7 +266,7 @@ TheSloth = {
 				console.debug(data, response, JSON.parse(response));
 				var response_JSON = JSON.parse(response);
 				if(response_JSON && response_JSON.to_be_spoken && response_JSON.to_be_spoken.length) {
-					$this.insertChat(response_JSON.to_be_spoken, {"fromID" : API.getUser()});
+					$this.insertChat(response_JSON.to_be_spoken);
 				}
 				if(response_JSON.db_play) {
 					var d = response_JSON.db_play;
