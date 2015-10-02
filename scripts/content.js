@@ -13,6 +13,7 @@ TheSloth = {
 		console.debug("theSloth: Setting up events");
 
 		Dubtrack.room.chat.model.on('change', function(model) {
+		
 			if($this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
 				console.error("Not in correct room", Dubtrack.room.model.get('_id'));
 				return false;
@@ -45,7 +46,7 @@ TheSloth = {
 					if(text.match(/on/)) {
 						$this.setPreference('autodub', 'on');
 						pref = $this.getPreference('autodub');
-					} else if (text.match(/off/)) {
+					} else if (text.match(/off/) || pref == undefined) {
 						$this.setPreference('autodub', 'off');
 						pref = $this.getPreference('autodub');								
 					}
@@ -183,8 +184,8 @@ TheSloth = {
 	},
 	insertChat(message) {
 		console.debug("Chatting", message);
-		Dubtrack.room.chat.$('input').val(message);
-		Dubtrack.room.chat.$('button').click();
+		Dubtrack.room.chat.$('input[name="message"]').val(message);
+		Dubtrack.room.chat.sendMessage();
 	},
 	getPreference: function(name) {
 		var prefName = "theSloth.preference." + name;
