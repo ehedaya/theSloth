@@ -19,11 +19,10 @@ TheSloth = {
 				return false;
 			}
 			console.debug("theSloth: Chat detected", model.toJSON());
-			var data = model.get('data');
+			var text = model.get('message');
 			var activeSong = Dubtrack.room.player.activeSong.toJSON();
 			
-			if(data && data.req && data.req.message) {
-				var text = data.req.message;
+			if(text) {
 				
 				console.debug("theSloth: Parsing message", text);
 				var matched_response = _.find($this.simpleResponses, function(r) { return text.match(r.trigger) });
