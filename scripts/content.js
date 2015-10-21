@@ -21,9 +21,10 @@ TheSloth = {
 			console.debug("theSloth: Chat detected", model.toJSON());
 			var text = model.get('message');
 			var activeSong = Dubtrack.room.player.activeSong.toJSON();
+			var chatid = model.get('chatid');
 			
-			if(text) {
-				
+			if(text && model.get('req') && this.lastSpoken != chatid) {
+				this.lastSpoken = chatid;
 				console.debug("theSloth: Parsing message", text);
 				var matched_response = _.find($this.simpleResponses, function(r) { return text.match(r.trigger) });
 				if(matched_response) {

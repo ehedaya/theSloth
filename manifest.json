@@ -1,6 +1,6 @@
 {
   "name":           "theSloth",
-  "version":        "0.7.8",
+  "version":        "0.7.10",
   "short_name":		"Stats tracking helper for dubtrack.fm/join/thephish",
   "description":    "This extension relays data about activity in dubtrack.fm/join/thephish for stats tracking purposes.",
   "browser_action" : {
