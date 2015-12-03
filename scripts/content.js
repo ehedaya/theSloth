@@ -37,7 +37,7 @@ TheSloth = {
 					var payload = {
 						track_time : Dubtrack.room.player.getCurrentTime(),
 						hash : activeSong.song._id,
-						from : data.user._id,
+						from : model.get('user')._id,
 						message : text
 					}
 					$this.relayEvent(payload, 'chat.php');
@@ -54,7 +54,7 @@ TheSloth = {
 				} else if (text.match(/^!pnet:/)) {
 					console.debug('Responding to !pnet:');
                     var pnet_username = escape(text.substr(6));
-                    var userid = data.user._id;
+                    var userid = data.model.get('user')._id;
                     var payload = { userid: userid, username: pnet_username };
 					$.ajax({
 						crossDomain:true,
@@ -111,7 +111,7 @@ TheSloth = {
 					});
    				} else if (text.match(/^!groove$/)) {
 	   				console.debug("Groove");
-					var user = data.user._id;
+					var user = data.model.get('user')._id;
 					$.ajax({
 						crossDomain:true,
 						type: "GET",
