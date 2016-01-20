@@ -54,7 +54,7 @@ TheSloth = {
 				} else if (text.match(/^!pnet:/)) {
 					console.debug('Responding to !pnet:');
                     var pnet_username = escape(text.substr(6));
-                    var userid = data.model.get('user')._id;
+                    var userid = model.get('user')._id;
                     var payload = { userid: userid, username: pnet_username };
 					$.ajax({
 						crossDomain:true,
