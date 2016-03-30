@@ -170,6 +170,19 @@ TheSloth = {
 							$this.insertChat(json.response);
 						}
 					});
+				} else if(text.match(/^!tiph/)){
+					var cached_showlist = localStorage.getItem('showlist');
+					if(cached_showlist !== undefined && cached_showlist.length > 0) {
+						var json = JSON.parse(cached_showlist);
+						var dates = _.keys(json);
+						var todayMMDD = moment().format('MM-DD');
+						var shows = _.filter(dates, function(d) { return d.substr(5).match(todayMMDD) });
+						var units = shows.length === 1 ? "show" : "shows";
+						$this.insertChat( shows.length + ' ' + units + ' on ' + moment().format('MMMM DD') + ': https://stats.thephish.fm/XXXX-' + moment().format(todayMMDD));
+					}
+				} else if(text.match(/^!/)) {
+					console.debug("Fell out");
+					$this.insertChat("!nope.");
 				}
 			}
 		});
