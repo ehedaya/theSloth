@@ -182,7 +182,6 @@ TheSloth = {
 					}
 				} else if(text.match(/^!/)) {
 					console.debug("Fell out");
-					$this.insertChat("!nope.");
 				}
 			}
 		});
