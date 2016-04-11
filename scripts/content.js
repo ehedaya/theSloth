@@ -111,7 +111,6 @@ TheSloth = {
 					});
    				} else if (text.match(/^!groove$/)) {
 	   				console.debug("Groove");
-					var user = data.model.get('user')._id;
 					$.ajax({
 						crossDomain:true,
 						type: "GET",
