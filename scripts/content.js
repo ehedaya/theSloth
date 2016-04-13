@@ -179,6 +179,18 @@ TheSloth = {
 						var units = shows.length === 1 ? "show" : "shows";
 						$this.insertChat( shows.length + ' ' + units + ' on ' + moment().format('MMMM DD') + ': https://stats.thephish.fm/XXXX-' + moment().format(todayMMDD));
 					}
+				} else if(text.match(/^!jam/)) {
+					$.ajax({
+						crossDomain:true,
+						type: "GET",
+						url: "https://stats.thephish.fm/api/getJamChart.php",
+						success: function(data){
+							var json = JSON.parse(data);
+							if(json.to_be_spoken != undefined) {
+								$this.insertChat(json.to_be_spoken);
+							}
+						}
+					});
 				} else if(text.match(/^!/)) {
 					console.debug("Fell out");
 				}
