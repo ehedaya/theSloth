@@ -13,7 +13,7 @@ TheSloth = {
 		console.debug("theSloth: Setting up events");
 
 		Dubtrack.room.chat.model.on('change', function(model) {
-		
+
 			if($this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
 				console.error("Not in correct room", Dubtrack.room.model.get('_id'));
 				return false;
@@ -22,7 +22,7 @@ TheSloth = {
 			var text = model.get('message');
 			var activeSong = Dubtrack.room.player.activeSong.toJSON();
 			var chatid = model.get('chatid');
-			
+
 			if(text && model.get('req') && this.lastSpoken != chatid) {
 				this.lastSpoken = chatid;
 				console.debug("theSloth: Parsing message", text);
@@ -30,7 +30,7 @@ TheSloth = {
 				if(matched_response) {
 					TheSloth.insertChat(matched_response.response);
 				}
-				
+
 				if(text.match(/^##/i)) {
 					// Log a note
 					console.debug("Sending note");
@@ -48,9 +48,9 @@ TheSloth = {
 						pref = $this.getPreference('autodub');
 					} else if (text.match(/off/) || pref == undefined) {
 						$this.setPreference('autodub', 'off');
-						pref = $this.getPreference('autodub');								
+						pref = $this.getPreference('autodub');
 					}
-					$this.insertChat("Autodub is " + pref); 
+					$this.insertChat("Autodub is " + pref);
 				} else if (text.match(/^!pnet:/)) {
 					console.debug('Responding to !pnet:');
                     var pnet_username = escape(text.substr(6));
@@ -191,12 +191,18 @@ TheSloth = {
 							}
 						}
 					});
+				} else if(text.match(/^!connect/)){
+					console.debug("Connect");
+					var userid = model.get('user')._id;
+					var url = "http://stats.thephish.fm/login.html?userid=" + userid;
+					var message_html = '<li class="current-chat-user"><div class="stream-item-content"><div class="activity-row"><div class="username"><span class="user-role-icon"></span>theSloth<span class="user-role"></span></div><div class="text"><p><a href="' + url + '" target="_blank">Connect your Facebook account</a></p></div><div class="meta-info"><span class="username">theSloth</span><i class="icon-dot"></i><span class="timeinfo"></span></div></div></div></li>';
+					$('.chat-main').append(message_html);
 				} else if(text.match(/^!/)) {
 					console.debug("Fell out");
 				}
 			}
 		});
-		
+
 		Dubtrack.room.player.activeSong.on('change', function(model) {
 			console.debug("theSloth: Room change detected", model.toJSON());
 			$this.relayCurrentTrack();
@@ -257,7 +263,7 @@ TheSloth = {
 	},
 	parseDate: function(blob, callback) {
         var r = /[0-9]{1,4}[\-\/\s\.\\]{1,2}[0-9]{1,2}[\-\/\s\.\\]{1,2}[0-9]{1,4}/;
-        var showdate = blob.match(r); 
+        var showdate = blob.match(r);
         if (showdate) {
                 var d = moment(showdate[0]);
                 if (d) {
@@ -268,7 +274,7 @@ TheSloth = {
         }  else {
                 callback(false);
         }
-	},	
+	},
 	relayEvent: function(payload, endpoint) {
 		if(this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
 			return false;
@@ -280,7 +286,7 @@ TheSloth = {
 			return false;
 		}
 		data = payload;
-						
+
 		$.ajax({
 			crossDomain:true,
 			type: "POST",
@@ -303,19 +309,19 @@ TheSloth = {
 				}
 			}
 		});
-	},	
+	},
 	simpleResponses: [],
 	fetchSimpleResponses: function() {
 		var $this = this;
 		$.getJSON('https://stats.thephish.fm/api/getSimpleResponses.php', function(responses) {
 			var updatedSimpleResponses = [];
-			_.each(responses, function(a) { 
+			_.each(responses, function(a) {
 				updatedSimpleResponses.push(
 					{
-						'trigger': new RegExp(a.regexp, 'i'), 
-						'response': a.response 
+						'trigger': new RegExp(a.regexp, 'i'),
+						'response': a.response
 					}
-				); 
+				);
 			});
 			console.log('Updated simple responses');
 			$this.simpleResponses = updatedSimpleResponses;
