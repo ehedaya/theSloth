@@ -11,9 +11,7 @@ TheSloth = {
 	setupEvents: function() {
 		var $this = this;
 		console.debug("theSloth: Setting up events");
-
 		Dubtrack.room.chat.model.on('change', function(model) {
-
 			if($this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
 				console.error("Not in correct room", Dubtrack.room.model.get('_id'));
 				return false;
@@ -26,7 +24,7 @@ TheSloth = {
 			if(text && model.get('req') && this.lastSpoken != chatid) {
 				this.lastSpoken = chatid;
 				console.debug("theSloth: Parsing message", text);
-				var matched_response = _.find($this.simpleResponses, function(r) { return text.match(r.trigger) });
+				var matched_response = _.find($this.simpleResponses, function(r) { return text.match(r.trigger); });
 				if(matched_response) {
 					TheSloth.insertChat(matched_response.response);
 				}
@@ -39,30 +37,29 @@ TheSloth = {
 						hash : activeSong.song._id,
 						from : model.get('user')._id,
 						message : text
-					}
+					};
 					$this.relayEvent(payload, 'chat.php');
 				} else if (text.match(/^!auto(woot|bop|dub|awesome)/)) {
 					var pref = $this.getPreference('autowoot');
 					if(text.match(/on/)) {
 						$this.setPreference('autodub', 'on');
 						pref = $this.getPreference('autodub');
-					} else if (text.match(/off/) || pref == undefined) {
+					} else if (text.match(/off/) || pref === undefined) {
 						$this.setPreference('autodub', 'off');
 						pref = $this.getPreference('autodub');
 					}
 					$this.insertChat("Autodub is " + pref);
 				} else if (text.match(/^!pnet:/)) {
 					console.debug('Responding to !pnet:');
-                    var pnet_username = escape(text.substr(6));
-                    var userid = model.get('user')._id;
-                    var payload = { userid: userid, username: pnet_username };
+          var pnet_username = escape(text.substr(6));
+          var userid = model.get('user')._id;
+          var payload = { userid: userid, username: pnet_username };
 					$.ajax({
 						crossDomain:true,
 						type: "GET",
 						url: "https://stats.thephish.fm/api/update_pnet.php",
 						data: payload,
 						success: function(data){
-							(data);
 							var json = JSON.parse(data);
 							$this.insertChat(json.response);
 							$this.syncShowAttendees();
@@ -73,11 +70,12 @@ TheSloth = {
 					var show_attendee_json = localStorage.getItem('show_attendees');
 					var show_attendees = JSON.parse(show_attendee_json);
 					$this.parseDate(activeSong.songInfo.name, function(showdate) {
+						var chat_text = false;
 						if(showdate && show_attendees[showdate] && show_attendees[showdate].length) {
 							var attendees = show_attendees[showdate].join(", ");
-							var chat_text = "Show attendees: " + attendees;
+							chat_text = "Show attendees: " + attendees;
 						} else {
-							var chat_text = "I don't know anyone who attended this show.";
+							chat_text = "I don't know anyone who attended this show.";
 						}
 						$this.insertChat(chat_text);
 					});
@@ -175,7 +173,7 @@ TheSloth = {
 						var json = JSON.parse(cached_showlist);
 						var dates = _.keys(json);
 						var todayMMDD = moment().format('MM-DD');
-						var shows = _.filter(dates, function(d) { return d.substr(5).match(todayMMDD) });
+						var shows = _.filter(dates, function(d) { return d.substr(5).match(todayMMDD); });
 						var units = shows.length === 1 ? "show" : "shows";
 						$this.insertChat( shows.length + ' ' + units + ' on ' + moment().format('MMMM DD') + ': https://stats.thephish.fm/XXXX-' + moment().format(todayMMDD));
 					}
@@ -186,17 +184,31 @@ TheSloth = {
 						url: "https://stats.thephish.fm/api/getJamChart.php",
 						success: function(data){
 							var json = JSON.parse(data);
-							if(json.to_be_spoken != undefined) {
+							if(json.to_be_spoken !== undefined) {
 								$this.insertChat(json.to_be_spoken);
 							}
 						}
 					});
 				} else if(text.match(/^!connect/)){
 					console.debug("Connect");
-					var userid = model.get('user')._id;
-					var url = "http://stats.thephish.fm/login.html?userid=" + userid;
-					var message_html = '<li class="current-chat-user"><div class="stream-item-content"><div class="activity-row"><div class="username"><span class="user-role-icon"></span>theSloth<span class="user-role"></span></div><div class="text"><p><a href="' + url + '" target="_blank">Connect your Facebook account</a></p></div><div class="meta-info"><span class="username">theSloth</span><i class="icon-dot"></i><span class="timeinfo"></span></div></div></div></li>';
-					$('.chat-main').append(message_html);
+					var user = model.get('user')._id;
+					if(user && user._id) {
+						$.ajax({
+							crossDomain:true,
+							type: "GET",
+							url: "https://stats.thephish.fm/api/preregister.php?userid=" + user._id,
+							success: function(data){
+								var json = JSON.parse(data);
+								if(json.error === false) {
+									var url = "http://stats.thephish.fm/login.html?userid=" + json.claim_token;
+									var message_html = '<li class="current-chat-user"><div class="stream-item-content"><div class="activity-row"><div class="username"><span class="user-role-icon"></span>theSloth<span class="user-role"></span></div><div class="text"><p><a href="' + url + '" target="_blank">Connect your Facebook account</a></p></div><div class="meta-info"><span class="username">theSloth</span><i class="icon-dot"></i><span class="timeinfo"></span></div></div></div></li>';
+									$('.chat-main').append(message_html);
+								}
+							}
+						});
+					} else {
+						console.error("Could not find userid");
+					}
 				} else if(text.match(/^!/)) {
 					console.debug("Fell out");
 				}
@@ -221,7 +233,7 @@ TheSloth = {
 		var val = localStorage.getItem(prefName);
 		if(val) {
 			console.debug("theSloth: getPreference", prefName, val);
-			return val
+			return val;
 		} else {
 			console.debug("theSloth: getPreference not found", prefName, val);
 		}
@@ -256,9 +268,9 @@ TheSloth = {
 					hash: r.song._id,
 					created: moment(r.song.played).format('X')
 				}
-			}
+			};
 			console.debug("theSloth: relay payload", payload);
-			$this.relayEvent(payload, 'now_playing.php')
+			$this.relayEvent(payload, 'now_playing.php');
 		});
 	},
 	parseDate: function(blob, callback) {
@@ -334,7 +346,6 @@ TheSloth = {
 			type: "GET",
 			url: "https://stats.thephish.fm/api/getAllShows.php",
 			success: function(response){
-				("Refreshed local show list");
 				localStorage.removeItem('showlist');
 				localStorage.setItem('showlist', response);
 			},
@@ -350,7 +361,6 @@ TheSloth = {
 			type: "GET",
 			url: "https://stats.thephish.fm/api/getUsersAtShow.php",
 			success: function(response){
-				("Refreshed show attendee list");
 				localStorage.removeItem('show_attendees');
 				localStorage.setItem('show_attendees', response);
 			},
@@ -362,9 +372,9 @@ TheSloth = {
 	logger: function(message) {
 		console.debug("theSloth: "+message);
 	}
-}
+};
 
-// Wait for the PlugAPI to be available before instantiating
+// Wait for the System API to be available before instantiating
 function initialize() {
 	if(Dubtrack && Dubtrack.room && Dubtrack.room.model) {
 			console.debug('theSloth: API connected.');
@@ -374,7 +384,7 @@ function initialize() {
 			TheSloth.fetchSimpleResponses();
 
 	} else {
-			console.debug('theSloth: API not connected.  Retrying....');
+		console.debug('theSloth: API not connected.  Retrying....');
 		setTimeout(initialize, 1000);
 	}
 }
