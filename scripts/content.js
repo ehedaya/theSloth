@@ -191,7 +191,7 @@ TheSloth = {
 					});
 				} else if(text.match(/^!connect/)){
 					console.debug("Connect");
-					var user = model.get('user')._id;
+					var user = model.get('user');
 					if(user && user._id) {
 						$.ajax({
 							crossDomain:true,
@@ -200,9 +200,13 @@ TheSloth = {
 							success: function(data){
 								var json = JSON.parse(data);
 								if(json.error === false) {
-									var url = "http://stats.thephish.fm/login.html?userid=" + json.claim_token;
-									var message_html = '<li class="current-chat-user"><div class="stream-item-content"><div class="activity-row"><div class="username"><span class="user-role-icon"></span>theSloth<span class="user-role"></span></div><div class="text"><p><a href="' + url + '" target="_blank">Connect your Facebook account</a></p></div><div class="meta-info"><span class="username">theSloth</span><i class="icon-dot"></i><span class="timeinfo"></span></div></div></div></li>';
+									var url = "http://stats.thephish.fm/login.html?claim_token=" + json.claim_token;
+									var message_html = '<li class="current-chat-user"><div class="stream-item-content"><div class="activity-row"><div class="username"><span class="user-role-icon"></span>theSloth<span class="user-role"></span></div><div class="text"><p><a href="' + url + '" target="_blank">Click here to connect your Facebook account</a></p></div><div class="meta-info"><span class="username">theSloth</span><i class="icon-dot"></i><span class="timeinfo"></span></div></div></div></li>';
 									$('.chat-main').append(message_html);
+								} else {
+									if(json.message) {
+										$this.insertChat(json.message);
+									}
 								}
 							}
 						});
