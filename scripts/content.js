@@ -69,16 +69,14 @@ TheSloth = {
    					console.debug("Parsing !who data");
 					var show_attendee_json = localStorage.getItem('show_attendees');
 					var show_attendees = JSON.parse(show_attendee_json);
-					$this.parseDate(activeSong.songInfo.name, function(showdate) {
-						var chat_text = false;
-						if(showdate && show_attendees[showdate] && show_attendees[showdate].length) {
-							var attendees = show_attendees[showdate].join(", ");
-							chat_text = "Show attendees: " + attendees;
-						} else {
-							chat_text = "I don't know anyone who attended this show.";
-						}
-						$this.insertChat(chat_text);
-					});
+                    var showdate = $this.db_play && $this.db_play.show ? $this.db_play.show.showdate : undefined;
+					if(showdate && show_attendees[showdate] && show_attendees[showdate].length) {
+						var attendees = show_attendees[showdate].join(", ");
+						chat_text = "Show attendees: " + attendees;
+					} else {
+						chat_text = "I don't know anyone who attended this show.";
+					}
+					$this.insertChat(chat_text);
    				} else if (text.match(/^!last/)) {
 					$.ajax({
 						crossDomain:true,
@@ -100,13 +98,20 @@ TheSloth = {
 					});
    				} else if (text.match(/^!(phishtracks|setlist)$/)) {
    					var url_base = text.indexOf("phishtracks") > 0 ? "http://phishtracks.com/shows/" : "http://phish.net/setlists/?d=";
-					$this.parseDate(activeSong.songInfo.name, function(showdate) {
-						if(showdate.length) {
-							$this.insertChat(url_base+showdate);
-						} else {
-							$this.insertChat('I don\'t know the showdate');
-						}
-					});
+                    if($this.db_play != undefined && $this.db_play.show && $this.db_play.show.showdate) {
+                        console.debug("Used local date stored from relay");
+                        var showdate = $this.db_play.show.showdate;
+                        $this.insertChat(url_base+showdate);
+                    } else {
+                        console.debug("Parsed date");
+                        $this.parseDate(activeSong.songInfo.name, function(showdate) {
+                            if(showdate.length) {
+                                $this.insertChat(url_base+showdate);
+                            } else {
+                                $this.insertChat('I don\'t know the showdate');
+                            }
+                        });
+                    }
    				} else if (text.match(/^!groove$/)) {
 	   				console.debug("Groove");
 					$.ajax({
@@ -221,6 +226,7 @@ TheSloth = {
 
 		Dubtrack.room.player.activeSong.on('change', function(model) {
 			console.debug("theSloth: Room change detected", model.toJSON());
+            $this.db_play = undefined;
 			$this.relayCurrentTrack();
 			if($this.getPreference('autodub') == "on") {
 				$('.dubup').click();
@@ -248,9 +254,9 @@ TheSloth = {
 		return this.getPreference(prefName);
 	},
 	relayCurrentTrack: function(){
-			if(this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
-				return false;
-			}
+		if(this.options.dubtrack.roomId != Dubtrack.room.model.get('_id')) {
+			return false;
+		}
  		var $this = this;
 		var r = Dubtrack.room.player.activeSong.toJSON();
 		if(!r || !r.songInfo || !r.songInfo.fkid) {
@@ -316,12 +322,9 @@ TheSloth = {
 				}
 				if(response_JSON.db_play) {
 					var d = response_JSON.db_play;
-					if(d.show && d.show.showdate) {
-						$this.now_playing_showdate = d.show.showdate;
-					} else {
-						$this.now_playing_showdate = null;
+					if(d) {
+						$this.db_play = d;
 					}
-					console.log($this.now_playing_showdate);
 				}
 			}
 		});
