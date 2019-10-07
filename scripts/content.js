@@ -383,7 +383,7 @@ TheSloth = {
 
 // Wait for the System API to be available before instantiating
 function initialize() {
-	if(Dubtrack && Dubtrack.room && Dubtrack.room.model) {
+	if("Dubtrack" in window && "room" in Dubtrack && "chat" in Dubtrack.room && "model" in Dubtrack.room.chat) {
 			console.debug('theSloth: API connected.');
 			TheSloth.setupEvents();
 			TheSloth.syncShowCache();
