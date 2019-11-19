@@ -123,7 +123,7 @@
 	"response": "http:\/\/thephish.fm\/stream"
 }, {
 	"regexp": "^!hold$",
-	"response": "https:\/\/i.imgur.com\/7xQ6BIF.png"
+	"response": "https:\/\/i.imgur.com\/7sMLc6V.png"
 }, {
 	"regexp": "^!mcm$",
 	"response": "https:\/\/www.youtube.com\/watch?v=FCJFmL4oxPE"
